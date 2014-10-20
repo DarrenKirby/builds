@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+
+#    app-util/file.build
+#    Sun Oct 19 03:16:31 UTC 2014
+
+#    app-shell/bash/bash.build
+#    Mon Oct 20 20:24:16 UTC 2014
+
+#    Copyright:: (c) 2014 Darren Kirby
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
+
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+use lib "/usr/builds/scripts";
+use Builds;
+
+$desc     = "File contains a utility for determining types of files";
+$homepage = "http://www.darwinsys.com/file/";
+$src_url  = "ftp://ftp.astron.com/pub/file/file-$V.tar.gz";
+$md5sum   = "e3526f59023f3f7d1ffa4d541335edab";
+$category = "app-util";
+$name     = "file";
+
+$here = "$builds/$category/$name";
+
+
+sub install {
+    system("$ins_bin bin/file $ub/file");
+    system("$ins_hdr include/magic.h $ui/magic.h");
+    system("$ins_lib lib/libmagic.so.1.0.0 $ul/libmagic.so.1.0.0");
+    system("$ins_lib lib/libmagic.la $ul/libmagic.la");
+    # Make symlinks
+    system("ln -sfv $ul/libmagic.so.1.0.0 $ul/libmagic.so.1");
+    system("ln -sfv $ul/libmagic.so.1.0.0 $ul/libmagic.so");
+    system("bzip2 share/man/man1/file.1");
+    system("bzip2 share/man/man3/libmagic.3");
+    system("bzip2 share/man/man4/magic.4");
+    system("$ins_man share/man/man1/file.1.bz2 $man1");
+    system("$ins_man share/man/man3/libmagic.3.bz2 $man3");
+    system("$ins_man share/man/man4/magic.4.bz2 $man4");
+}
+
+@files = qw[/usr/bin/file
+            /usr/include/magic.h
+            /usr/lib/libmagic.so.1.0.0
+            /usr/lib/libmagic.so.1
+            /usr/lib/libmagic.so
+            /usr/lib/libmagic.la
+            /usr/share/man/man1/file.1.bz2
+            /usr/share/man/man3/libmagic.3.bz2
+            /usr/share/man/man4/magic.4.bz2
+           ]

@@ -1,0 +1,175 @@
+#!/usr/bin/perl -w
+
+#    app-arch/xz/xz.build
+#    Mon Oct 20 04:43:11 UTC 2014
+
+#    Copyright:: (c) 2014 Darren Kirby
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
+
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+use lib "/usr/builds/scripts";
+use Builds;
+
+$desc     = "The Xz package contains programs for compressing and decompressing files";
+$homepage = "http://tukaani.org/xz";
+$src_url  = "http://tukaani.org/xz/xz-$V.tar.xz";
+$md5sum   = "aa17280f4521dbeebed0fbd11cd7fa30";
+$category = "app-arch";
+$name     = "xz";
+
+$here = "$builds/$category/$name";
+
+
+sub install {
+    system("$ins_bin bin/lzmadec $ub/lzmadec");
+    system("$ins_bin bin/lzmainfo $ub/lzmainfo");
+    system("$ins_bin bin/xz $b/xz");
+    system("$ins_bin bin/xzdec $ub/xzdec");
+    system("$ins_scr bin/xzdiff $ub/xzdiff");
+    system("$ins_scr bin/xzgrep $ub/xzgrep");
+    system("$ins_scr bin/xzless $ub/xzless");
+    system("$ins_scr bin/xzmore $ub/xzmore");
+    system("ln -sfv $b/xz $b/xzcat");
+    system("ln -sfv $b/xz $b/lzma");
+    system("ln -sfv $b/xz $b/lzcat");
+    system("ln -sfv $b/xz $b/unlzma");
+    system("ln -sfv $b/xz /bin/unxz");
+    system("ln -sfv $ub/xzdiff $ub/xzcmp");
+    system("ln -sfv $ub/xzdiff $ub/lzcmp ");
+    system("ln -sfv $ub/xzdiff $ub/lzdiff");
+    system("ln -sfv $ub/xzgrep $ub/xzegrep");
+    system("ln -sfv $ub/xzgrep $ub/xzfgrep");
+    system("ln -sfv $ub/xzgrep $ub/lzegrep");
+    system("ln -sfv $ub/xzgrep $ub/lzfgrep");
+    system("ln -sfv $ub/xzgrep $ub/lzgrep");
+    system("ln -sfv $ub/xzless $ub/lzless");
+    system("ln -sfv $ub/xzmore $ub/lzmore");
+    # Header files
+    system("$ins_hdr include/lzma.h $ui/lzma.h");
+    system("mkdir -vp $ui/lzma");
+    foreach $header (`ls -1 include/lzma/`) {
+        chomp($header);
+        system("$ins_hdr include/lzma/$header $ui/lzma/$header");
+    }
+    # libraries
+    system("$ins_lib lib/liblzma.la $ul/liblzma.la");
+    system("$ins_lib lib/liblzma.so.5.0.5 $ul/liblzma.so.5.0.5");
+    system("ln -sfv $ul/liblzma.so.5.0.5 $ul/liblzma.so.5");
+    system("ln -sfv $ul/liblzma.so.5.0.5 $ul/liblzma.so");
+    # pkg-config .pc file
+    system("$ins_hdr lib/pkgconfig/liblzma.pc /usr/lib/pkgconfig/liblzma.pc");
+    # Manpages...
+    system("bzip2 share/man/man1/lzmainfo.1");
+    system("bzip2 share/man/man1/xz.1");
+    system("bzip2 share/man/man1/xzdec.1");
+    system("bzip2 share/man/man1/xzdiff.1");
+    system("bzip2 share/man/man1/xzgrep.1");
+    system("bzip2 share/man/man1/xzless.1");
+    system("bzip2 share/man/man1/xzmore.1");
+    system("$ins_man share/man/man1/lzmainfo.1.bz2 $man1");
+    system("$ins_man share/man/man1/xz.1.bz2 $man1");
+    system("$ins_man share/man/man1/xzdec.1.bz2 $man1");
+    system("$ins_man share/man/man1/xzdiff.1.bz2 $man1");
+    system("$ins_man share/man/man1/xzgrep.1.bz2 $man1");
+    system("$ins_man share/man/man1/xzless.1.bz2 $man1");
+    system("$ins_man share/man/man1/xzmore.1.bz2 $man1");
+    system("ln -sfv $man1/xz.1.bz2 $man1/lzcat.1");
+    system("ln -sfv $man1/xz.1.bz2 $man1/lzma.1");
+    system("ln -sfv $man1/xz.1.bz2 $man1/unlzma.1");
+    system("ln -sfv $man1/xz.1.bz2 $man1/unxz.1");
+    system("ln -sfv $man1/xz.1.bz2 $man1/xzcat.1");
+    system("ln -sfv $man1/xzdiff.1.bz2 $man1/lzcmp.1");
+    system("ln -sfv $man1/xzdiff.1.bz2 $man1/lzdiff.1");
+    system("ln -sfv $man1/xzdiff.1.bz2 $man1/xzcmp.1");
+    system("ln -sfv $man1/xzgrep.1.bz2 $man1/lzegrep.1");
+    system("ln -sfv $man1/xzgrep.1.bz2 $man1/lzfgrep.1");
+    system("ln -sfv $man1/xzgrep.1.bz2 $man1/lzgrep.1");
+    system("ln -sfv $man1/xzgrep.1.bz2 $man1/xzegrep.1");
+    system("ln -sfv $man1/xzgrep.1.bz2 $man1/xzfgrep.1");
+    system("ln -sfv $man1/xzless.1.bz2 $man1/lzless.1");
+    system("ln -sfv $man1/xzmore.1 $man1/lzmore.1");
+    system("ln -sfv $man1/xzdec.1.bz2 /usr/share/man/man1/lzmadec.1");
+
+}
+
+@files = qw[/usr/bin/lzmadec
+            /usr/bin/lzmainfo
+            /bin/xz
+            /usr/bin/xzdec
+            /usr/bin/xzdiff
+            /usr/bin/xzgrep
+            /usr/bin/xzless
+            /usr/bin/xzmore
+            /bin/xzcat
+            /bin/lzma
+            /bin/lzcat
+            /bin/unlzma
+            /bin/unxz
+            /usr/bin/xzcmp
+            /usr/bin/lzcmp
+            /usr/bin/lzdiff
+            /usr/bin/xzegrep
+            /usr/bin/xzfgrep
+            /usr/bin/lzegrep
+            /usr/bin/lzfgrep
+            /usr/bin/lzgrep
+            /usr/bin/lzless
+            /usr/bin/lzmore
+            /usr/include/lzma.h
+            /usr/include/lzma
+            /usr/include/lzma/base.h
+            /usr/include/lzma/bcj.h
+            /usr/include/lzma/block.h
+            /usr/include/lzma/check.h
+            /usr/include/lzma/container.h
+            /usr/include/lzma/delta.h
+            /usr/include/lzma/filter.h
+            /usr/include/lzma/hardware.h
+            /usr/include/lzma/index.h
+            /usr/include/lzma/index_hash.h
+            /usr/include/lzma/lzma.h
+            /usr/include/lzma/stream_flags.h
+            /usr/include/lzma/version.h
+            /usr/include/lzma/vli.h
+            /usr/lib/liblzma.la
+            /usr/lib/liblzma.so.5.0.5
+            /usr/lib/liblzma.so.5
+            /usr/lib/liblzma.so
+            /usr/lib/pkgconfig/liblzma.pc
+            /usr/share/man/man1/lzmainfo.1.bz2
+            /usr/share/man/man1/xz.1.bz2
+            /usr/share/man/man1/xzdec.1.bz2
+            /usr/share/man/man1/xzdiff.1.bz2
+            /usr/share/man/man1/xzgrep.1.bz2
+            /usr/share/man/man1/xzless.1.bz2
+            /usr/share/man/man1/xzmore.1.bz2
+            /usr/share/man/man1/lzcat.1
+            /usr/share/man/man1/lzma.1
+            /usr/share/man/man1/unlzma.1
+            /usr/share/man/man1/unxz.1
+            /usr/share/man/man1/xzcat.1
+            /usr/share/man/man1/lzcmp.1
+            /usr/share/man/man1/lzdiff.1
+            /usr/share/man/man1/xzcmp.1
+            /usr/share/man/man1/lzegrep.1
+            /usr/share/man/man1/lzfgrep.1
+            /usr/share/man/man1/lzgrep.1
+            /usr/share/man/man1/xzegrep.1
+            /usr/share/man/man1/xzfgrep.1
+            /usr/share/man/man1/lzless.1
+            /usr/share/man/man1/lzmore.1
+            /usr/share/man/man1/lzmadec.1
+           ]
