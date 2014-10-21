@@ -23,7 +23,7 @@ require Exporter;
 
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(bold green yellow red $builds $distfiles $conf
-                  $b $s $ub $us $ui $ul $ulb $uls $uli $ull
+                  $b $s $ub $us $ui $ul $ulb $uls $uli $ull do_dl
                   $man1 $man2 $man3 $man4 $man5 $man6 $man7 $man8
                   $ins_bin $ins_scr $ins_lib $ins_hdr $ins_man);
 
