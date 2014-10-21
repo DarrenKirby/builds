@@ -69,18 +69,6 @@ $ins_man = "install -v -o root -g root -m 644";
 # Functions used globally
 #
 
-sub do_dl {
-    if (-e "$distfiles/$_[0]") {
-        bold "Nothing to fetch...\n";
-    } else {
-        chdir $distfiles;
-        unless (system("wget $_[0]") == 0) {
-            red "fetch failed\n";
-            die;
-        }
-    }
-}
-
 # Coloured output
 sub bold {
     system('echo -en $"\\033[1;37m"');
@@ -106,4 +94,15 @@ sub red {
     system('echo -en $"\\033[0;39m"');
 }
 
+sub do_dl {
+    if (-e "$distfiles/$_[0]") {
+        bold "Nothing to fetch...\n";
+    } else {
+        chdir $distfiles;
+        unless (system("wget $_[0]") == 0) {
+            red "fetch failed\n";
+            die;
+        }
+    }
+}
 
