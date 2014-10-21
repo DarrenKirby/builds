@@ -23,9 +23,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# FIXME: magic file! And hack on manpage (or configure properly) to fix paths from
-#        temporary install directory.
-
 use lib "/usr/builds/scripts";
 use Builds;
 
@@ -38,6 +35,14 @@ $name     = "file";
 
 $here = "$builds/$category/$name";
 
+# file seems to encode the location of the magic file
+# directly into the binary (and also adds the path into
+# the man-ages) so things get screwy when installing to
+# our temp root. So we use configure to install the man
+# pages and magic file directly into the live file system.
+sub configure {
+    system("./configure --prefix=$here/build --datarootdir=/usr/share");
+}
 
 sub install {
     system("$ins_bin bin/file $ub/file");
@@ -47,12 +52,11 @@ sub install {
     # Make symlinks
     system("ln -sfv $ul/libmagic.so.1.0.0 $ul/libmagic.so.1");
     system("ln -sfv $ul/libmagic.so.1.0.0 $ul/libmagic.so");
-    system("bzip2 share/man/man1/file.1");
-    system("bzip2 share/man/man3/libmagic.3");
-    system("bzip2 share/man/man4/magic.4");
-    system("$ins_man share/man/man1/file.1.bz2 $man1");
-    system("$ins_man share/man/man3/libmagic.3.bz2 $man3");
-    system("$ins_man share/man/man4/magic.4.bz2 $man4");
+    # these have already been placed in the live file system:
+    system("bzip2 -v9 $man1/file.1");
+    system("bzip2 -v9 $man3/libmagic.3");
+    system("bzip2 -v9 $man4/magic.4");
+
 }
 
 @files = qw[/usr/bin/file
@@ -61,6 +65,8 @@ sub install {
             /usr/lib/libmagic.so.1
             /usr/lib/libmagic.so
             /usr/lib/libmagic.la
+            /usr/share/misc/
+            /usr/share/misc/magic.mgc
             /usr/share/man/man1/file.1.bz2
             /usr/share/man/man3/libmagic.3.bz2
             /usr/share/man/man4/magic.4.bz2
