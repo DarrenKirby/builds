@@ -33,7 +33,7 @@ our @EXPORT  = qw(bold green yellow red $builds $distfiles $conf
 
 # general paths
 $builds    = "/usr/builds";
-$distfiles = "/usr/ports/distfiles";
+$distfiles = "$builds/distfiles";
 $conf      = "/etc/build.conf";
 
 # Install paths
