@@ -75,18 +75,10 @@ sub fetch_wrapper {
             die;
         }
     } else {
-        if (-e "$distfiles/$PN") {
-            bold "Nothing to fetch...\n";
-        } else {
-            chdir $distfiles;
-            unless (system("wget $src_url") == 0) {
-                red "fetch failed\n";
-                die;
-            }
-            chdir $here;
-        }
+        do_dl($src_url);
     }
 
+    chdir $here;
     check_md5sum();
     green "fetch complete\n";
 }
@@ -249,6 +241,13 @@ require $build;
 # Load config file if it exists
 if (-e $conf) {
     require $conf;
+}
+
+if (defined $cflags) {
+    $ENV{'CFLAGS'} = $cflags;
+}
+if (defined $cxxflags) {
+    $ENV{'CXXFLAGS'} = $cxxflags;
 }
 
 # Another default var. Cannot be defined until

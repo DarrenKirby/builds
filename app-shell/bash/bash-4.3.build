@@ -29,6 +29,6 @@ $src_url  = "http://ftp.gnu.org/gnu/bash/bash-$P.tar.gz";
 $md5sum   = "81348932d5da294953e15d4814c74dd1";
 $category = "app-shell";
 $name     = "bash";
-$depend   = "lib-util/readline-6.3";
+$depend   = "lib-util/readline";
 
 $here = "$builds/$category/$name";

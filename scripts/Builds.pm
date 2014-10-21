@@ -1,7 +1,22 @@
-# /usr/constructs/scripts/Constructs.pm
-# Sun Oct 19 04:28:01 UTC 2014
-#
-#
+#    /usr/builds/scripts/Builds.pm
+#    Sun Oct 19 04:28:01 UTC 2014
+
+#    Copyright:: (c) 2014 Darren  Kirby
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
+
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 
 package Builds;
 require Exporter;
@@ -54,6 +69,17 @@ $ins_man = "install -v -o root -g root -m 644";
 # Functions used globally
 #
 
+sub do_dl {
+    if (-e "$distfiles/$_[0]") {
+        bold "Nothing to fetch...\n";
+    } else {
+        chdir $distfiles;
+        unless (system("wget $_[0]") == 0) {
+            red "fetch failed\n";
+            die;
+        }
+    }
+}
 
 # Coloured output
 sub bold {

@@ -23,6 +23,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+# FIXME: magic file! And hack on manpage (or configure properly) to fix paths from
+#        temporary install directory.
+
 use lib "/usr/builds/scripts";
 use Builds;
 
