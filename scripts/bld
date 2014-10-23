@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 #    /bin/bld
 #    Sun Oct 19 03:34:12 UTC 2014
@@ -25,11 +25,7 @@
 #use Posix qw(setuid);
 #setuid();
 
-use strict;
 use warnings;
-
-use vars qw($md5sum $here $MAKEOPTS $CONFIG_OPTS $command @builds_to_build
-             $src_url $PN $command $PD);
 
 use lib "/usr/builds/scripts";
 use Builds;
@@ -37,10 +33,10 @@ use Db;
 
 # This is to shut up '-w'.
 # These vars are set/used in the build file.
-$md5sum   = "";
-$here     = "";
-$MAKEOPTS = "";
-$CONFIG_OPTS = "";
+$md5sum      = undef;
+$here        = undef;
+$MAKEOPTS    = undef;
+$CONFIG_OPTS = undef;
 
 {
     my $args_n = scalar @ARGV;

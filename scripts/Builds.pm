@@ -17,7 +17,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use strict;
 use warnings;
 
 package Builds;
@@ -32,14 +31,6 @@ our @EXPORT  = qw(&bold &green &yellow &red $builds $distfiles $conf
                   &install_src_wrapper &configure_wrapper &make_wrapper
                   &make_install_wrapper &sys_install_wrapper &clean_wrapper
                   &get_tokens @valid_commands &do_download);
-
-
-use vars       qw($builds $distfiles $conf $b $s $l $ub $us $ui $ul
-                  $ulb $uls $uli $ull $man1 $man2 $man3 $man4 $man5
-                  $man6 $man7 $man8 $ins_bin $ins_scr $ins_lib $ins_hdr
-                  $ins_man @valid_commands $cflags $cxxflags $PN $md5sum
-                  $src_url $here $PD $CONFIG_OPTS $MAKEOPTS @files $build $N $V);
-
 
 # Useful variables used by all builds. These are
 # theoretically hackable to systemwide effect
