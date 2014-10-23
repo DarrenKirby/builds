@@ -24,19 +24,22 @@ package Builds;
 require Exporter;
 
 our @ISA     = qw(Exporter);
-our @EXPORT  = qw(bold green yellow red $builds $distfiles $conf
+our @EXPORT  = qw(&bold &green &yellow &red $builds $distfiles $conf
                   $b $s $ub $us $ui $ul $ulb $uls $uli $ull do_dl
                   $man1 $man2 $man3 $man4 $man5 $man6 $man7 $man8
                   $ins_bin $ins_scr $ins_lib $ins_hdr $ins_man
-                  parse_config_file check_md5sum fetch_wrapper
-                  install_src_wrapper configure_wrapper make_wrapper
-                  make_install_wrapper sys_install_wrapper clean_wrapper
-                  get_tokens @valid_commands do_download);
+                  &parse_config_file &check_md5sum &fetch_wrapper
+                  &install_src_wrapper &configure_wrapper &make_wrapper
+                  &make_install_wrapper &sys_install_wrapper &clean_wrapper
+                  &get_tokens @valid_commands &do_download);
 
-use vars       qw($builds $distfiles $conf $b $s $l $ub $us $ui $ul
-                  $ulb $uls $uli $ull $man1 $man2 $man3 $man4 $man5
-                  $man6 $man7 $man8 $ins_bin $ins_scr $ins_lib $ins_hdr
-                  $ins_man @valid_commands);
+use vars        qw(@ISA @EXPORT $cflags $cxxflags $PN $md5sum $src_url $here
+                   $here $PD $CONFIG_OPTS $MAKEOPTS @files $build $N $V)
+
+#use vars       qw($builds $distfiles $conf $b $s $l $ub $us $ui $ul
+#                  $ulb $uls $uli $ull $man1 $man2 $man3 $man4 $man5
+#                  $man6 $man7 $man8 $ins_bin $ins_scr $ins_lib $ins_hdr
+ #                 $ins_man @valid_commands);
 
 
 # Useful variables used by all builds. These are
