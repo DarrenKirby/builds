@@ -44,7 +44,7 @@ $CONFIG_OPTS = "";
     if ($args_n < 2) {
         red "bld requires one command and at least one package";
         show_usage();
-        croak;
+        die;
     }
     $command = shift @ARGV;
     while (my $x = shift @ARGV) { push @builds_to_build, $x };
@@ -53,11 +53,12 @@ $CONFIG_OPTS = "";
 unless ($command ~~ @valid_commands) {
     red "$command is not a valid command";
     show_usage();
-    croak;
+    die;
 }
 
 foreach my $build (@builds_to_build) {
     &get_tokens();
+    &parse_config_file();
     # Source the build file we are going to install
     require $build;
 

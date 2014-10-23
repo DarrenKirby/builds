@@ -28,10 +28,15 @@ our @EXPORT  = qw(bold green yellow red $builds $distfiles $conf
                   $b $s $ub $us $ui $ul $ulb $uls $uli $ull do_dl
                   $man1 $man2 $man3 $man4 $man5 $man6 $man7 $man8
                   $ins_bin $ins_scr $ins_lib $ins_hdr $ins_man
-                  do_conf check_md5sum fetch_wrapper install_src_wrapper
-                  configure_wrapper make_wrapper make_install_wrapper
-                  sys_install_wrapper clean_wrapper get_tokens
-                  @valid_commands);
+                  parse_config_file check_md5sum fetch_wrapper
+                  install_src_wrapper configure_wrapper make_wrapper
+                  make_install_wrapper sys_install_wrapper clean_wrapper
+                  get_tokens @valid_commands do_download);
+
+use vars       qw($builds $distfiles $conf $b $s $l $ub $us $ui $ul
+                  $ulb $uls $uli $ull $man1 $man2 $man3 $man4 $man5
+                  $man6 $man7 $man8 $ins_bin $ins_scr $ins_lib $ins_hdr
+                  $ins_man @valid_commands);
 
 
 # Useful variables used by all builds. These are
@@ -73,8 +78,8 @@ $ins_hdr = "install -v -o root -g root -m 644";
 $ins_man = "install -v -o root -g root -m 644";
 
 # Valid commands
-@valid_commands = qw/install fetch install_src configure 
-                     make make_install sys_install clean/
+@valid_commands = qw/install fetch install_src configure
+                     make make_install sys_install clean/;
 
 
 # Functions used globally
@@ -106,7 +111,7 @@ sub red {
 }
 
 # Download distfiles
-sub do_dl {
+sub do_download {
     if (-e "$distfiles/" . $_[0]) {
         bold "Nothing to fetch...\n";
     } else {
@@ -119,7 +124,7 @@ sub do_dl {
 }
 
 # Check for a config file and parse it if it exists
-sub do_conf {
+sub parse_config_file {
     if (-e $conf) {
         require $conf;
     }
@@ -161,7 +166,7 @@ sub fetch_wrapper {
             die;
         }
     } else {
-        do_dl($src_url);
+        do_download($src_url);
     }
 
     chdir $here;

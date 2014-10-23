@@ -25,6 +25,8 @@ require Exporter;
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(format_time $db_path);
 
+use vars       qw($db_path);
+
 $db_path    = "/var/lib/builds";
 
 sub add_to_db {
