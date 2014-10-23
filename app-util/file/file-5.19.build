@@ -53,9 +53,9 @@ sub install {
     system("ln -sfv $ul/libmagic.so.1.0.0 $ul/libmagic.so.1");
     system("ln -sfv $ul/libmagic.so.1.0.0 $ul/libmagic.so");
     # these have already been placed in the live file system:
-    system("bzip2 -v9 $man1/file.1");
-    system("bzip2 -v9 $man3/libmagic.3");
-    system("bzip2 -v9 $man4/magic.4");
+    system("bzip2 -9 $man1/file.1");
+    system("bzip2 -9 $man3/libmagic.3");
+    system("bzip2 -9 $man4/magic.4");
 
 }
 
