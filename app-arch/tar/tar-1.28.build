@@ -21,7 +21,7 @@
 
 
 use lib "/usr/builds/scripts";
-use Build;
+use Builds;
 
 $desc     = "Tar provides the ability to create tar archives";
 $homepage = "http://http://www.gnu.org/software/tar/";
