@@ -28,6 +28,9 @@
 use strict;
 use warnings;
 
+use vars qw($md5sum $here $MAKEOPTS $CONFIG_OPTS $command @builds_to_build
+             $src_url $PN $command $PD);
+
 use lib "/usr/builds/scripts";
 use Builds;
 use Db;
@@ -88,7 +91,7 @@ foreach my $build (@builds_to_build) {
     } else { die "No such command: $command\n";} # Should never run
 
     my $time_end = time();
-    $elapsed = $time_end - $time_start;
+    my $elapsed = $time_end - $time_start;
     my $time_s = &format_time($elapsed);
     green "Package $PD successfully installed in $time_s\n";
 }
