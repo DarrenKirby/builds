@@ -1,9 +1,9 @@
 #!/usr/bin/ruby
 
-#    /bin/bld
-#    Sun Oct 19 03:34:12 UTC 2014
+#    /usr/builds/scripts/initialize_builds_tree.rb
+#    Fri Oct 24 22:04:05 UTC 2014
 
-#    The front end to the builds source building tree
+#    A simple script to initialize the builds source building tree
 #
 #    Copyright:: (c) 2014 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -20,17 +20,31 @@
 
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+
+
+require 'etc'
+require 'dbm'
+require 'csv'
+require 'fileutils'
 
 $builds_root = "/home/bulliver/code/builds"
-$:.insert(0, "#{$builds_root}/scripts/")
-require "Builds"
 
-begin
-    do_main()
-rescue SignalException
-    red "keyboard interupt received..."
-    red "temporary build files possibly left on filesystem"
-    exit 1
+#if Etc.getlogin != "root"
+#    puts "you must be root to run this script"
+#    exit 1
+#end
+
+if File.exists? "#{$builds_root}/scripts/builds.db"
+    puts "db already initialized. To re-initialize please"
+    puts "delete #{$builds_root}/scripts/builds.dbm manually"
+    puts "and run this script again"
 end
 
+#Install 'bld' into PATH
+#Fileutils.remove_file("/usr/bin/bld", force = true)
+#Fileutils.cp("#{$builds_root}/scripts/bld","/usr/bin/bld")
+
+db = DBM.open("#{$builds_root}/scripts/builds", 0660, DMB::NEWDB)
+CSV.foreach("#{$builds_root}/scripts/builds.csv") do |row|
+    db[row.shift] = row.join(",")
+end

@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 #    app-shell/bash/bash.build
 #    Mon Oct 20 20:24:16 UTC 2014
 
@@ -19,16 +17,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+$depend = "lib-util/readline"
 
-use lib "/usr/builds/scripts";
-use Builds;
 
-$desc     = "The Bash package contains the Bourne-Again SHell";
-$homepage = "http://www.gnu.org/software/bash/";
-$src_url  = "http://ftp.gnu.org/gnu/bash/bash-$P.tar.gz";
-$md5sum   = "81348932d5da294953e15d4814c74dd1";
-$category = "app-shell";
-$name     = "bash";
-$depend   = "lib-util/readline";
-
-$here = "$builds/$category/$name";
