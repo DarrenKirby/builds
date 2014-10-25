@@ -23,7 +23,7 @@
 
 
 require 'etc'
-require 'dbm'
+require 'gdbm'
 require 'csv'
 require 'fileutils'
 
@@ -34,17 +34,17 @@ $builds_root = "/home/bulliver/code/builds"
 #    exit 1
 #end
 
-if File.exists? "#{$builds_root}/scripts/builds.db"
-    puts "db already initialized. To re-initialize please"
-    puts "delete #{$builds_root}/scripts/builds.dbm manually"
-    puts "and run this script again"
-end
+#if File.exists? "#{$builds_root}/scripts/builds.db"
+#    puts "db already initialized. To re-initialize please"
+#    puts "delete #{$builds_root}/scripts/builds.dbm manually"
+#    puts "and run this script again"
+#end
 
 #Install 'bld' into PATH
 #Fileutils.remove_file("/usr/bin/bld", force = true)
 #Fileutils.cp("#{$builds_root}/scripts/bld","/usr/bin/bld")
 
-db = DBM.open("#{$builds_root}/scripts/builds", 0660, DMB::NEWDB)
+db = GDBM.open("#{$builds_root}/scripts/builds.db", 0660, GDBM::NEWDB)
 CSV.foreach("#{$builds_root}/scripts/builds.csv") do |row|
     db[row.shift] = row.join(",")
 end

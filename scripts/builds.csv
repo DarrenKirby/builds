@@ -1,8 +1,9 @@
-bash,app-shell/bash,4.3,81348932d5da294953e15d4814c74dd1,http://www.gnu.org/software/bash/,GNU Bourne again shell
-bzip2,app-arch/bzip2,1.0.6,00b516f4704d4a7cb50a1d97e6e8e15b,http://www.bzip.org/,High-quality data compressor
-file,app-util/file,5.19,e3526f59023f3f7d1ffa4d541335edab,http://www.darwinsys.com/file/,Identify a file's type
-gzip,app-arch/gzip,1.6,da981f86677d58a106496e68de6f8995,http://www.gnu.org/software/gzip/,Standard GNU compressor
-tar,app-arch/tar,1.28,49b6306167724fe48f419a33a5beb857,http://http://www.gnu.org/software/tar/,GNU archive tool
-vim,app-editor/vim,7.4,607e135c559be642f210094ad023dc65,http://www.vim.org/,Improved vi-style editor
-xz,app-arch/xz,5.0.5,aa17280f4521dbeebed0fbd11cd7fa30,http://tukaani.org/xz,Compress or decompress .xz and .lzma files
-zlib,app-arch/zlib,1.2.8,28f1205d8dd2001f26fec1e8c2cebe37,http://www.zlib.net/,Standard compression/decompression library
+bash,app-shell/bash,4.3,81348932d5da294953e15d4814c74dd1,http://ftp.gnu.org/gnu/bash/bash-VVV.tar.gz,http://www.gnu.org/software/bash/,GNU Bourne again shell
+bzip2,app-arch/bzip2,1.0.6,00b516f4704d4a7cb50a1d97e6e8e15b,http://www.bzip.org/VVV/bzip2-VVV.tar.gz,http://www.bzip.org/,High-quality data compressor
+file,app-util/file,5.19,e3526f59023f3f7d1ffa4d541335edab,ftp://ftp.astron.com/pub/file/file-VVV.tar.gz,http://www.darwinsys.com/file/,Identify a file's type
+gzip,app-arch/gzip,1.6,da981f86677d58a106496e68de6f8995,http://ftp.gnu.org/gnu/gzip/gzip-VVV.tar.xz,http://www.gnu.org/software/gzip/,Standard GNU compressor
+readline,lib-util/readline,6.3,33c8fb279e981274f485fd91da77e94a,http://ftp.gnu.org/gnu/readline/readline-VVV.tar.gz,http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html
+tar,app-arch/tar,1.28,49b6306167724fe48f419a33a5beb857,http://ftp.gnu.org/gnu/tar/tar-VVV.tar.xz,http://http://www.gnu.org/software/tar/,GNU archive tool
+vim,app-editor/vim,7.4,607e135c559be642f210094ad023dc65,ftp://ftp.vim.org/pub/vim/unix/vim-VVV.tar.bz2,http://www.vim.org/,Improved vi-style editor
+xz,app-arch/xz,5.0.5,aa17280f4521dbeebed0fbd11cd7fa30,http://tukaani.org/xz/xz-VVV.tar.xz,http://tukaani.org/xz,Compress or decompress .xz and .lzma files
+zlib,app-arch/zlib,1.2.8,28f1205d8dd2001f26fec1e8c2cebe37,http://www.zlib.net/zlib-VVV.tar.xz,http://www.zlib.net/,Standard compression/decompression library

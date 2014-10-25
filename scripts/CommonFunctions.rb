@@ -22,6 +22,7 @@
 
 $distfiles = "#{$builds_root}/distfiles"
 $conf      = "/etc/build.conf"
+$logfile   = "/var/log/builds.log"
 
 # Install paths
 $b   = "/bin"

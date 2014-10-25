@@ -20,10 +20,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require 'CommonFunctions'
-require 'dbm'
+require 'gdbm'
 
 def resolve_dependancies(args)
-    db = DBM.open("#{$builds_root}/scripts/builds", 0666, DBM::READER)
+    db = GDBM.open("#{$builds_root}/scripts/builds.db", 0666, GDBM::READER)
     atoms = []
     packages_to_build = []
     args.each do |arg|
@@ -45,9 +45,11 @@ def resolve_dependancies(args)
     # of the scaffolding is up...
     atoms.each do |atom|
         build_file = Dir.glob("#{$builds_root}/#{atom}/*.build")
-        load build_file[0]
-        if defined? $depend
-            packages_to_build += $depend.split(",")
+        File.readlines(build_file[0]).each do |line|
+            if line.include? "depend"
+                packages_to_build += line.split[-1][1..-2].split(",")
+                break
+            end
         end
     end
     packages_to_build += atoms

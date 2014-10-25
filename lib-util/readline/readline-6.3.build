@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 #    lib-util/readline/readline.build
 #    Mon Oct 20 22:31:55 UTC 2014
 
@@ -20,52 +18,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-use lib "/usr/builds/scripts";
-use Builds;
 
-$desc     = "The Readline package is a set of libraries that offers command-line editing and history capabilities";
-$homepage = "http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html";
-$src_url  = "http://ftp.gnu.org/gnu/readline/readline-6.3.tar.gz";
-$md5sum   = "33c8fb279e981274f485fd91da77e94a";
-$category = "lib-util";
-$name     = "readline";
-$depend   = "dev-lib/ncurses";
 
-$here = "$builds/$category/$name";
-
-sub install_src {
-        chdir $here;
-        mkdir "build";
-        chdir "build";
-        unless (system("tar xf $distfiles/$PN -C .") == 0) {
-            red "source install failed!\n";
-            die;
-        }
-        chdir $PD;
-        bold "applying 'readline-6.3-upstream_fixes-2.patch'";
-        unless (system("patch -Np1 -i ../../readline-6.3-upstream_fixes-2.patch") == 0) {
-            red "patching failed!\n";
-            die;
-        }
-        system("sed -i '/MV.*old/d' Makefile.in");
-        system("sed -i '/{OLDSUFF}/c:' support/shlib-install");
-}
-
-sub make {
-    unless (system("make $MAKEOPTS SHLIB_LIBS=-lncurses") == 0) {
-        red "make failed!\n";
-        die;
-    }
-}
-
-sub make_install {
-    unless (system("make SHLIB_LIBS=-lncurses install") == 0) {
-        red "make install failed!\n";
-        die;
-    }
-}
-
-sub install {
-
-}
+# class BuildPackage
+#     def fetch
+#         puts "in readline-#{@version}.build"
+#     end
+# end
 

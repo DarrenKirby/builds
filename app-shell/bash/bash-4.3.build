@@ -19,4 +19,10 @@
 
 $depend = "lib-util/readline"
 
+# class BuildPackage
+#     def fetch
+#         puts "in bash-#{@version}.build"
+#     end
+# end
+
 

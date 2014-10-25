@@ -27,6 +27,7 @@ QUIP       = "By far the best software available for turtle stacking"
 KNOWN_COMMANDS = %w[install uninstall search info]
 
 require 'CommonFunctions'
+require 'BuildPackage'
 
 def process_cliopts()
     require 'getoptlong'
@@ -88,7 +89,12 @@ def do_main()
         builds_to_build = resolve_dependancies(args)
     end
     builds_to_build.each do |build|
+        bold("starting build for #{build}")
         bld = BuildPackage.new(build)
+        green("Fetching package")
+        bld.fetch()
+        green("fetch complete")
+    end
     #puts command
     #puts args
     #puts $man1
