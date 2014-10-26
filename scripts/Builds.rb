@@ -44,18 +44,15 @@ def process_cliopts()
         end
     rescue GetoptLong::InvalidOption
         yellow("#{cliopts.error_message}")
-        yellow("Hint: try '#{APPNAME} --help' for usage details")
-        puts
+        show_usage
         exit 1
     rescue GetoptLong::NeedlessArgument
         yellow("#{cliopts.error_message}")
-        yellow("Hint: try '#{APPNAME} --help' for usage details")
-        puts
+        show_usage
         exit 1
     rescue GetoptLong::MissingArgument
         yellow("#{cliopts.error_message}")
-        yellow("Hint: try '#{APPNAME} --help' for usage details")
-        puts
+        show_usage
         exit 1
     end
     command = ARGV.shift
@@ -69,19 +66,27 @@ def do_main()
         fd.write("#{Time.now.asctime} >>> bld started\n")
         fd.close
     }
-    puts "#{APPNAME} version #{APPVERSION} (#{QUIP})"
-    puts "Written by Darren Kirby :: d@curseofknowledge.com :: http://www.curseofknowledge.com/unix/bld/"
+    # Print the banner
+    print_green "#{APPNAME} "
+    print "version "
+    print_green "#{APPVERSION} "
+    print "("
+    print_bold "#{QUIP}"
+    puts ")"
+    puts "Written by Darren Kirby :: d@curseofknowledge.com :: http://www.curseofknowledge.com/unix/builds/"
     puts "Released under the GPL"
     puts
     command, args = process_cliopts()
 
     unless KNOWN_COMMANDS.include? command
         yellow("no such command: '#{command}'")
-        yellow("Hint: try '#{APPNAME} --help' for usage details")
+        show_usage
+        exit 1
     end
     if (command == "search") || (command == "info") && (args.length > 1)
         yellow("'#{command}' can only operate on one pkg_atom at a time")
-        yellow("Hint: try '#{APPNAME} --help' for usage details")
+        show_usage
+        exit 1
     end
 
     if command == "search"
@@ -110,9 +115,21 @@ def do_main()
         green("installing source...")
         bld.install_source()
         green("source installed")
-        green("running configure...")
-        
+        green("configuring...")
+        bld.configure()
+        green("configure complete")
+        green("running make...")
+        bld.make()
+        green("make complete")
+        green("installing to temporary root...")
+        bld.make_install()
+        green("done")
 
+        green("cleaning temporary build directory...")
+        bld.clean()
+        green("done")
+        bold("updating ld.so.cache...")
+        system("/sbin/ldconfig")
         Thread.new {
             fd = File.open($logfile, "a")
             fd.write("#{Time.now.asctime} >>> finished build for #{build}\n")
