@@ -22,7 +22,7 @@
 
 $distfiles = "#{$builds_root}/distfiles"
 $conf      = "/etc/build.conf"
-$logfile   = "/var/log/builds.log"
+$logfile   = "#{$builds_root}/builds.log"
 
 # Install paths
 $b   = "/bin"
@@ -77,6 +77,17 @@ def red(msg)
     system('echo -en $"\\033[1;31m"')
     puts ">>> #{msg}"
     system('echo -en $"\\033[0;39m"')
+end
+
+def get_elapsed(start, finish)
+    seconds = finish - start
+    if seconds < 60
+        return "#{seconds} seconds"
+    else
+        minutes = seconds / 60
+        seconds = seconds % 60
+        return "#{minutes} minute#{minutes > 1 ? "s" : ""} and #{seconds} seconds"
+    end
 end
 
 def show_usage
