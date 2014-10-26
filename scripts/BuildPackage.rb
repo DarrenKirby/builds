@@ -36,9 +36,13 @@ class BuildPackage
     end
 
     def fetch
-        puts "in main fetch!"
         Dir.chdir($distfiles)
         unless File.exists? @package
+            Thread.new {
+                fd = File.open($logfile, "a")
+                fd.write("#{Time.now.asctime} >>> downloading #{@package}\n")
+                fd.close
+            }
             system("wget #{@src_url}")
         else
             bold("nothing to download...")
@@ -51,6 +55,30 @@ class BuildPackage
         end
     end
 
+    def install_source
+        Dir.mkdir(@work_dir)
+        Dir.chdir(@work_dir)
+        unless system("tar xf #{$distfiles}/#{@package} -C .")
+            red("install source failed!")
+            exit 1
+        end
+
+    end
+
+    def configure
+    end
+
+    def make
+    end
+
+    def make_install
+    end
+
+    def install
+    end
+
+    def clean
+    end
     private
 
     def resolve_paths
