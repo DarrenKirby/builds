@@ -19,10 +19,18 @@
 
 $depend = "lib-util/readline"
 
-# class BuildPackage
-#     def fetch
-#         puts "in bash-#{@version}.build"
-#     end
-# end
+class BuildPackage
+    def install_source_post_hook
+        Dir.chdir(@package_dir)
+        bold("applying 'bash-4.3-upstream_fixes-3.patch'")
+        system("patch -Np1 -i ../../bash-4.3-upstream_fixes-3.patch")
+    end
+
+    def configure
+        Dir.chdir("#{@work_dir}/#{@package_dir}")
+        # FIXME: get bash to compile with '--with-installed-readline'
+        system("./configure --prefix=#{@work_dir} --bindir=#{@work_dir}/bin --without-bash-malloc")
+    end
+end
 
 
