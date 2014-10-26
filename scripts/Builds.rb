@@ -64,11 +64,17 @@ def process_cliopts()
 end
 
 def do_main()
+    Thread.new {
+        fd = File.open($logfile, "a")
+        fd.write("#{Time.now.asctime} >>> bld started\n")
+        fd.close
+    }
     puts "#{APPNAME} version #{APPVERSION} (#{QUIP})"
     puts "Written by Darren Kirby :: d@curseofknowledge.com :: http://www.curseofknowledge.com/unix/bld/"
     puts "Released under the GPL"
     puts
     command, args = process_cliopts()
+
     unless KNOWN_COMMANDS.include? command
         yellow("no such command: '#{command}'")
         yellow("Hint: try '#{APPNAME} --help' for usage details")
@@ -77,8 +83,8 @@ def do_main()
         yellow("'#{command}' can only operate on one pkg_atom at a time")
         yellow("Hint: try '#{APPNAME} --help' for usage details")
     end
-    if command == "search"
 
+    if command == "search"
         do_search(args[0])
     elsif command == "info"
         do_info(args[0])
@@ -88,12 +94,32 @@ def do_main()
         require 'DepResolve'
         builds_to_build = resolve_dependancies(args)
     end
+
     builds_to_build.each do |build|
+        start = Time.now.to_i
+        Thread.new {
+            fd = File.open($logfile, "a")
+            fd.write("#{Time.now.asctime} >>> starting build for #{build}\n")
+            fd.close
+        }
         bold("starting build for #{build}")
         bld = BuildPackage.new(build)
-        green("Fetching package")
+        green("fetching package...")
         bld.fetch()
         green("fetch complete")
+        green("installing source...")
+        bld.install_source()
+        green("source installed")
+        green("running configure...")
+        
+
+        Thread.new {
+            fd = File.open($logfile, "a")
+            fd.write("#{Time.now.asctime} >>> finished build for #{build}\n")
+            fd.close
+        }
+        finish = Time.now.to_i
+        bold("#{build} installed in #{get_elapsed(start, finish)}")
     end
     #puts command
     #puts args
