@@ -34,7 +34,7 @@ def resolve_dependancies(args)
                 atoms << db[arg].split(",")[0]
             else
                 red("'#{arg}' does not appear to be a valid package name")
-                yellow("hint: try \"#{APPNAME} search 'package'\"")
+                yellow("try \"#{APPNAME} search 'package'\"")
                 exit 1
             end
         end
