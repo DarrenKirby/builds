@@ -61,21 +61,45 @@ def bold(msg)
     system('echo -en $"\\033[0;39m"')
 end
 
+def print_bold(msg)
+    system('echo -en $"\\033[1;37m"')
+    print msg
+    system('echo -en $"\\033[0;39m"')
+end
+
 def green(msg)
     system('echo -en $"\\033[0;32m"')
     puts ">>>  #{msg}"
     system('echo -en $"\\033[0;39m"')
 end
 
+def print_green(msg)
+    system('echo -en $"\\033[0;32m"')
+    print msg
+    system('echo -en $"\\033[0;39m"')
+end
+
 def yellow(msg)
     system('echo -en $"\\033[1;33m"')
-    puts ">>>  #{msg}"
+    puts "***  #{msg}"
+    system('echo -en $"\\033[0;39m"')
+end
+
+def print_yellow(msg)
+    system('echo -en $"\\033[1;33m"')
+    puts msg
     system('echo -en $"\\033[0;39m"')
 end
 
 def red(msg)
     system('echo -en $"\\033[1;31m"')
-    puts ">>> #{msg}"
+    puts "!!! #{msg}"
+    system('echo -en $"\\033[0;39m"')
+end
+
+def print_red(msg)
+    system('echo -en $"\\033[1;31m"')
+    print msg
     system('echo -en $"\\033[0;39m"')
 end
 
@@ -86,7 +110,16 @@ def get_elapsed(start, finish)
     else
         minutes = seconds / 60
         seconds = seconds % 60
-        return "#{minutes} minute#{minutes > 1 ? "s" : ""} and #{seconds} seconds"
+        return "#{minutes} minute#{minutes > 1 ? "s" : ""} and #{seconds} second#{seconds > 1 ? "s" : ""}"
+    end
+end
+
+def get_package_dir
+    # Runs under the assumption that our source directory is
+    # the ONLY (real) directory present in work/. This may blow up...
+    Dir.entries.each do |entry|
+        next if entry == "." || entry == ".."
+        return entry if File.directory?(entry)
     end
 end
 
