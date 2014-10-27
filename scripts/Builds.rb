@@ -61,6 +61,8 @@ def process_cliopts()
 end
 
 def do_main()
+    do_conf()
+
     Thread.new {
         fd = File.open($logfile, "a")
         fd.write("#{Time.now.asctime} >>> bld started\n")
@@ -100,6 +102,9 @@ def do_main()
         builds_to_build = resolve_dependancies(args)
     end
 
+    n_builds   = builds_to_build.length
+    this_build = 1
+
     builds_to_build.each do |build|
         start = Time.now.to_i
         Thread.new {
@@ -107,7 +112,14 @@ def do_main()
             fd.write("#{Time.now.asctime} >>> starting build for #{build}\n")
             fd.close
         }
-        bold("starting build for #{build}")
+
+        print_bold("starting build ")
+        print_yellow(this_build)
+        print_bold(" of ")
+        print_yellow(n_builds)
+        print_bold(" #{build}\n")
+        this_build += 1
+
         bld = BuildPackage.new(build)
         green("fetching package...")
         bld.fetch()
