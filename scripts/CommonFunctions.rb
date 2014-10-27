@@ -21,7 +21,7 @@
 #
 
 $distfiles = "#{$builds_root}/distfiles"
-$conf      = "/etc/build.conf"
+$conf      = "#{$builds_root}/builds.conf"   #"/etc/build.conf"
 $logfile   = "#{$builds_root}/builds.log"
 
 # Install paths
@@ -87,7 +87,7 @@ end
 
 def print_yellow(msg)
     system('echo -en $"\\033[1;33m"')
-    puts msg
+    print msg
     system('echo -en $"\\033[0;39m"')
 end
 
@@ -117,9 +117,27 @@ end
 def get_package_dir
     # Runs under the assumption that our source directory is
     # the ONLY (real) directory present in work/. This may blow up...
-    Dir.entries.each do |entry|
+    Dir.entries(".").each do |entry|
+        red(entry)
         next if entry == "." || entry == ".."
         return entry if File.directory?(entry)
+    end
+end
+
+def do_conf
+    File.foreach($conf) do |line|
+        line.chomp!
+        key, value = line.split("=", 2)
+        case key
+        when /^([#;]|$)/
+            ;
+        when "CFLAGS"
+            $cflags = value || ""
+        when "CXXFLAGS"
+            $cxxflags = value || ""
+        when "MAKEOPTS"
+            $makeopts = value || ""
+        end
     end
 end
 
