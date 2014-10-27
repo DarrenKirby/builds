@@ -1,7 +1,12 @@
 bash,app-shell/bash,4.3,81348932d5da294953e15d4814c74dd1,http://ftp.gnu.org/gnu/bash/bash-VVV.tar.gz,http://www.gnu.org/software/bash/,GNU Bourne again shell
 bzip2,app-arch/bzip2,1.0.6,00b516f4704d4a7cb50a1d97e6e8e15b,http://www.bzip.org/VVV/bzip2-VVV.tar.gz,http://www.bzip.org/,High-quality data compressor
 file,app-util/file,5.19,e3526f59023f3f7d1ffa4d541335edab,ftp://ftp.astron.com/pub/file/file-VVV.tar.gz,http://www.darwinsys.com/file/,Identify a file's type
+gmp,sci-math/gmp,6.0.0a,1e6da4e434553d2811437aa42c7f7c76,http://ftp.gnu.org/gnu/gmp/gmp-VVV.tar.xz,http://www.gnu.org/software/gmp/,Arbitrary precision math library
 gzip,app-arch/gzip,1.6,da981f86677d58a106496e68de6f8995,http://ftp.gnu.org/gnu/gzip/gzip-VVV.tar.xz,http://www.gnu.org/software/gzip/,Standard GNU compressor
+mpc,sci-math/mpc,1.0.2,68fadff3358fb3e7976c7a398a0af4c3,http://www.multiprecision.org/mpc/download/mpc-VVV.tar.gz,http://www.multiprecision.org/,Complex number math library
+mpfr,sci-math/mpfr,3.1.2,e3d203d188b8fe60bb6578dd3152e05c,http://www.mpfr.org/mpfr-VVV/mpfr-VVV.tar.xz,http://www.mpfr.org/,Multiple precision math library
+ncurses,dev-lib/ncurses,5.9,8cb9c412e5f2d96bc6f459aa8c6282a1,http://ftp.gnu.org/gnu/ncurses/ncurses-VVV.tar.gz,http://www.gnu.org/software/ncurses/,Console display library
+pkg-config,dev-tool/pkg-config,0.28,aa3c86e67551adc3ac865160e34a2a0d,http://pkgconfig.freedesktop.org/releases/pkg-config-VVV.tar.gz,http://www.freedesktop.org/wiki/Software/pkg-config,Shared library config tool
 readline,lib-util/readline,6.3,33c8fb279e981274f485fd91da77e94a,http://ftp.gnu.org/gnu/readline/readline-VVV.tar.gz,http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html, a console display library
 tar,app-arch/tar,1.28,49b6306167724fe48f419a33a5beb857,http://ftp.gnu.org/gnu/tar/tar-VVV.tar.xz,http://http://www.gnu.org/software/tar/,GNU archive tool
 vim,app-editor/vim,7.4,607e135c559be642f210094ad023dc65,ftp://ftp.vim.org/pub/vim/unix/vim-VVV.tar.bz2,http://www.vim.org/,Improved vi-style editor
