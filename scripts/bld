@@ -29,6 +29,7 @@ require "Builds"
 begin
     do_main()
 rescue SignalException
+    puts
     red "keyboard interupt received..."
     red "temporary build files possibly left on filesystem"
     exit 1
