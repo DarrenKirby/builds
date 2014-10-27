@@ -94,6 +94,9 @@ class BuildPackage
         Dir.mkdir(@work_dir)
         Dir.chdir(@work_dir)
         system("tar xf #{$distfiles}/#{@package} -C .")
+        unless File.exists? @package_dir
+            @package_dir = get_package_dir()
+        end
 
         if self.respond_to?(:install_source_post_hook)
             self.send :install_source_post_hook
@@ -109,12 +112,7 @@ class BuildPackage
             self.configure_pre_hook
         end
 
-        Dir.chdir(@work_dir)
-        if File.exists? @package_dir
-            Dir.chdir(@package_dir)
-        else
-            Dir.chdir(get_package_dir())
-        end
+        Dir.chdir("#{@work_dir}/#{@package_dir}")
         system("./configure --prefix=#{@work_dir}")
 
         if self.respond_to?(:configure_post_hook)
@@ -131,7 +129,7 @@ class BuildPackage
             self.make_pre_hook
         end
 
-        system("make")
+        system("make #{$makeopts} CFLAGS='#{$cflags}' CXXFLAGS='#{$cxxflags}'")
 
         if self.respond_to?(:make_post_hook)
             self.make_post_hook
