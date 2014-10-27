@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-#
 #    app-editor/vim/vim.build
 #    Mon Oct 20 07:21:24 UTC 2014
 #
@@ -20,58 +18,16 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-use lib "/usr/builds/scripts";
-use Builds;
+class BuildPackage
+    def configure_pre_hook
+        Dir.chdir("#{@work_dir}/#{@package_dir}")
+        system("echo '#define SYS_VIMRC_FILE \"/etc/vimrc\"' >> src/feature.h")
+    end
+end
 
-$desc     = "The Vim package contains a powerful text editor";
-$homepage = "http://www.vim.org/";
-$src_url  = "ftp://ftp.vim.org/pub/vim/unix/vim-$V.tar.bz2";
-$md5sum   = "607e135c559be642f210094ad023dc65";
-$category = "app-editor";
-$name     = "vim";
+__END__
 
-$here = "$builds/$category/$name";
-
-
-sub install_src {
-    mkdir "build";
-    chdir "build";
-    unless (system("tar xf $distfiles/$PN -C .") == 0) {
-        red "source install failed!\n";
-        die;
-    }
-    system("mv vim74 vim-7.4"); # Ugh!!!! WHY U SO DUM VIM?
-    system('echo \'#define SYS_VIMRC_FILE "/etc/vimrc"\' >> vim-7.4/src/feature.h');
-}
-
-sub install {
-    system("$ins_bin bin/vim $ub/vim");
-    system("$ins_scr bin/vimtutor $ub/vimtutor");
-    system("$ins_bin bin/xxd $ub/xxd");
-    system("ln -sfv $ub/vim $ub/ex");
-    system("ln -sfv $ub/vim $ub/rview");
-    system("ln -sfv $ub/vim $ub/rvim");
-    system("ln -sfv $ub/vim $ub/view");
-    system("ln -sfv $ub/vim $ub/vimdiff");
-    system("bzip2 -v9 share/man/man1/evim.1");
-    system("bzip2 -v9 share/man/man1/vim.1");
-    system("bzip2 -v9 share/man/man1/vimdiff.1");
-    system("bzip2 -v9 share/man/man1/vimtutor.1");
-    system("bzip2 -v9 share/man/man1/xxd.1");
-    system("$ins_man share/man/man1/evim.1.bz2 $man1");
-    system("$ins_man share/man/man1/vim.1.bz2 $man1");
-    system("$ins_man share/man/man1/vimdiff.1.bz2 $man1");
-    system("$ins_man share/man/man1/vimtutor.1.bz2 $man1");
-    system("$ins_man share/man/man1/xxd.1.bz2 $man1");
-    system("ln -sfv $man1/vim.1.bz2 $man1/ex.1");
-    system("ln -sfv $man1/vim.1.bz2 $man1/rview.1");
-    system("ln -sfv $man1/vim.1.bz2 $man1/rvim.1");
-    system("ln -sfv $man1/vim.1.bz2 $man1/view.1");
-    system("mkdir -p /usr/share/vim/vim74/");
-    system("cp -vru share/vim/vim74/ /usr/share/vim/");
-}
-
-@files = qw[/usr/bin/vim
+files = qw[/usr/bin/vim
             /usr/bin/vimtutor
             /usr/bin/xxd
             /usr/bin/ex

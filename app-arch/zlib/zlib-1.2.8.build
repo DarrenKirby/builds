@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 #    app-arch/zlib/zlib.build
 #    Mon Oct 20 02:35:11 UTC 2014
 
@@ -20,32 +18,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-use lib "/usr/builds/scripts";
-use Builds;
+__END__
 
-$desc     = "The Zlib package contains compression and decompression routines used by some programs";
-$homepage = "http://www.zlib.net/";
-$src_url  = "http://www.zlib.net/zlib-$V.tar.xz";
-$md5sum   = "28f1205d8dd2001f26fec1e8c2cebe37";
-$category = "app-arch";
-$name     = "zlib";
-
-$here = "$builds/$category/$name";
-
-
-sub install {
-    system("$ins_hdr include/zconf.h $ui/zconf.h");
-    system("$ins_hdr include/zlib.h $ui/zlib.h");
-    system("$ins_lib lib/libz.so.1.2.8 $l/libz.so.1.2.8");
-    # Make symbolic links
-    system("ln -sfv $l/libz.so.1.2.8 $l/libz.so.1");
-    system("ln -sfv $l/libz.so.1.2.8 $l/libz.so");
-    # Man pages
-    system("bzip2 share/man/man3/zlib.3");
-    system("$ins_man share/man/man3/zlib.3.bz2 $man3");
-}
-
-@files = qw[/usr/include/zconf.h
+files = qw[/usr/include/zconf.h
             /usr/include/zlib.h
             /lib/libz.so.1.2.8
             /lib/libz.so.1

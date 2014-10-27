@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 #    app-arch/gzip/gzip.build
 #    Mon Oct 20 07:20:10 UTC 2014
 
@@ -20,65 +18,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-use lib "/usr/builds/scripts";
-use Builds;
-
-$desc     = "The Gzip package contains programs for compressing and decompressing files";
-$homepage = "http://www.gnu.org/software/gzip/";
-$src_url  = "http://ftp.gnu.org/gnu/gzip/gzip-$V.tar.xz";
-$md5sum   = "da981f86677d58a106496e68de6f8995";
-$category = "app-arch";
-$name     = "gzip";
-
-$here = "$builds/$category/$name";
-
-
-sub install {
-    system "$ins_scr bin/gunzip $b/gunzip";
-    system "$ins_scr bin/gzexe $ub/gzexe";
-    system "$ins_bin bin/gzip $b/gzip";
-    system "$ins_scr bin/uncompress $ub/uncompress";
-    system "$ins_scr bin/zcat /bin/zcat";
-    system "$ins_scr bin/zcmp $ub/zcmp";
-    system "$ins_scr bin/zdiff $ub/zdiff";
-    system "$ins_scr bin/zegrep $ub/zegrep";
-    system "$ins_scr bin/zfgrep $ub/zfgrep";
-    system "$ins_scr bin/zforce $ub/zforce";
-    system "$ins_scr bin/zgrep $ub/zgrep";
-    system "$ins_scr bin/zless $ub/zless";
-    system "$ins_scr bin/zmore $ub/zmore";
-    system "$ins_scr bin/znew $ub/znew";
-    # Manpages...
-    foreach $manpage (`ls -1 share/man/man1/`) {
-        chomp($manpage);
-        system("bzip2 share/man/man1/$manpage");
-        system("$ins_man share/man/man1/$manpage.bz2 $man1");
-    }
-}
-
-@files = qw[/bin/gunzip
-            /usr/bin/gzexe
-            /bin/gzip
-            /usr/bin/uncompress
-            /bin/zcat
-            /usr/bin/zcmp
-            /usr/bin/zdiff
-            /usr/bin/zegrep
-            /usr/bin/zfgrep
-            /usr/bin/zforce
-            /usr/bin/zgrep
-            /usr/bin/zless
-            /usr/bin/zmore
-            /usr/bin/znew
-            /usr/share/man/man1/gunzip.1.bz2
-            /usr/share/man/man1/gzexe.1.bz2
-            /usr/share/man/man1/gzip.1.bz2
-            /usr/share/man/man1/zcat.1.bz2
-            /usr/share/man/man1/zcmp.1.bz2
-            /usr/share/man/man1/zdiff.1.bz2
-            /usr/share/man/man1/zforce.1.bz2
-            /usr/share/man/man1/zgrep.1.bz2
-            /usr/share/man/man1/zless.1.bz2
-            /usr/share/man/man1/zmore.1.bz2
-            /usr/share/man/man1/znew.1.bz2
-           ]
+class BuildPackage
+    def configure
+        Dir.chdir("#{@work_dir}/#{@package_dir}")
+        system("./configure --prefix=#{@work_dir} --bindir=#{@work_dir}/bin")
+    end
+end
