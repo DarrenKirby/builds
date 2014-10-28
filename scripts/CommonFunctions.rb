@@ -54,6 +54,38 @@ $ins_lib = "install -v -o root -g root -m 755"
 $ins_hdr = "install -v -o root -g root -m 644"
 $ins_man = "install -v -o root -g root -m 644"
 
+# Install binary
+def do_bin(from, to)
+    system("install -v -o root -g root -m 755 -s #{from} #{to}")
+end
+
+# install script
+def do_scr(from, to)
+    system("install -v -o root -g root -m 755 #{from} #{to}")
+end
+
+# install library
+def do_lib(from, to)
+    system("install -v -o root -g root -m 755 #{from} #{to}")
+end
+
+# install header
+def do_hdr(from, to)
+    system("install -v -o root -g root -m 644 #{from} #{to}")
+end
+
+# install manpage
+def do_man(from, to)
+    system("bzip2 #{from}")
+    system("install -v -o root -g root -m 644 #{from}.bz2 #{to}")
+end
+
+# install symlink
+def do_sym(target, name)
+    system("ln -svf #{target} #{name}")
+end
+
+
 # Coloured output
 def bold(msg)
     system('echo -en $"\\033[1;37m"')
