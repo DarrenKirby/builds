@@ -61,7 +61,6 @@ def process_cliopts()
 end
 
 def do_main()
-    do_conf()
 
     Thread.new {
         fd = File.open($logfile, "a")
@@ -85,13 +84,14 @@ def do_main()
         show_usage
         exit 1
     end
-    if (command == "search") || (command == "info") && (args.length > 1)
+    if (command == "search")  && (args.length > 1) || (command == "info") && (args.length > 1)
         yellow("'#{command}' can only operate on one pkg_atom at a time")
         show_usage
         exit 1
     end
 
     if command == "search"
+        require 'SearchPackage'
         do_search(args[0])
     elsif command == "info"
         do_info(args[0])
@@ -102,6 +102,7 @@ def do_main()
         builds_to_build = resolve_dependancies(args)
     end
 
+    do_conf()
     n_builds   = builds_to_build.length
     this_build = 1
 
