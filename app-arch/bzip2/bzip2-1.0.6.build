@@ -40,4 +40,21 @@ class BuildPackage
     def make_install
         system("make PREFIX=#{@work_dir} install")
     end
+
+    def install
+        Dir.chdir(@work_dir)
+        do_bin "./bin/bzip2", "#{$b}/bzip2"
+        do_bin "./bin/bzip2recover", "#{$ub}/bzip2recover"
+        do_scr "./bin/bzmore", "#{$ub}/bzmore"
+        do_scr "./bin/bzdiff", "#{$ub}/bzdiff"
+        do_scr "./bin/bzgrep", "#{$ub}/bzgrep"
+        do_sym "#{$ub}/bzmore", "#{$ub}/bzless"
+        do_sym "#{$ub}/bzgrep", "#{$ub}/bzegrep"
+        do_sym "#{$ub}/bzgrep", "#{$ub}/bzfgrep"
+        do_sym "#{$ub}/bzdiff", "#{$ub}/bzcmp"
+        do_sym "#{$b}/bzip2", "#{$b}/bunzip2"
+        do_sym "#{$b}/bzip2", "#{$b}/bzcat"
+        do_hdr "./include/bzlib.h", "#{$ui}/bzlib.h"
+        
+    end
 end
