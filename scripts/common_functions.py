@@ -1,59 +1,47 @@
-#    /usr/builds/scripts/common_functions.py
-#    Wed Sep 25 01:10:46 UTC 2024
+"""
+    /usr/builds/scripts/common_functions.py
+    Wed Sep 25 23:30:16 UTC 2024
 
-#    Helper module for the builds source building tree
-#
-#    Copyright:: (c) 2024 Darren Kirby
-#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
+    Helper module for the builds source building tree
 
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+    Copyright:: (c) 2024 Darren Kirby
+    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 import hashlib
 import sys
 import subprocess as sp
 import shlex
+import os
 
 import requests
 import tqdm
-
-COLOR = COLOR or True
-BUILDS_ROOT = BUILDS_ROOT or "/usr/builds"
-DISTFILES = f"{BUILDS_ROOT}/distfiles"
-CONF      = f"{BUILDS_ROOT}/builds.conf"
-LOGFILE   = f"{BUILDS_ROOT}/builds.log"
-
-
-class clr:
-    GREEN = '\033[1;32m'
-    YELLOW = '\033[1;33m'
-    RED = '\033[1;31m'
-    BOLD = '\033[1;37m'
-    END = '\033[0;39m'
 
 
 # These are a bunch of common paths to be used in
 # tandem with the helper functions in the next section
 # Install paths
 paths = {}
-paths['b']   = "/bin"
-paths['s']   = "/sbin"
-paths['l']   = "/lib"
-paths['ub']  = "/usr/bin"
-paths['us']  = "/usr/sbin"
-paths['ui']  = "/usr/include"
-paths['ul']  = "/usr/lib"
+paths['b'] = "/bin"
+paths['s'] = "/sbin"
+paths['l'] = "/lib"
+paths['ub'] = "/usr/bin"
+paths['us'] = "/usr/sbin"
+paths['ui'] = "/usr/include"
+paths['ul'] = "/usr/lib"
 paths['ulb'] = "/usr/local/bin"
 paths['uls'] = "/usr/local/sbin"
 paths['uli'] = "/usr/local/include"
@@ -69,92 +57,152 @@ paths['man6'] = "/usr/share/man/man6"
 paths['man7'] = "/usr/share/man/man7"
 paths['man8'] = "/usr/share/man/man8"
 
+
+def get_config():
+    """Read the configuration file """
+    if not os.path.exists("scripts/builds.conf"):
+        red("Cannot find builds.conf")
+        sys.exit(-1)
+
+    _config = {}
+    with open("scripts/builds.conf","r", encoding='UTF8') as f:
+        for line in f.readlines():
+            if line.startswith("#"):
+                pass
+            elif line in ('\n', ''):
+                pass
+            else:
+                c = line.split("=")
+                _config[c[0].strip()] = c[1].strip()
+    return _config
+
+
+config = get_config()
+
+
 # These helper functions are intended to be used in the
 # make_install() function in the package.build file.
-# Install binary
 def do_bin(frm: str, to: str) -> None:
+    """Install a binary to the live filesystem"""
     try:
-        es = sp.call(shlex.split(f"install -v -o root -g root -m 755 -s {frm} {to}"))
-    except OSError:
-        red(f"Install of {frm} failed")
+        sp.run(shlex.split(f"install -S -v -o root -g root -m 755 -s {frm} {to}"), check=True)
+    except sp.CalledProcessError as e:
+        red(f"Install of {frm} failed:")
+        print(e)
+        log_fail(config['logfile'], f"install of {frm} failed.")
+        sys.exit(-1)
 
-# install script
+
 def do_scr(frm: str, to: str) -> None:
-    es = sp.call(shlex.split(f"install -v -o root -g root -m 755 {frm} {to}"))
+    """Install a script to the live filesystem"""
+    try:
+        sp.run(shlex.split(f"install -S -v -o root -g root -m 755 {frm} {to}"), check=True)
+    except sp.CalledProcessError as e:
+        red(f"Install of {frm} failed:")
+        print(e)
+        log_fail(config['logfile'], f"install of {frm} failed.")
+        sys.exit(-1)
 
 
-# install library
 def do_lib(frm: str, to: str) -> None:
-    es = sp.call(shlex.split(f"install -v -o root -g root -m 755 {frm} {to}"))
+    """Install a library to the live filesystem"""
+    try:
+        sp.run(shlex.split(f"install -S -v -o root -g root -m 755 {frm} {to}"), check=True)
+    except sp.CalledProcessError as e:
+        red(f"Install of {frm} failed:")
+        print(e)
+        log_fail(config['logfile'], f"install of {frm} failed.")
+        sys.exit(-1)
 
 
-# install header
 def do_hdr(frm: str, to: str) -> None:
-    es = sp.call(shlex.split(f"install -v -o root -g root -m 644 {frm} {to}"))
+    """Install a header file to the live filesystem"""
+    try:
+        sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm} {to}"), check=True)
+    except sp.CalledProcessError as e:
+        red(f"Install of {frm} failed:")
+        print(e)
+        log_fail(config['logfile'], f"install of {frm} failed: {e}")
+        sys.exit(-1)
 
 
-# install manpage
 def do_man(frm: str, to: str) -> None:
-    es = sp.call(shlex.split(f"bzip2 {frm}"))
-    es = sp.call(shlex.split(f"install -v -o root -g root -m 644 {frm}.bz2 {to}"))
+    """Compress and install a manpage to the live filesystem"""
+    try:
+        sp.run(shlex.split(f"bzip2 {frm}"), check=True)
+        sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm} {to}"), check=True)
+    except sp.CalledProcessError as e:
+        red(f"Install of {frm} failed:")
+        print(e)
+        log_fail(config['logfile'], f"install of {frm} failed: {e}")
+        sys.exit(-1)
 
 
-# install symlink
 def do_sym(target: str, name: str) -> None:
-    es = sp.call(shlex.split(f"ln -svf {target} {name}"))
+    """Make a symbolic link in the live filesystem"""
+    try:
+        sp.run(shlex.split(f"ln -svf {target} {name}"), check=True)
+    except sp.CalledProcessError as e:
+        red(f"Install of {name} failed:")
+        print(e)
+        log_fail(config['logfile'], f"install of {name} failed: {e}")
+        sys.exit(-1)
+
+
+clr = {
+    'green': '\033[1;32m',
+    'yellow': '\033[1;33m',
+    'red': '\033[1;31m',
+    'bold': '\033[1;37m',
+    'end': '\033[0;39m'
+}
 
 
 # Coloured output. For the following functions, the `print_x`
 # version does not include a newline.
 def bold(msg: str) -> None:
-    print(f"{clr.BOLD if COLOR else clr.END}>>>  {msg}{clr.END}")
+    """Print bold text """
+    print(f"{clr['bold'] if config['color'] else ''}>>>  {msg}{clr['end']}")
 
 
 def print_bold(msg: str) -> None:
-    print(f"{clr.BOLD}{msg}{clr.END}", end='')
+    """Print bold text with no newline """
+    print(f"{clr['bold']}{msg}{clr['end']}", end='')
 
 
 def green(msg: str) -> None:
-    print(f"{clr.GREEN}>>>  {msg}{clr.END}")
+    """Print green text """
+    print(f"{clr['green']}>>>  {msg}{clr['end']}")
 
 
 def print_green(msg: str) -> None:
-    print(f"{clr.GREEN}{msg}{clr.END}", end='')
+    """Print green text with no newline """
+    print(f"{clr['green']}{msg}{clr['end']}", end='')
 
 
 def yellow(msg: str) -> None:
-    print(f"{clr.GREEN}***  {msg}{clr.END}")
+    """Print yellow text """
+    print(f"{clr['green']}***  {msg}{clr['end']}")
 
 
 def print_yellow(msg: str) -> None:
-    print(f"{clr.YELLOW}{msg}{clr.END}", end='')
+    """Print yellow text with no newline """
+    print(f"{clr['yellow']}{msg}{clr['end']}", end='')
 
 
 def red(msg: str) -> None:
-    print(f"{clr.RED}!!!  {msg}{clr.END}")
+    """Print red text """
+    print(f"{clr['red']}!!!  {msg}{clr['end']}")
 
 
 def print_red(msg: str) -> None:
-    print(f"{clr.RED}{msg}{clr.END}", end='')
+    """Print red text with no newline """
+    print(f"{clr['red']}{msg}{clr['end']}", end='')
 
 
-# Print usage details and exit
-def show_usage() -> None:
-    print(f"""
-Usage: {APPNAME} [options] command pkg_atom [pkg_atom...]
-    General Options:
-        '-h'   or '--help'                  show usage details
-        '-f'   or '--fetch'                 download packages but do not install
-        '-p'   or '--pretend'               only show which packages would be built
-        '-a'   or '--ask'                   prompt before building packages
-
-    Commands:
-        'install'   pkg_atom [pkg_atom...]  install one or more packages and dependancies
-        'uninstall' pkg_atom                uninstall package
-        'search'    string                  search the package db for package names matching string
-        'info'      pkg_atom                print info on package if installed
-""")
-    sys.exit(0)
+def log_fail(logfile: str, message: str) -> None:
+    """Write details of installation failure to a log file"""
+    pass
 
 
 def download(url: str, filename: str) -> None:
@@ -164,23 +212,29 @@ def download(url: str, filename: str) -> None:
     This requires requests and tqdm
     """
     with open(filename, 'wb') as f:
-        with requests.get(url, stream=True) as r:
-            r.raise_for_status()
-            total = int(r.headers.get('content-length', 0))
+        try:
+            with requests.get(url, stream=True, timeout=10) as r:
+                r.raise_for_status()
+                total = int(r.headers.get('content-length', 0))
 
             # tqdm has many interesting parameters. Feel free to experiment!
-            tqdm_params = {
-                'desc': url,
-                'total': total,
-                'miniters': 1,
-                'unit': 'B',
-                'unit_scale': True,
-                'unit_divisor': 1024,
-            }
-            with tqdm.tqdm(**tqdm_params) as pb:
-                for chunk in r.iter_content(chunk_size=8192):
-                    pb.update(len(chunk))
-                    f.write(chunk)
+                tqdm_params = {
+                    'desc': url,
+                    'total': total,
+                    'miniters': 1,
+                    'unit': 'B',
+                    'unit_scale': True,
+                    'unit_divisor': 1024,
+                }
+                with tqdm.tqdm(**tqdm_params) as pb:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        pb.update(len(chunk))
+                        f.write(chunk)
+
+        except requests.exceptions.Timeout:
+            yellow("Download timed out")
+            print("Perhaps try a mirror?")
+            log_fail(config['logfile'], f"Download of {filename} timed out")
 
 
 def get_sha256sum(file_name: str) -> str:
@@ -188,4 +242,3 @@ def get_sha256sum(file_name: str) -> str:
     with open(file_name, "rb") as f:
         digest = hashlib.file_digest(f, "sha256")
         return digest.hexdigest()
-
