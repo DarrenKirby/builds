@@ -1,36 +1,41 @@
-#    /usr/builds/scripts/build_package.py
-#    Wed Sep 25 01:10:46 UTC 2024
+"""
+    /usr/builds/scripts/build_package.py
+    Wed Sep 25 23:30:16 UTC 2024
 
-#    Helper module for the builds source building tree
-#
-#    Copyright:: (c) 2024 Darren Kirby
-#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
+    Class definition of BuildPackage, which builds and installs
+    software from source code
 
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+    Copyright:: (c) 2024 Darren Kirby
+    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
-import importlib
+import importlib.util
 import dbm
 import sys
 from os import chdir, mkdir
 from os.path import exists
 from shutil import unpack_archive, rmtree
 
-import common_functions
+import common_functions as cf
 
+
+# pylint: disable=too-many-instance-attributes
 class BuildPackage:
-    def __init__(self, build):
+    """Implements the main logic for building packages"""
+    def __init__(self, build, config):
         """
          The '__init__' and '_resolve_paths' methods create a bunch of useful
          instance variables which can be used in the build scripts.
@@ -48,13 +53,20 @@ class BuildPackage:
          package     = 'tar-1.28.tar.xz'
          package_dir = 'tar-1.28'
 
-         Note that some packages untar to a non-standard directory name, that is, one
-         that cannot be sussed out from the tarball name. In these cases package_dir
-         will not be correct until the source_install phase, where it is actually un-tarred.
+         The config dictionary passed to __init__ also contains some useful
+         system-wide values:
+
+         config['builds_root'] = '/usr/builds' (default)
+         config['distfiles']   = '/usr/builds/distfiles'
+         config['db_file']     = 'builds-stable.db' (default)
+         config['logfile']     = '/usr/builds/builds.log'
+         config['cflags']      = empty by default
+         config['cxxflags']    = empty by default
         """
+        self.config = config
         self.build = build
         self.name = build.split('/')[1]
-        with dbm.open(f"{BUILDS_ROOT}/db/{db_file}") as db:
+        with dbm.open(f"{self.config['builds_root']}/db/{self.config['db_file']}") as db:
             a = db[self.name].split(",")
 
         self.version = a[1]
@@ -62,50 +74,38 @@ class BuildPackage:
         self.src_url = a[3]
 
         self._resolve_paths()
-        self.build_module = self.load_build_file()
-
-
-    def load_build_file(self):
-        """Dynamically load the package-specific build module"""
-        return load_module_from_path("build_module", self.build_file)
-
-
-    def run_buildfile_method(self, method_name):
-        """Helper method to run custom behavior if defined."""
-        if self.build_module and hasattr(self.build_file, method_name):
-            custom_method = getattr(self.build_file, method_name)
-            custom_method(self)
-
+        self.build_module = self._load_build_file()
 
     def fetch(self):
         """Fetch the package source code and check sha256sum"""
-        self.run_buildfile_method('fetch_prehook')
+        self._run_buildfile_method('fetch_prehook')
 
-        chdir(DISTFILES)
+        chdir(self.config['distfiles'])
         if exists(self.package):
-            bold(f"{self.package} already downloaded...")
+            cf.bold(f"...{self.package} already downloaded...")
         else:
-            download(self.source_url, self.package)
+            cf.bold(f"...downloading {self.package}")
+            cf.download(self.src_url, self.package)
 
-        if get_sha256sum(self.package) == self.sha256sum:
-            green("sha256sum matches ;-)")
+        print("...done. Checking sha256sum...")
+
+        if cf.get_sha256sum(self.package) == self.sha256sum:
+            cf.green("sha256sum matches ;-)")
         else:
-            red(f"sha256sum of download {self.package} does not match!")
+            cf.red(f"sha256sum of download {self.package} does not match!")
             sys.exit(-1)
 
-        self.run_buildfile_method('fetch_posthook')
-
+        self._run_buildfile_method('fetch_posthook')
 
     def install_source(self):
         """Extract the source into the work directory"""
-        self.run_buildfile_method('unpack_source_prehook')
+        self._run_buildfile_method('unpack_source_prehook')
 
         mkdir(self.work_dir)
         chdir(self.work_dir)
-        unpack_archive(f"{DISTFILES}/{self.package}", self.package_dir)
+        unpack_archive(f"{self.config['distfiles']}/{self.package}", self.package_dir)
 
-        self.run_buildfile_method('unpack_source_posthook')
-
+        self._run_buildfile_method('unpack_source_posthook')
 
     def configure(self):
         """
@@ -118,8 +118,7 @@ class BuildPackage:
             print("Nothing to configure")
 
         """
-        self.run_buildfile_method('configure_source')
-
+        self._run_buildfile_method('configure_source')
 
     def make(self):
         """
@@ -132,8 +131,7 @@ class BuildPackage:
             print("Nothing to make")
 
         """
-        self.run_buildfile_method('make_source')
-
+        self._run_buildfile_method('make_source')
 
     def make_install(self):
         """
@@ -141,8 +139,7 @@ class BuildPackage:
 
         make_install() MUST be defined in the package.build file.
         """
-        self.run_buildfile_method('make_install')
-
+        self._run_buildfile_method('make_install')
 
     def cleanup(self):
         """
@@ -151,16 +148,38 @@ class BuildPackage:
         This is also a good place to perform any other necessary
         post-installation tasks
         """
-        self.run_buildfile_method('cleanup_prehook')
+        self._run_buildfile_method('cleanup_prehook')
         chdir(self.build_dir)
         rmtree(self.work_dir)
-        self.run_buildfile_method('cleanup_posthook')
+        self._run_buildfile_method('cleanup_posthook')
 
     def _resolve_paths(self):
-        self.build_dir = f"{BUILDS_ROOT}/{self.build}"
+        self.build_dir = f"{self.config['builds_root']}/{self.build}"
         self.build_file = f"{self.build_dir}/{self.name}-{self.version}.build"
-        self.work_dir = f"{BUILDS_ROOT}/{self.build}/work"
+        self.work_dir = f"{self.config['builds_root']}/{self.build}/work"
         self.src_url = self.src_url.replace("VVV", self.version)
         self.package = self.src_url.split("/")[-1]
-        self.package_dir = f"#{self.name}-#{self.version}"
+        self.package_dir = f"{self.name}-{self.version}"
 
+    # The following methods are 'private', that is, they are
+    # not intended for use outside this class.
+
+    def _load_module_from_path(self, module_name: str, path: str):
+        """Read the package.build file and return as eecutable code"""
+        spec = importlib.util.spec_from_file_location(module_name, path)
+        if spec is None:
+            raise ImportError(f"Cannot find module at {path}")
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
+        return module
+
+    def _load_build_file(self):
+        """Dynamically load the package-specific build module"""
+        return self._load_module_from_path("build_module", self.build_file)
+
+    def _run_buildfile_method(self, method_name):
+        """Helper method to run custom behavior if defined."""
+        if self.build_module and hasattr(self.build_file, method_name):
+            custom_method = getattr(self.build_file, method_name)
+            custom_method(self)
