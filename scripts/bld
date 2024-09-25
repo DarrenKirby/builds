@@ -1,11 +1,11 @@
-#!/usr/bin/ruby
+#!/usr/bin/env python3
 
-#    /bin/bld
+#    /usr/sbin/bld
 #    Sun Oct 19 03:34:12 UTC 2014
 
 #    The front end to the builds source building tree
 #
-#    Copyright:: (c) 2014 Darren Kirby
+#    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -22,16 +22,18 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-$builds_root = "/home/bulliver/code/builds"
-$:.insert(0, "#{$builds_root}/scripts/")
-require "Builds"
+import sys
 
-begin
-    do_main()
-rescue SignalException
-    puts
-    red "keyboard interupt received..."
-    red "temporary build files possibly left on filesystem"
-    exit 1
-end
+sys.path.insert(0, '/usr/builds/scripts')
+
+import builds
+import common_functions as cf
+
+try:
+    builds.do_main()
+except KeyboardInterrupt:
+    print()
+    cf.red("keyboard interupt received...")
+    cf.red("temporary build files possibly left on filesystem")
+    sys.exit(-1)
 
