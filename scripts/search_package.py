@@ -19,8 +19,38 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
+import dbm
+
+import common_functions as cf
+
+
 def do_search(args, config):
-    pass
+    to_search = args.pkg_atom
+    match = False
+    print(config)
+    with dbm.open(config['db_file']) as db:
+        for pkg in to_search:
+            for k in db.keys():
+                name = k.decode('UTF-8')
+                val = db[k].decode('UTF-8')
+                a = val.split(",")
+                if (name.find(pkg) != -1) or (a[5].find(pkg) != -1):
+                    cf.print_bold("Category/Name ")
+                    cf.green(a[0])
+                    cf.print_bold("      Version ")
+                    cf.green(a[1])
+                    cf.print_bold("  Description ")
+                    cf.green(a[5])
+                    cf.print_bold("     Homepage ")
+                    cf.green(a[4])
+                    print()
+                    match = True
+
+    if not match:
+        print(f"Could not find package(s) matching `{', '.join(to_search)}`")
+        print()
+
 
 def do_info(args, config):
     pass
