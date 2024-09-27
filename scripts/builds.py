@@ -50,16 +50,31 @@ def process_args():
     global_parser = CustomArgumentParser(add_help=False)
     subparsers = global_parser.add_subparsers(dest="command")
 
+    # Global options
     global_parser.add_argument('-h', '--help', action='store_true')
+    global_parser.add_argument('-v', '--verbose', action='store_true')
 
+    # 'install' command options
     install_parser = subparsers.add_parser("install")
     install_parser.add_argument('-f', '--fetch', action='store_true')
     install_parser.add_argument('-p', '--pretend', action='store_true')
     install_parser.add_argument('-a', '--ask', action='store_true')
+    install_parser.add_argument("pkg_atom", action="extend", nargs="+", type=str)
 
+    # 'uninstall' command options
     uninstall_parser = subparsers.add_parser("uninstall")
+    uninstall_parser.add_argument('-p', '--pretend', action='store_true')
+    uninstall_parser.add_argument('-a', '--ask', action='store_true')
+    uninstall_parser.add_argument("pkg_atom", action="extend", nargs="+", type=str)
+
+    # 'search' command options
     search_parser = subparsers.add_parser("search")
+    search_parser.add_argument('-n', '--nameonly', action='store_true')
+    search_parser.add_argument("pkg_atom", action="extend", nargs="+", type=str)
+
+    # 'info' command options
     info_parser = subparsers.add_parser("info")
+    info_parser.add_argument("pkg_atom", action="extend", nargs="+", type=str)
 
     args = global_parser.parse_args()
     return args
@@ -81,13 +96,14 @@ def do_main():
     print("(", end='')
     cf.print_bold(f"{QUIP}")
     print(")")
+    print()
 
     args = process_args()
     if args.help:
         show_usage()
         sys.exit(0)
 
-    print(args)
+    #print(args)
 
     config = cf.get_config()
 
@@ -113,16 +129,21 @@ def do_main():
 def show_usage() -> None:
     """Prints usage details to the screen"""
     print(f"""
-Usage: {APPNAME} [options] command pkg_atom [pkg_atom...]
-    General Options:
-        '-h'   or '--help'                  show usage details
-        '-f'   or '--fetch'                 download packages but do not install
-        '-p'   or '--pretend'               only show which packages would be built
-        '-a'   or '--ask'                   prompt before building packages
+Usage: {APPNAME} [general options] command [command options] pkg_atom [pkg_atom...]
 
     Commands:
         'install'   pkg_atom [pkg_atom...]  install one or more packages and dependancies
         'uninstall' pkg_atom                uninstall package
         'search'    string                  search the package db for package names matching string
         'info'      pkg_atom                print info on packages if installed
+
+    General Options:
+        '-h'   or '--help'                  show these usage details
+        '-v'   or '--verbose'               make bld more chatty
+
+    install/uninstall Options:
+        '-f'   or '--fetch'                 download packages but do not install
+        '-p'   or '--pretend'               only show which packages would be built
+        '-a'   or '--ask'                   prompt beforeinstalling/uninstalling package
+
 """)
