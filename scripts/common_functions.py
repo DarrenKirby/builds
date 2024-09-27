@@ -58,14 +58,70 @@ paths['man7'] = "/usr/share/man/man7"
 paths['man8'] = "/usr/share/man/man8"
 
 
+clr = {
+    'green': '\033[1;32m',
+    'yellow': '\033[1;33m',
+    'red': '\033[1;31m',
+    'bold': '\033[1;37m',
+    'end': '\033[0;39m'
+}
+
+
+# Coloured output. For the following functions, the `print_x`
+# version does not include a newline.
+def bold(msg: str) -> None:
+    """Print bold text """
+    print(f"{clr['bold'] if config['color'] else ''}>>>  {msg}{clr['end']}")
+
+
+def print_bold(msg: str) -> None:
+    """Print bold text with no newline """
+    print(f"{clr['bold']}{msg}{clr['end']}", end='')
+
+
+def green(msg: str) -> None:
+    """Print green text """
+    print(f"{clr['green']}>>>  {msg}{clr['end']}")
+
+
+def print_green(msg: str) -> None:
+    """Print green text with no newline """
+    print(f"{clr['green']}{msg}{clr['end']}", end='')
+
+
+def yellow(msg: str) -> None:
+    """Print yellow text """
+    print(f"{clr['green']}***  {msg}{clr['end']}")
+
+
+def print_yellow(msg: str) -> None:
+    """Print yellow text with no newline """
+    print(f"{clr['yellow']}{msg}{clr['end']}", end='')
+
+
+def red(msg: str) -> None:
+    """Print red text """
+    print(f"{clr['red']}!!!  {msg}{clr['end']}")
+
+
+def print_red(msg: str) -> None:
+    """Print red text with no newline """
+    print(f"{clr['red']}{msg}{clr['end']}", end='')
+
+
+def log_fail(logfile: str, message: str) -> None:
+    """Write details of installation failure to a log file"""
+    pass
+
+
 def get_config():
     """Read the configuration file """
-    if not os.path.exists("scripts/builds.conf"):
+    if not os.path.exists("/Users/darrenkirby/code/builds/scripts/builds.conf"):
         red("Cannot find builds.conf")
         sys.exit(-1)
 
     _config = {}
-    with open("scripts/builds.conf","r", encoding='UTF8') as f:
+    with open("/Users/darrenkirby/code/builds/scripts/builds.conf","r", encoding='UTF8') as f:
         for line in f.readlines():
             if line.startswith("#"):
                 pass
@@ -149,60 +205,7 @@ def do_sym(target: str, name: str) -> None:
         sys.exit(-1)
 
 
-clr = {
-    'green': '\033[1;32m',
-    'yellow': '\033[1;33m',
-    'red': '\033[1;31m',
-    'bold': '\033[1;37m',
-    'end': '\033[0;39m'
-}
 
-
-# Coloured output. For the following functions, the `print_x`
-# version does not include a newline.
-def bold(msg: str) -> None:
-    """Print bold text """
-    print(f"{clr['bold'] if config['color'] else ''}>>>  {msg}{clr['end']}")
-
-
-def print_bold(msg: str) -> None:
-    """Print bold text with no newline """
-    print(f"{clr['bold']}{msg}{clr['end']}", end='')
-
-
-def green(msg: str) -> None:
-    """Print green text """
-    print(f"{clr['green']}>>>  {msg}{clr['end']}")
-
-
-def print_green(msg: str) -> None:
-    """Print green text with no newline """
-    print(f"{clr['green']}{msg}{clr['end']}", end='')
-
-
-def yellow(msg: str) -> None:
-    """Print yellow text """
-    print(f"{clr['green']}***  {msg}{clr['end']}")
-
-
-def print_yellow(msg: str) -> None:
-    """Print yellow text with no newline """
-    print(f"{clr['yellow']}{msg}{clr['end']}", end='')
-
-
-def red(msg: str) -> None:
-    """Print red text """
-    print(f"{clr['red']}!!!  {msg}{clr['end']}")
-
-
-def print_red(msg: str) -> None:
-    """Print red text with no newline """
-    print(f"{clr['red']}{msg}{clr['end']}", end='')
-
-
-def log_fail(logfile: str, message: str) -> None:
-    """Write details of installation failure to a log file"""
-    pass
 
 
 def download(url: str, filename: str) -> None:
