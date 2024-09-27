@@ -1,4 +1,4 @@
 distfiles/
 .flake8
 __pycache__/
-
+scripts/*.db
