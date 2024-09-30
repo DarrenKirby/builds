@@ -27,16 +27,19 @@ import common_functions as cf
 
 
 def do_search(args: argparse.Namespace, config: dict) -> None:
+    """Search string arguments against db names and descriptions"""
     to_search = args.pkg_atom
     match = False
-    #print(config)
+
     with dbm.open(config['db_file']) as db:
         for pkg in to_search:
             for k in db.keys():
-                if type(k) == bytes:
+                if isinstance(k, bytes):
                     name = k.decode('UTF-8')
-                val = db[k].decode('UTF-8')
+                if isinstance(db[k], bytes):
+                    val = db[k].decode('UTF-8')
                 a = val.split(",")
+
                 if (name.find(pkg) != -1) or (a[5].find(pkg) != -1):
                     cf.print_bold("Category/Name ")
                     cf.green(a[0])
@@ -56,4 +59,3 @@ def do_search(args: argparse.Namespace, config: dict) -> None:
 
 def do_info(args, config):
     pass
-
