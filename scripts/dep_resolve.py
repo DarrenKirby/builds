@@ -1,7 +1,7 @@
 #    /usr/builds/scripts/dep_resolve.py
-#    Sun Oct 19 03:34:12 UTC 2014
+#    Mon Sep 30 02:10:47 UTC 2024
 
-#    Core functionality of the bld command
+#    Naïve dependancy resolver
 #
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,5 +19,49 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-def resolve_dependencies():
-    pass
+
+import dbm
+import sys
+import glob
+
+import common_functions as cf
+
+
+def resolve_dependencies(args: list, config: dict) -> list:
+    """Translate package names into atoms, and check for dependencies"""
+    atoms = []
+    pkgs_to_build = []
+    with dbm.open(config['db_name']) as db:
+        for arg in args:
+            if arg.match('/') != -1:
+                a = db[arg.split('/')[1]].split(',')[0]
+                # atom not in db...
+                if not a == arg:
+                    cf.red(f"{arg} does not appear to be a valid package atom.")
+                    cf.yellow(f"Try: 'bld search {arg}'")
+                    sys.exit(2)
+                atoms.append(arg)
+            else:
+                try:
+                    atoms.append(db[arg].split(',')[0])
+                except IndexError:
+                    cf.red(f"'{arg}' does not appear to be a valid package name.")
+                    cf.yellow(f"Try: 'bld search {arg}'")
+                    sys.exit(2)
+    # This is a _REALLY_ naive implementation of a dependancy tree
+    # This will have to be refactored and improved when the rest
+    # of the scaffolding is up...
+    for atom in atoms:
+        build_file = glob.glob(f"{config['builds_root']}/{atom}/*.build")[0]
+        with open(build_file, 'r', encoding='UTF8') as fh:
+            lines = fh.readlines()
+            for line in lines:
+                if line.startswith('depend'):
+                    pkgs = line.split('=')[-1]
+                    for pkg in pkgs.split(','):
+                        # We do not yet distinguish between build depends and run depends,
+                        # so for now we just insert dependencies at the begining of the
+                        # list so that they get built first.
+                        pkgs_to_build.insert(0, pkg)
+    pkgs_to_build += atoms
+    return pkgs_to_build
