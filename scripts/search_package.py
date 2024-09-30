@@ -21,18 +21,20 @@
 
 
 import dbm
+import argparse
 
 import common_functions as cf
 
 
-def do_search(args, config):
+def do_search(args: argparse.Namespace, config: dict) -> None:
     to_search = args.pkg_atom
     match = False
-    print(config)
+    #print(config)
     with dbm.open(config['db_file']) as db:
         for pkg in to_search:
             for k in db.keys():
-                name = k.decode('UTF-8')
+                if type(k) == bytes:
+                    name = k.decode('UTF-8')
                 val = db[k].decode('UTF-8')
                 a = val.split(",")
                 if (name.find(pkg) != -1) or (a[5].find(pkg) != -1):
