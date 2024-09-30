@@ -34,8 +34,7 @@ if os.geteuid() != 0:
     print("not root!")
 
 with dbm.open(f'{BUILDS_ROOT}/scripts/builds-stable', 'c') as db:
-    with open(f'{BUILDS_ROOT}/scripts/builds-stable.csv', newline='') as f:
+    with open(f'{BUILDS_ROOT}/scripts/builds-stable.csv', newline='', encoding='UTF8') as f:
         reader = csv.reader(f)
         for row in reader:
             db[row[0]] = ','.join(row[1:])
-
