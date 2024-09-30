@@ -109,11 +109,6 @@ def print_red(msg: str) -> None:
     print(f"{clr['red']}{msg}{clr['end']}", end='')
 
 
-def log_fail(logfile: str, message: str) -> None:
-    """Write details of installation failure to a log file"""
-    pass
-
-
 def get_config():
     """Read the configuration file """
     if not os.path.exists("/Users/darrenkirby/code/builds/scripts/builds.conf"):
@@ -121,7 +116,7 @@ def get_config():
         sys.exit(-1)
 
     _config = {}
-    with open("/Users/darrenkirby/code/builds/scripts/builds.conf","r", encoding='UTF8') as f:
+    with open("/Users/darrenkirby/code/builds/scripts/builds.conf", "r", encoding='UTF8') as f:
         for line in f.readlines():
             if line.startswith("#"):
                 pass
@@ -205,9 +200,6 @@ def do_sym(target: str, name: str) -> None:
         sys.exit(-1)
 
 
-
-
-
 def download(url: str, filename: str) -> None:
     """
     Download package with nice progress bar
@@ -220,7 +212,6 @@ def download(url: str, filename: str) -> None:
                 r.raise_for_status()
                 total = int(r.headers.get('content-length', 0))
 
-            # tqdm has many interesting parameters. Feel free to experiment!
                 tqdm_params = {
                     'desc': url,
                     'total': total,
@@ -237,7 +228,7 @@ def download(url: str, filename: str) -> None:
         except requests.exceptions.Timeout:
             yellow("Download timed out")
             print("Perhaps try a mirror?")
-            log_fail(config['logfile'], f"Download of {filename} timed out")
+            #log_fail(config['logfile'], f"Download of {filename} timed out")
 
 
 def get_sha256sum(file_name: str) -> str:
