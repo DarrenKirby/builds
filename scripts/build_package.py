@@ -25,6 +25,7 @@
 import importlib.util
 import dbm
 import sys
+import argparse
 from os import chdir, mkdir
 from os.path import exists
 from shutil import unpack_archive, rmtree
@@ -35,7 +36,7 @@ import common_functions as cf
 # pylint: disable=too-many-instance-attributes
 class BuildPackage:
     """Implements the main logic for building packages"""
-    def __init__(self, build, config):
+    def __init__(self, build: str, config: dict, args: argparse.Namespace) -> None:
         """
          The '__init__' and '_resolve_paths' methods create a bunch of useful
          instance variables which can be used in the build scripts.
@@ -58,7 +59,7 @@ class BuildPackage:
 
          config['builds_root'] = '/usr/builds' (default)
          config['distfiles']   = '/usr/builds/distfiles'
-         config['db_file']     = 'builds-stable.db' (default)
+         config['db_file']     = 'builds-stable' (default)
          config['logfile']     = '/usr/builds/builds.log'
          config['cflags']      = empty by default
          config['cxxflags']    = empty by default
@@ -76,7 +77,7 @@ class BuildPackage:
         self._resolve_paths()
         self.build_module = self._load_build_file()
 
-    def fetch(self):
+    def fetch(self) -> None:
         """Fetch the package source code and check sha256sum"""
         self._run_buildfile_method('fetch_prehook')
 
@@ -97,43 +98,43 @@ class BuildPackage:
 
         self._run_buildfile_method('fetch_posthook')
 
-    def install_source(self):
+    def install_source(self) -> None:
         """Extract the source into the work directory"""
-        self._run_buildfile_method('unpack_source_prehook')
+        self._run_buildfile_method('install_source_prehook')
 
         mkdir(self.work_dir)
         chdir(self.work_dir)
         unpack_archive(f"{self.config['distfiles']}/{self.package}", self.package_dir)
 
-        self._run_buildfile_method('unpack_source_posthook')
+        self._run_buildfile_method('install_source_posthook')
 
-    def configure(self):
+    def configure(self) -> None:
         """
         Configure the source code and build environment
 
-        configure() MUST be defined in the package.build file. If the package
-        does not need configuration then it is good form to just do:
+        configure_source() MUST be defined in the package.build file. If the
+        package does not need configuration then it is good form to just do:
 
-        def configure():
+        def configure_source():
             print("Nothing to configure")
 
         """
         self._run_buildfile_method('configure_source')
 
-    def make(self):
+    def make(self) -> None:
         """
         Compile and link the source code.
 
-        make() MUST be defined in the package.build file. If the package
+        make_source() MUST be defined in the package.build file. If the package
         does not need to compile anything then it is good form to just do:
 
-        def make():
+        def make_source():
             print("Nothing to make")
 
         """
         self._run_buildfile_method('make_source')
 
-    def make_install(self):
+    def make_inst(self) -> None:
         """
         Install the compiled program into the live filesystem.
 
@@ -141,7 +142,7 @@ class BuildPackage:
         """
         self._run_buildfile_method('make_install')
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         """
         Remove the source tree and work directory.
 
@@ -153,7 +154,7 @@ class BuildPackage:
         rmtree(self.work_dir)
         self._run_buildfile_method('cleanup_posthook')
 
-    def _resolve_paths(self):
+    def _resolve_paths(self) -> None:
         self.build_dir = f"{self.config['builds_root']}/{self.build}"
         self.build_file = f"{self.build_dir}/{self.name}-{self.version}.build"
         self.work_dir = f"{self.config['builds_root']}/{self.build}/work"
@@ -178,7 +179,7 @@ class BuildPackage:
         """Dynamically load the package-specific build module"""
         return self._load_module_from_path("build_module", self.build_file)
 
-    def _run_buildfile_method(self, method_name):
+    def _run_buildfile_method(self, method_name: str) -> None:
         """Helper method to run custom behavior if defined."""
         if self.build_module and hasattr(self.build_file, method_name):
             custom_method = getattr(self.build_file, method_name)
