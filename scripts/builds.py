@@ -1,6 +1,6 @@
 """
     /usr/builds/scripts/builds.py
-    Wed Sep 25 23:30:16 UTC 2024
+    Mon Sep 30 03:13:31 UTC 2024
 
     Core functionality of the bld command
 
@@ -25,6 +25,7 @@
 import argparse
 import datetime
 import sys
+import logging
 
 import common_functions as cf
 import search_package
@@ -103,8 +104,6 @@ def do_main():
         show_usage()
         sys.exit(0)
 
-    #print(args)
-
     config = cf.get_config()
 
     if args.command == 'search':
@@ -117,7 +116,19 @@ def do_main():
         do_uninstall(args, config)
         sys.exit(0)
     else:
-        builds_to_build = dep_resolve.resolve_dependencies()
+        builds_to_build = dep_resolve.resolve_dependencies(args, config)
+
+    # Initialize logger
+    #   call: logging.warning("File: '%s' does not exist", filename)
+    # output: 2024-07-22 09:55 - WARNING - File 'foo.txt'does not exist
+    logging.basicConfig(
+        filename=config['logfile'],
+        encoding="utf-8",
+        filemode="a",
+        format="{asctime} - {levelname} - {message}",
+        style="%",
+        datefmt="%Y-%m-%d %H:%M",
+    )
 
     n_builds = len(builds_to_build)
     this_build = 1
@@ -144,6 +155,6 @@ Usage: {APPNAME} [general options] command [command options] pkg_atom [pkg_atom.
     install/uninstall Options:
         '-f'   or '--fetch'                 download packages but do not install
         '-p'   or '--pretend'               only show which packages would be built
-        '-a'   or '--ask'                   prompt beforeinstalling/uninstalling package
+        '-a'   or '--ask'                   prompt before installing/uninstalling package
 
 """)
