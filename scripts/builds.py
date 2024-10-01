@@ -28,6 +28,7 @@ import sys
 import logging
 
 import common_functions as cf
+import build_package
 import search_package
 import dep_resolve
 
@@ -104,6 +105,8 @@ def do_main():
         show_usage()
         sys.exit(0)
 
+    print(args)
+
     config = cf.get_config()
 
     if args.command == 'search':
@@ -125,16 +128,55 @@ def do_main():
         filename=config['logfile'],
         encoding="utf-8",
         filemode="a",
-        format="{asctime} - {levelname} - {message}",
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        #format="{asctime} - {levelname} - {message}",
         style="%",
         datefmt="%Y-%m-%d %H:%M",
+        level=logging.INFO
     )
 
     n_builds = len(builds_to_build)
     this_build = 1
 
+    cf.green("builds to build:")
+    print()
+    for name in builds_to_build:
+        cf.bold(f"{name}")
+    print()
+
     for build in builds_to_build:
+        if args.ask:
+            cont = input("...continue with these builds? [y/n]")
+            if cont in ['n', 'N']:
+                cf.red("aborting")
+                sys.exit(1)
+
+        print()
         start_time = datetime.datetime.now()
+        logging.info('Starting build of %s', build)
+
+        cf.print_bold("starting build ")
+        cf.print_green(this_build)
+        cf.print_bold(" of ")
+        cf.print_green(n_builds)
+        cf.print_bold(f" {build}\n")
+        print()
+        this_build += 1
+
+        bld = build_package.BuildPackage(build, config, args)
+        bld.fetch()
+        if args.fetch:
+            continue
+        bld.install_source()
+        bld.configure()
+        bld.make()
+        bld.make_inst()
+        bld.clean()
+
+        finish_time = datetime.datetime.now()
+        elapsed = finish_time - start_time
+        cf.bold(f"build of {build} complete in {elapsed}.")
+        logging('build of %s complete' % build)
 
 
 def show_usage() -> None:
