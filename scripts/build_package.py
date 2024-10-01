@@ -67,8 +67,8 @@ class BuildPackage:
         self.config = config
         self.build = build
         self.name = build.split('/')[1]
-        with dbm.open(f"{self.config['builds_root']}/db/{self.config['db_file']}") as db:
-            a = db[self.name].split(",")
+        with dbm.open(f"{self.config['builds_root']}/scripts/{self.config['db_file']}") as db:
+            a = db[self.name].decode().split(",")
 
         self.version = a[1]
         self.sha256sum = a[2]
@@ -80,15 +80,16 @@ class BuildPackage:
     def fetch(self) -> None:
         """Fetch the package source code and check sha256sum"""
         self._run_buildfile_method('fetch_prehook')
+        cf.bold(f"Fetching {self.package}...")
 
         chdir(self.config['distfiles'])
         if exists(self.package):
-            cf.bold(f"...{self.package} already downloaded...")
+            cf.bold(f"...{self.package} already downloaded.")
         else:
-            cf.bold(f"...downloading {self.package}")
+            cf.bold(f"Fetching {self.package}")
             cf.download(self.src_url, self.package)
 
-        print("...done. Checking sha256sum...")
+        cf.bold("Checking sha256sum...")
 
         if cf.get_sha256sum(self.package) == self.sha256sum:
             cf.green("sha256sum matches ;-)")
@@ -156,7 +157,7 @@ class BuildPackage:
 
     def _resolve_paths(self) -> None:
         self.build_dir = f"{self.config['builds_root']}/{self.build}"
-        self.build_file = f"{self.build_dir}/{self.name}-{self.version}.build"
+        self.build_file = f"{self.build_dir}/{self.name}-{self.version}.build.py"
         self.work_dir = f"{self.config['builds_root']}/{self.build}/work"
         self.src_url = self.src_url.replace("VVV", self.version)
         self.package = self.src_url.split("/")[-1]
@@ -166,7 +167,7 @@ class BuildPackage:
     # not intended for use outside this class.
 
     def _load_module_from_path(self, module_name: str, path: str):
-        """Read the package.build file and return as eecutable code"""
+        """Read the package.build file and return as executable code"""
         spec = importlib.util.spec_from_file_location(module_name, path)
         if spec is None:
             raise ImportError(f"Cannot find module at {path}")
