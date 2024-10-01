@@ -31,10 +31,11 @@ def resolve_dependencies(args: list, config: dict) -> list:
     """Translate package names into atoms, and check for dependencies"""
     atoms = []
     pkgs_to_build = []
-    with dbm.open(config['db_name']) as db:
-        for arg in args:
-            if arg.match('/') != -1:
-                a = db[arg.split('/')[1]].split(',')[0]
+    with dbm.open(config['db_file']) as db:
+        for arg in args.pkg_atom:
+            if arg.find('/') != -1:
+                a = db[arg.split('/')[1]].decode()
+                a = a.split(',')[0]
                 # atom not in db...
                 if not a == arg:
                     cf.red(f"{arg} does not appear to be a valid package atom.")
@@ -43,7 +44,8 @@ def resolve_dependencies(args: list, config: dict) -> list:
                 atoms.append(arg)
             else:
                 try:
-                    atoms.append(db[arg].split(',')[0])
+                    a = db[arg].decode()
+                    atoms.append(a.split(',')[0])
                 except IndexError:
                     cf.red(f"'{arg}' does not appear to be a valid package name.")
                     cf.yellow(f"Try: 'bld search {arg}'")
