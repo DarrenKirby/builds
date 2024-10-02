@@ -25,8 +25,9 @@
 import importlib.util
 import dbm
 import sys
+import types
 import argparse
-from os import chdir, mkdir
+import os
 from os.path import exists
 from shutil import unpack_archive, rmtree
 
@@ -35,7 +36,9 @@ import common_functions as cf
 
 # pylint: disable=too-many-instance-attributes
 class BuildPackage:
-    """Implements the main logic for building packages"""
+    """
+    Implements the main logic for building packages
+    """
     def __init__(self, build: str, config: dict, args: argparse.Namespace) -> None:
         """
          The '__init__' and '_resolve_paths' methods create a bunch of useful
@@ -49,7 +52,7 @@ class BuildPackage:
          sha256sum   = '9599b22ecd1d5787ad7d3b7bf0c59f312b3396d1e281175dd1f8a4014da621ff'
          src_url     = 'http://ftp.gnu.org/gnu/tar/tar-1.28.tar.xz'
          build_dir   = '/usr/builds/app-arch/tar'
-         build_file  = '/usr/builds/app-arch/tar/tar-1.28.build'
+         build_file  = '/usr/builds/app-arch/tar/tar-1.28.build.py'
          work_dir    = '/usr/builds/app-arch/tar/work'
          package     = 'tar-1.28.tar.xz'
          package_dir = 'tar-1.28'
@@ -75,14 +78,21 @@ class BuildPackage:
         self.src_url = a[3]
 
         self._resolve_paths()
-        self.build_module = self._load_build_file()
+
+        # Load build_file methods as a module
+        self._load_buildfile_methods()
 
     def fetch(self) -> None:
-        """Fetch the package source code and check sha256sum"""
-        self._run_buildfile_method('fetch_prehook')
+        """
+        Fetch the package source code and check sha256sum
+        """
+
+        if hasattr(self, 'fetch_prehook'):
+            self.fetch_prehook()
+
         cf.bold(f"Fetching {self.package}...")
 
-        chdir(self.config['distfiles'])
+        os.chdir(self.config['distfiles'])
         if exists(self.package):
             cf.bold(f"...{self.package} already downloaded.")
         else:
@@ -97,43 +107,50 @@ class BuildPackage:
             cf.red(f"sha256sum of download {self.package} does not match!")
             sys.exit(-1)
 
-        self._run_buildfile_method('fetch_posthook')
+        if hasattr(self, 'fetch_posthook'):
+            self.fetch_posthook()
 
     def install_source(self) -> None:
-        """Extract the source into the work directory"""
-        self._run_buildfile_method('install_source_prehook')
+        """
+        Extract the source into the work directory
+        """
 
-        mkdir(self.work_dir)
-        chdir(self.work_dir)
-        unpack_archive(f"{self.config['distfiles']}/{self.package}", self.package_dir)
+        if hasattr(self, 'install_source_prehook'):
+            self.install_source_prehook()
 
-        self._run_buildfile_method('install_source_posthook')
+        cf.bold(f"Extracting {self.package} into {self.work_dir}")
+
+        os.mkdir(self.work_dir)
+        os.chdir(self.work_dir)
+        unpack_archive(f"{self.config['distfiles']}/{self.package}", ".")
+        cf.green("Source tree installed.")
+
+        if hasattr(self, 'install_source_posthook'):
+            self.install_source_posthook()
 
     def configure(self) -> None:
         """
         Configure the source code and build environment
-
-        configure_source() MUST be defined in the package.build file. If the
-        package does not need configuration then it is good form to just do:
-
-        def configure_source():
-            print("Nothing to configure")
-
         """
-        self._run_buildfile_method('configure_source')
+        cf.bold("Configuring package...")
+        if hasattr(self, 'configure_source'):
+            self.configure_source()
+            cf.green("Package successfully configured.")
+        else:
+            cf.bold("Nothing to configure.")
+
 
     def make(self) -> None:
         """
         Compile and link the source code.
-
-        make_source() MUST be defined in the package.build file. If the package
-        does not need to compile anything then it is good form to just do:
-
-        def make_source():
-            print("Nothing to make")
-
         """
-        self._run_buildfile_method('make_source')
+        cf.bold("Running `make`...")
+
+        if hasattr(self, 'make_source'):
+            self.make_source()
+            cf.green("`make` successful.")
+        else:
+            cf.bold("Nothing to make.")
 
     def make_inst(self) -> None:
         """
@@ -141,7 +158,13 @@ class BuildPackage:
 
         make_install() MUST be defined in the package.build file.
         """
-        self._run_buildfile_method('make_install')
+        if hasattr(self, 'make_install'):
+            self.make_install()
+        else:
+            cf.red(f"{self.build_file} has no `make_install()` method defined")
+            cf.yellow("All build files must define `make_install()`")
+            self.cleanup()
+            sys.exit(5)
 
     def cleanup(self) -> None:
         """
@@ -150,12 +173,27 @@ class BuildPackage:
         This is also a good place to perform any other necessary
         post-installation tasks
         """
-        self._run_buildfile_method('cleanup_prehook')
-        chdir(self.build_dir)
+        if hasattr(self,'cleanup_prehook'):
+            self.cleanup_prehook()
+
+        cf.bold("Cleaning up work directory...")
+
+        os.chdir(self.build_dir)
         rmtree(self.work_dir)
-        self._run_buildfile_method('cleanup_posthook')
+
+        cf.green("Clean up successful")
+        cf.green(f"Build of {self.name} {self.version} complete.")
+
+        if hasattr(self, 'cleanup_posthook'):
+            self.cleanup_posthook()
+
+    # The following methods are 'private', that is, they are
+    # not intended for use outside this class.
 
     def _resolve_paths(self) -> None:
+        """
+        Resolve pathnames and create useful instance attributes.
+        """
         self.build_dir = f"{self.config['builds_root']}/{self.build}"
         self.build_file = f"{self.build_dir}/{self.name}-{self.version}.build.py"
         self.work_dir = f"{self.config['builds_root']}/{self.build}/work"
@@ -163,25 +201,40 @@ class BuildPackage:
         self.package = self.src_url.split("/")[-1]
         self.package_dir = f"{self.name}-{self.version}"
 
-    # The following methods are 'private', that is, they are
-    # not intended for use outside this class.
+    def _load_buildfile_methods(self):
+        """
+        Bind the build_file methods to the class instance
+        """
+
+        # Dynamically import the package-specific module
+        module = self._load_module_from_path('bld_mod', self.build_file)
+
+        # Inject any required globals into the module's namespace
+        module_globals = module.__dict__
+        module_globals['os'] = os  # Inject os into the namespace
+        module_globals['cf'] = cf  # Inject cf into the namespace
+
+        # Iterate over methods defined in the module
+        for name in dir(module):
+            if not name.startswith("_"):  # Ignore private methods
+                method = getattr(module, name)
+                if callable(method):
+                    # Bind the method to the class instance
+                    bound_method = types.MethodType(method, self)
+                    # Set it as a method on the class instance
+                    setattr(self, name, bound_method)
 
     def _load_module_from_path(self, module_name: str, path: str):
-        """Read the package.build file and return as executable code"""
+        """
+        Read the package.build.py file and return as a module
+        """
         spec = importlib.util.spec_from_file_location(module_name, path)
+
         if spec is None:
             raise ImportError(f"Cannot find module at {path}")
+
         module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = module
         spec.loader.exec_module(module)
+
         return module
-
-    def _load_build_file(self):
-        """Dynamically load the package-specific build module"""
-        return self._load_module_from_path("build_module", self.build_file)
-
-    def _run_buildfile_method(self, method_name: str) -> None:
-        """Helper method to run custom behavior if defined."""
-        if self.build_module and hasattr(self.build_file, method_name):
-            custom_method = getattr(self.build_file, method_name)
-            custom_method(self)
