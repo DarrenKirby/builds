@@ -27,46 +27,34 @@ depend = []
 
 
 # Use these two as pre/post hooks into the fetch process
-# def fetch_prehook():
+# def fetch_prehook(self):
 #     pass
 #
-# def fetch_posthook():
+# def fetch_posthook(self):
 #     pass
 
 
 # Use these two as pre/post hooks into the source-install process
-# def install_source_prehook():
+# def install_source_prehook(self):
 #     pass
 #
-# def install_source_posthook():
+# def install_source_posthook(self):
 #     pass
-
-
-# configure_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def configure_source():
-    print("Nothing to configure")
-
-
-# make_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def make_source():
-    print("Nothing to configure")
 
 
 # make_install MUST be defined in the build file.
 # Use the helper functions in common_functions.py
 # to install binaries, scripts, libraries, headers,
 # documentation (man pages), and to create symlinks.
-def make_install():
+def make_install(self):
     pass
 
 
 # Use these two as pre/post hooks into the cleanup process
-# def fetch_prehook():
+# def fetch_prehook(self):
 #     pass
 #
-# def fetch_posthook():
+# def fetch_posthook(self):
 #     pass
 
 
