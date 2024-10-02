@@ -1,4 +1,4 @@
-#    app-arch/tar/tar-1.35.build.py
+#    app-editor/nano/nano-8.2.build.py
 #    Fri Sep 27 20:45:32 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
@@ -18,7 +18,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
 def configure_source(self):
     os.chdir(f"{self.work_dir}/{self.package_dir}")
     os.system(f"./configure --prefix={self.work_dir} --bindir={self.work_dir}/bin")
@@ -26,16 +25,13 @@ def configure_source(self):
 def make_source(self):
     os.system("make")
 
-def install():
+def install(self):
     os.chdir(work_dir)
-    do_bin(f"./bin/tar", "{b}/tar")
-    do_bin(f"./libexec/rmt", "{sb}/rmt")
-    do_man(f"./share/man/man1/tar.1" "{man1}/tar.1.bz2")
-    do_man(f"./share/man/man8/rmt.8" "{man8}/rmt.8.bz2")
+    cf.do_bin(f"./bin/tar", "{cf.b}/tar")
+    cf.do_bin(f"./libexec/rmt", "{cf.sb}/rmt")
+    cf.do_man(f"./share/man/man1/tar.1" "{cf.man1}/tar.1.bz2")
+    cf.do_man(f"./share/man/man8/rmt.8" "{cf.man8}/rmt.8.bz2")
 
 """
-/bin/tar
-/sbin/rmt
-/usr/share/man/man1/tar.1.bz2
-/usr/share/man/man8/rmt.8.bz2
+
 """
