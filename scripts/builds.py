@@ -25,7 +25,7 @@
 import argparse
 import datetime
 import sys
-import logging
+import logging as log
 
 import common_functions as cf
 import build_package
@@ -123,8 +123,8 @@ def do_main():
 
     # Initialize logger
     #   call: logging.warning("File: '%s' does not exist", filename)
-    # output: 2024-07-22 09:55 - WARNING - File 'foo.txt'does not exist
-    logging.basicConfig(
+    # output: 2024-07-22 09:55 - WARNING - File 'foo.txt' does not exist
+    log.basicConfig(
         filename=config['logfile'],
         encoding="utf-8",
         filemode="a",
@@ -132,7 +132,7 @@ def do_main():
         #format="{asctime} - {levelname} - {message}",
         style="%",
         datefmt="%Y-%m-%d %H:%M",
-        level=logging.INFO
+        level=log.INFO
     )
 
     n_builds = len(builds_to_build)
@@ -140,30 +140,34 @@ def do_main():
 
     cf.green("builds to build:")
     print()
-    for name in builds_to_build:
-        cf.bold(f"{name}")
+    for name, version in builds_to_build:
+        cf.print_bold(f">>> {name} ")
+        cf.print_green(f"{version}\n")
     print()
+
+    if args.pretend:
+        sys.exit(0)
 
     for build in builds_to_build:
         if args.ask:
-            cont = input("...continue with these builds? [y/n]")
+            cont = input("...continue with these builds? [y/n] ")
             if cont in ['n', 'N']:
                 cf.red("aborting")
                 sys.exit(1)
 
         print()
         start_time = datetime.datetime.now()
-        logging.info('Starting build of %s', build)
+        log.info('Starting build of %s', build[0])
 
         cf.print_bold("starting build ")
         cf.print_green(this_build)
         cf.print_bold(" of ")
         cf.print_green(n_builds)
-        cf.print_bold(f" {build}\n")
+        cf.print_bold(f" {build[0]}\n")
         print()
         this_build += 1
 
-        bld = build_package.BuildPackage(build, config, args)
+        bld = build_package.BuildPackage(build[0], config, args)
         bld.fetch()
         if args.fetch:
             continue
@@ -171,12 +175,12 @@ def do_main():
         bld.configure()
         bld.make()
         bld.make_inst()
-        bld.clean()
+        bld.cleanup()
 
         finish_time = datetime.datetime.now()
         elapsed = finish_time - start_time
-        cf.bold(f"build of {build} complete in {elapsed}.")
-        logging('build of %s complete' % build)
+        cf.bold(f"build of {build[0]} version {build[1]} complete in {elapsed}.")
+        log.info('build of %s version %s complete' % build[0],build[1])
 
 
 def show_usage() -> None:
@@ -197,6 +201,6 @@ Usage: {APPNAME} [general options] command [command options] pkg_atom [pkg_atom.
     install/uninstall Options:
         '-f'   or '--fetch'                 download packages but do not install
         '-p'   or '--pretend'               only show which packages would be built
-        '-a'   or '--ask'                   prompt before installing/uninstalling package
+        '-a'   or '--ask'                   prompt before installing/uninstalling package(s)
 
 """)
