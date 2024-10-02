@@ -91,7 +91,7 @@ def print_green(msg: str) -> None:
 
 def yellow(msg: str) -> None:
     """Print yellow text """
-    print(f"{clr['green']}***  {msg}{clr['end']}")
+    print(f"{clr['yellow']}***  {msg}{clr['end']}")
 
 
 def print_yellow(msg: str) -> None:
