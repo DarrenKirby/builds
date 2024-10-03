@@ -131,7 +131,7 @@ def do_main():
         format="%(asctime)s - %(levelname)s - %(message)s",
         #format="{asctime} - {levelname} - {message}",
         style="%",
-        datefmt="%Y-%m-%d %H:%M",
+        datefmt="%Y-%m-%d %H:%M:%S",
         level=log.INFO
     )
 
