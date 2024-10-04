@@ -26,6 +26,9 @@ import sys
 import subprocess as sp
 import shlex
 import os
+import csv
+import dbm
+import logging as log
 
 import requests
 import tqdm
@@ -130,11 +133,26 @@ def get_config():
 
 config = get_config()
 
+# Initialize logger
+#   call: logging.warning("File: '%s' does not exist", filename)
+# output: 2024-07-22 09:55 - WARNING - File 'foo.txt' does not exist
+log.basicConfig(
+        filename=config['logfile'],
+        encoding="utf-8",
+        filemode="a",
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        #format="{asctime} - {levelname} - {message}",
+        style="%",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        level=log.INFO
+)
 
 # These helper functions are intended to be used in the
-# make_install() function in the package.build file.
+# install() function in the package.build file.
 def do_bin(frm: str, to: str) -> None:
-    """Install a binary to the live filesystem"""
+    """
+    Install a binary to the live filesystem
+    """
     try:
         sp.run(shlex.split(f"install -S -v -o root -g root -m 755 -s {frm} {to}"), check=True)
     except sp.CalledProcessError as e:
@@ -145,7 +163,9 @@ def do_bin(frm: str, to: str) -> None:
 
 
 def do_scr(frm: str, to: str) -> None:
-    """Install a script to the live filesystem"""
+    """
+    Install a script to the live filesystem
+    """
     try:
         sp.run(shlex.split(f"install -S -v -o root -g root -m 755 {frm} {to}"), check=True)
     except sp.CalledProcessError as e:
@@ -156,7 +176,9 @@ def do_scr(frm: str, to: str) -> None:
 
 
 def do_lib(frm: str, to: str) -> None:
-    """Install a library to the live filesystem"""
+    """
+    Install a library to the live filesystem
+    """
     try:
         sp.run(shlex.split(f"install -S -v -o root -g root -m 755 {frm} {to}"), check=True)
     except sp.CalledProcessError as e:
@@ -167,7 +189,9 @@ def do_lib(frm: str, to: str) -> None:
 
 
 def do_hdr(frm: str, to: str) -> None:
-    """Install a header file to the live filesystem"""
+    """
+    Install a header file to the live filesystem
+    """
     try:
         sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm} {to}"), check=True)
     except sp.CalledProcessError as e:
@@ -178,10 +202,12 @@ def do_hdr(frm: str, to: str) -> None:
 
 
 def do_man(frm: str, to: str) -> None:
-    """Compress and install a manpage to the live filesystem"""
+    """
+    Compress and install a manpage to the live filesystem
+    """
     try:
         sp.run(shlex.split(f"bzip2 {frm}"), check=True)
-        sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm} {to}"), check=True)
+        sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm}.bz2 {to}"), check=True)
     except sp.CalledProcessError as e:
         red(f"Install of {frm} failed:")
         print(e)
@@ -190,7 +216,9 @@ def do_man(frm: str, to: str) -> None:
 
 
 def do_sym(target: str, name: str) -> None:
-    """Make a symbolic link in the live filesystem"""
+    """
+    Make a symbolic link in the live filesystem
+    """
     try:
         sp.run(shlex.split(f"ln -svf {target} {name}"), check=True)
     except sp.CalledProcessError as e:
@@ -232,7 +260,21 @@ def download(url: str, filename: str) -> None:
 
 
 def get_sha256sum(file_name: str) -> str:
-    """Produce checksum of downloaded file"""
+    """
+    Produce checksum of downloaded file
+    """
     with open(file_name, "rb") as f:
         digest = hashlib.file_digest(f, "sha256")
         return digest.hexdigest()
+
+
+def do_initdb(args: list, config: dict) -> None:
+    """
+    Initialize a db file from a csv file
+    """
+    for csv_file in args:
+        with dbm.open(f'{BUILDS_ROOT}/scripts/{csv_file[:-4]}', 'c') as db:
+            with open(csv_file, newline='', encoding='UTF8') as f:
+                reader = csv.reader(f)
+                for row in reader:
+                    db[row[0]] = ','.join(row[1:])
