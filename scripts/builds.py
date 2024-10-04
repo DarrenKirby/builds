@@ -25,7 +25,7 @@
 import argparse
 import datetime
 import sys
-import logging as log
+#import logging as log
 
 import common_functions as cf
 import build_package
@@ -78,6 +78,10 @@ def process_args():
     info_parser = subparsers.add_parser("info")
     info_parser.add_argument("pkg_atom", action="extend", nargs="+", type=str)
 
+    # 'initdb' command options
+    initdb_parser = subparsers.add_parser("initdb")
+    initdb_parser.add_argument("db_file", action="extend", nargs="+", type=str)
+
     args = global_parser.parse_args()
     return args
 
@@ -105,7 +109,7 @@ def do_main():
         show_usage()
         sys.exit(0)
 
-    print(args)
+    #print(args)
 
     config = cf.get_config()
 
@@ -118,22 +122,14 @@ def do_main():
     elif args.command == 'uninstall':
         do_uninstall(args, config)
         sys.exit(0)
+    elif args.command == 'initdb':
+        cf.do_initdb(args, config)
+        sys.exit(0)
     else:
         builds_to_build = dep_resolve.resolve_dependencies(args, config)
 
-    # Initialize logger
-    #   call: logging.warning("File: '%s' does not exist", filename)
-    # output: 2024-07-22 09:55 - WARNING - File 'foo.txt' does not exist
-    log.basicConfig(
-        filename=config['logfile'],
-        encoding="utf-8",
-        filemode="a",
-        format="%(asctime)s - %(levelname)s - %(message)s",
-        #format="{asctime} - {levelname} - {message}",
-        style="%",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        level=log.INFO
-    )
+
+
 
     n_builds = len(builds_to_build)
     this_build = 1
@@ -157,7 +153,7 @@ def do_main():
 
         print()
         start_time = datetime.datetime.now()
-        log.info('Starting build of %s', build[0])
+        cf.log.info('Starting build of %s', build[0])
 
         cf.print_bold("starting build ")
         cf.print_green(this_build)
@@ -172,27 +168,31 @@ def do_main():
         if args.fetch:
             continue
         bld.install_source()
-        bld.configure()
-        bld.make()
+        bld.configure_src()
+        bld.make_src()
         bld.make_inst()
-        bld.cleanup()
+        #bld.inst()
+        #bld.cleanup()
 
         finish_time = datetime.datetime.now()
         elapsed = finish_time - start_time
         cf.bold(f"build of {build[0]} version {build[1]} complete in {elapsed}.")
-        log.info('build of %s version %s complete' % build[0],build[1])
+        cf.log.info('build of %s version %s complete in %s', build[0], build[1], elapsed)
 
 
 def show_usage() -> None:
-    """Prints usage details to the screen"""
+    """
+    Prints usage details to the screen
+    """
     print(f"""
-Usage: {APPNAME} [general options] command [command options] pkg_atom [pkg_atom...]
+Usage: {APPNAME} [general options] command [command options] arg [arg2...]
 
     Commands:
         'install'   pkg_atom [pkg_atom...]  install one or more packages and dependancies
         'uninstall' pkg_atom                uninstall package
         'search'    string                  search the package db for package names matching string
         'info'      pkg_atom                print info on packages if installed
+        'initdb'    csv_file [csv_file...]  initialze a build db with data from csv_file
 
     General Options:
         '-h'   or '--help'                  show these usage details
