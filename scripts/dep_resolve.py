@@ -28,7 +28,9 @@ import common_functions as cf
 
 
 def resolve_dependencies(args: list, config: dict) -> list:
-    """Translate package names into atoms, and check for dependencies"""
+    """
+    Translate package names into atoms, and check for dependencies
+    """
     atoms = []
     pkgs_to_build = []
     with dbm.open(config['db_file']) as db:
@@ -69,8 +71,8 @@ def resolve_dependencies(args: list, config: dict) -> list:
                             db_string = db[arg.split('/')[1]].decode()
 
                             # We do not yet distinguish between build depends and run depends,
-                            # so for now we just insert dependencies at the begining of the
-                            # list so that they get built first.
+                            # (let alone optional depends) so for now we just insert dependencies
+                            # at the begining of the list so that they get built first.
                             pkgs_to_build.insert(0, (pkg, db_string.split()[1]))
     pkgs_to_build += atoms
     return pkgs_to_build
