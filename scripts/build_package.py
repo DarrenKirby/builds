@@ -54,6 +54,7 @@ class BuildPackage:
          build_dir   = '/usr/builds/app-arch/tar'
          build_file  = '/usr/builds/app-arch/tar/tar-1.28.build.py'
          work_dir    = '/usr/builds/app-arch/tar/work'
+         seg_dir     - '/usr/builds/app-arch/tar/work/seg'
          package     = 'tar-1.28.tar.xz'
          package_dir = 'tar-1.28'
 
@@ -128,41 +129,57 @@ class BuildPackage:
         if hasattr(self, 'install_source_posthook'):
             self.install_source_posthook()
 
-    def configure(self) -> None:
+    def configure_src(self) -> None:
         """
         Configure the source code and build environment
         """
+        os.chdir(self.package_dir)
         cf.bold("Configuring package...")
-        if hasattr(self, 'configure_source'):
-            self.configure_source()
-            cf.green("Package successfully configured.")
+        if hasattr(self, 'configure'):
+            if self.configure() == 0:
+                cf.green("Package successfully configured.")
+            else:
+                cf.red("Configure failed")
+                cf.log.critical(f"configure of {self.name} v. {self.version} failed")
+                sys.exit(12)
         else:
             cf.bold("Nothing to configure.")
 
-
-    def make(self) -> None:
+    def make_src(self) -> None:
         """
         Compile and link the source code.
         """
         cf.bold("Running `make`...")
 
-        if hasattr(self, 'make_source'):
-            self.make_source()
-            cf.green("`make` successful.")
+        if hasattr(self, 'make'):
+            if self.make() == 0:
+                cf.green("`make` successful.")
+            else:
+                cf.red("`make` failed")
+                cf.log.critical(f"make of {self.name} v. {self.version} failed")
+                sys.exit(13)
         else:
             cf.bold("Nothing to make.")
 
     def make_inst(self) -> None:
         """
-        Install the compiled program into the live filesystem.
-
-        make_install() MUST be defined in the package.build file.
+        Install the compiled program into a segregated directory.
         """
         if hasattr(self, 'make_install'):
             self.make_install()
+
+    def inst(self) -> None:
+        """
+        Install the program and files into the live filesystem.
+
+        make_install() MUST be defined in the package.build file.
+        """
+        if hasattr(self, 'install'):
+            self.install()
         else:
-            cf.red(f"{self.build_file} has no `make_install()` method defined")
-            cf.yellow("All build files must define `make_install()`")
+            cf.red(f"{self.build_file} has no `install()` method defined")
+            cf.yellow("All build files must define `install()`")
+            cf.log.critical(f"{self.build_file} has no install() method defined - aborting")
             self.cleanup()
             sys.exit(5)
 
@@ -197,6 +214,7 @@ class BuildPackage:
         self.build_dir = f"{self.config['builds_root']}/{self.build}"
         self.build_file = f"{self.build_dir}/{self.name}-{self.version}.build.py"
         self.work_dir = f"{self.config['builds_root']}/{self.build}/work"
+        self.seg_dir = f"{self.work_dir}/seg"
         self.src_url = self.src_url.replace("VVV", self.version)
         self.package = self.src_url.split("/")[-1]
         self.package_dir = f"{self.name}-{self.version}"
@@ -231,7 +249,9 @@ class BuildPackage:
         spec = importlib.util.spec_from_file_location(module_name, path)
 
         if spec is None:
-            raise ImportError(f"Cannot find module at {path}")
+            cf.red(f"Cannot find build file at {path}")
+            cf.log.critical(f"{self.build_file} not found - aborting")
+            sys.exit(25)
 
         module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = module
