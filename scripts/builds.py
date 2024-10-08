@@ -39,7 +39,9 @@ QUIP = "By far the best software available for turtle stacking"
 
 
 class CustomArgumentParser(argparse.ArgumentParser):
-    """Overrides the default argparse error handling"""
+    """
+    Overrides the default argparse error handling
+    """
     def error(self, message):
         cf.red(message)
         show_usage()
@@ -47,7 +49,9 @@ class CustomArgumentParser(argparse.ArgumentParser):
 
 
 def process_args():
-    """Process command line arguments"""
+    """
+    Process command line arguments
+    """
 
     global_parser = CustomArgumentParser(add_help=False)
     subparsers = global_parser.add_subparsers(dest="command")
@@ -86,7 +90,7 @@ def process_args():
     return args
 
 
-def do_main():
+def do_main() -> None:
     """
     The main dispatch loop.
 
@@ -178,6 +182,10 @@ def do_main():
         elapsed = finish_time - start_time
         cf.bold(f"build of {build[0]} version {build[1]} complete in {elapsed}.")
         cf.log.info('build of %s version %s complete in %s', build[0], build[1], elapsed)
+
+    print()
+    cf.green("Finished all builds. Exiting...")
+    sys.exit(0)
 
 
 def show_usage() -> None:
