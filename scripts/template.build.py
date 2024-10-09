@@ -1,4 +1,4 @@
-#    <category>/<name>/<name>.build
+#    <category>/<name>/<name>.build.py
 #    `date --utc`
 
 #    Copyright:: (c) 2024 <name>
@@ -42,11 +42,11 @@ depend = []
 #     pass
 
 
-# make_install MUST be defined in the build file.
+# install() MUST be defined in the build file.
 # Use the helper functions in common_functions.py
 # to install binaries, scripts, libraries, headers,
 # documentation (man pages), and to create symlinks.
-def make_install(self):
+def install(self):
     pass
 
 
@@ -63,6 +63,7 @@ def make_install(self):
 """
 /etc/foo.conf
 /usr/bin/foo
+/usr/include/foo.h
 /usr/lib/libfoo.so
 /usr/lib/libfoo.so.5.2
 /usr/share/man/man1/foo.1
