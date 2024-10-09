@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>.build
-#    `date --utc`
+#    app-arch/zstd/zstd-1.5.6-.build.py
+#    Tue Oct  8 23:59:38 UTC 2024
 
-#    Copyright:: (c) 2024 <name>
-#    Author:: <name> (mailto:<email>)
+#    Copyright:: (c) 2024 Darren Kirby
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,52 +18,52 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment this line out,
-# otherwise, add all dependencies to this list as strings ie:
-# depend=['dev-lang/ruby', 'dev-editor/nano']
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are already installed.
-depend = []
+def make(self):
+    return os.system(f"make prefix={self.seg_dir}")
 
-
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook(self):
-#     pass
-#
-# def fetch_posthook(self):
-#     pass
-
-
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook(self):
-#     pass
-#
-# def install_source_posthook(self):
-#     pass
-
-
-# make_install MUST be defined in the build file.
-# Use the helper functions in common_functions.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
 def make_install(self):
-    pass
+    return os.system(f"make prefix={self.seg_dir} install")
 
+def install(self):
+    cf.do_lib(f"{self.seg_dir}/lib/libzstd.so.1.5.6", cf.paths['ul'])
+    cf.do_sym(f"{cf.paths['ul']}/libzstd.so.1.5.6", f"{cf.paths['ul']}/libzstd.so")
+    cf.do_sym(f"{cf.paths['ul']}/libzstd.so.1.5.6", f"{cf.paths['ul']}/libzstd.so.1")
 
-# Use these two as pre/post hooks into the cleanup process
-# def fetch_prehook(self):
-#     pass
-#
-# def fetch_posthook(self):
-#     pass
+    cf.do_hdr(f"{self.seg_dir}/include/zdict.h", cf.paths['ui'])
+    cf.do_hdr(f"{self.seg_dir}/include/zstd.h", cf.paths['ui'])
+    cf.do_hdr(f"{self.seg_dir}/include/zstd_errors.h", cf.paths['ui'])
 
+    cf.do_bin(f"{self.seg_dir}/bin/zstd", f"{cf.paths['ub']}")
+    cf.do_bin(f"{self.seg_dir}/bin/zstdgrep", f"{cf.paths['ub']}")
+    cf.do_bin(f"{self.seg_dir}/bin/zsrdless", f"{cf.paths['ub']}")
 
-# Write each installed file one per line in the commented section below.
-# This is the list that `bld uninstall` uses to know which files to remove.
+    cf.do_sym(f"{cf.paths['ub']}/zstd", f"{cf.paths['ub']}/unzstd")
+    cf.do_sym(f"{cf.paths['ub']}/zstd", f"{cf.paths['ub']}/zstdcat")
+    cf.do_sym(f"{cf.paths['ub']}/zstd", f"{cf.paths['ub']}/zstdmt")
+
+    cf.do_man(f"{self.seg_dir}/share/man/man1/zstd.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/zstdgrep.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/zstdless.1", cf.paths['man1'])
+
+    cf.do_sym(f"{cf.paths['man1']}/zstd.1.bz2", f"{cf.paths['man1']}/unzstd.1")
+    cf.do_sym(f"{cf.paths['man1']}/zstd.1.bz2", f"{cf.paths['man1']}/zstdcat.1")
+
 """
-/etc/foo.conf
-/usr/bin/foo
-/usr/lib/libfoo.so
-/usr/lib/libfoo.so.5.2
-/usr/share/man/man1/foo.1
+/usr/bin/zstd
+/usr/bin/zstdgrep
+/usr/bin/zstdless
+/usr/bin/unzstd
+/usr/bin/zstdcat
+/usr/bin/zstdmt
+/usr/include/zdict.h
+/usr/include/zstd.h
+/usr/include/zstd_errors.h
+/usr/lib/libzstd.so.1.5.6
+/usr/lib/libzstd.so.1
+/usr/lib/libzstd.so
+/usr/share/man/man1/zstd.1.bz2
+/usr/share/man/man1/zstdgrep.1.bz2
+/usr/share/man/man1/zstdless.1.bz2
+/usr/share/man/man1/unzstd.1
+/usr/share/man/man1/zstdcat.1
 """

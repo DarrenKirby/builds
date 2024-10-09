@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>.build
-#    `date --utc`
+#    app-util/file/file-5.45.build.py
+#    Wed Oct  9 00:40:11 UTC 2024
 
-#    Copyright:: (c) 2024 <name>
-#    Author:: <name> (mailto:<email>)
+#    Copyright:: (c) 2024 Darren Kirby
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,64 +18,39 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment this line out,
-# otherwise, add all dependencies to this list as strings ie:
-# depend=['dev-lang/ruby', 'dev-editor/nano']
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are already installed.
-depend = []
+def configure(self):
+    return os.system(f"./configure --prefix={self.seg_dir}")
 
+def make(self):
+    return os.system("make")
 
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
+def make_install(self):
+    return os.system("make install")
 
+def install(self):
+    cf.do_lib(f"{self.seg_dir}/lib/libmagic.so.1.0.0", cf.paths['ul'])
+    cf.do_sym(f"{cf.paths['ul']}/libmagic.so.1.0.0", f"{cf.paths['ul']}/libmagic.so")
+    cf.do_sym(f"{cf.paths['ul']}/libmagic.so.1.0.0", f"{cf.paths['ul']}/libmagic.so.1")
 
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook():
-#     pass
-#
-# def install_source_posthook():
-#     pass
+    cf.do_hdr(f"{self.seg_dir}/include/magic.h", cf.paths['ui'])
 
+    cf.do_bin(f"{self.seg_dir}/bin/file", f"{cf.paths['ub']}")
 
-# configure_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def configure_source():
-    print("Nothing to configure")
+    cf.do_man(f"{self.seg_dir}/share/man/man1/file.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/libmagic.3", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man4/magic.4", cf.paths['man4'])
 
+    os.system("mkdir -p /usr/share/misc")
+    cf.do_bin(f"{self.seg_dir}/share/misc/magic.mgc", "/usrshare/misc/magic.mgc")
 
-# make_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def make_source():
-    print("Nothing to configure")
-
-
-# make_install MUST be defined in the build file.
-# Use the helper functions in common_functions.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
-def make_install():
-    pass
-
-
-# Use these two as pre/post hooks into the cleanup process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
-
-
-# Write each installed file one per line in the commented section below.
-# This is the list that `bld uninstall` uses to know which files to remove.
 """
-/etc/foo.conf
-/usr/bin/foo
-/usr/lib/libfoo.so
-/usr/lib/libfoo.so.5.2
-/usr/share/man/man1/foo.1
+/usr/bin/file
+/usr/inlude/magic.h
+/usr/lib/libmagic.so
+/usr/lib/libmagic.so.1
+/usr/lib/libmagic.so.1.0.0
+/usr/share/man/man1/file.1.bz2
+/usr/share/man/man3/libmagic.3.bz2
+/usr/share/man/man4/magic.4.bz2
+/usr/share/miscmagic.mgc
 """

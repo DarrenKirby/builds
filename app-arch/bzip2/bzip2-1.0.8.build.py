@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>.build
-#    `date --utc`
+#    app-arch/bzip2/bzip2-1.0.8.build.py
+#    Tue Oct  8 18:43:05 UTC 2024
 
-#    Copyright:: (c) 2024 <name>
-#    Author:: <name> (mailto:<email>)
+#    Copyright:: (c) 2024 Darren Kirby
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,52 +18,76 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment this line out,
-# otherwise, add all dependencies to this list as strings ie:
-# depend=['dev-lang/ruby', 'dev-editor/nano']
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are already installed.
-depend = []
+def configure(self):
+    # Ensure symbolic links are relative
+    exit1 = os.system("sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile")
+    # Fix manpage installation PATH
+    exit2 = os.system('sed -i "s@(PREFIX)/man@(PREFIX/share/man@g)" Makefile')
+    if (exit1 == 0) and (exit2 == 0):
+        return 0
+    return 1
 
+def make(self):
+    # Build shared lib, and use Makefile which links binaries against it
+    exit1 = os.system("make -f Makefile-libbz2_so")
+    exit2 = os.system("make clean")
+    if (exit1 != 0) and (exit2 != 0):
+        return 1
+    return os.system("make")
 
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook(self):
-#     pass
-#
-# def fetch_posthook(self):
-#     pass
-
-
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook(self):
-#     pass
-#
-# def install_source_posthook(self):
-#     pass
-
-
-# make_install MUST be defined in the build file.
-# Use the helper functions in common_functions.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
 def make_install(self):
-    pass
+    return os.system(f"make PREFIX={self.seg_dir} install")
 
+def install(self):
+    cf.do_lib("libbz2.so.1.0.8", cf.paths['ul'])
+    cf.do_sym(f"{cf.paths['ul']}/libbz2.so.1.0.8", f"{cf.paths['ul']}/libbz2.so")
+    cf.do_sym(f"{cf.paths['ul']}/libbz2.so.1.0.8", f"{cf.paths['ul']}/libbz2.so.1.0")
 
-# Use these two as pre/post hooks into the cleanup process
-# def fetch_prehook(self):
-#     pass
-#
-# def fetch_posthook(self):
-#     pass
+    cf.do_hdr(f"{self.seg_dir}/include/bzlib.h", cf.paths['ui'])
 
+    cf.do_bin("bzip2-shared", f"{cf.paths['ub']}/bzip2")
+    cf.do_sym(f"{cf.paths['ub']}/bzip2", f"{cr.paths['ub']}/bzat")
+    cf.do_sym(f"{cf.paths['ub']}/bzip2", f"{cr.paths['ub']}/bunzip2")
 
-# Write each installed file one per line in the commented section below.
-# This is the list that `bld uninstall` uses to know which files to remove.
+    cf.do_bin(f"{self.seg_dir}/bin/bzdiff", f"{cf.paths['ub']}")
+    cf.do_bin(f"{self.seg_dir}/bin/bzgrep", f"{cf.paths['ub']}")
+    cf.do_bin(f"{self.seg_dir}/bin/bzmore", f"{cf.paths['ub']}")
+
+    cf.do_sym(f"{cf.paths['ub']}/bzdiff", f"{cf.paths['ub']}/bzcmp")
+    cf.do_sym(f"{cf.paths['ub']}/bzgrep", f"{cf.paths['ub']}/bzegrep")
+    cf.do_sym(f"{cf.paths['ub']}/bzgrep", f"{cf.paths['ub']}/bzfgrep")
+    cf.do_sym(f"{cf.paths['ub']}/bzmore", f"{cf.paths['ub']}/bzless")
+
+    cf.do_man(f"{self.seg_dir}/share/man/man1/bzcmp.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/bzdiff.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/bzegrep.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/bzfgrep.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/bzgrep.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/bzip2.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/bzless.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/bzmore.1", cf.paths['man1'])
+
 """
-/etc/foo.conf
-/usr/bin/foo
-/usr/lib/libfoo.so
-/usr/lib/libfoo.so.5.2
-/usr/share/man/man1/foo.1
+/usr/lib/libbz2.so.1.0.8
+/usr/lib/libbz2.so.1.0
+/usr/lib/libbz2.so
+/usr/include/bzlib.h
+/usr/bin/bzip2
+/usr/bin/bzcat
+/usr/bin/bunzip2
+/usr/bin/bzdiff
+/usr/bin/bzgrep
+/usr/bin/bzegrep
+/usr/bin/bzfgrep
+/usr/bin/bzmore
+/usr/bin/bzless
+/usr/bin/bzcmp
+/usr/share/man/man1/bzcmp.1.bz2
+/usr/share/man/man1/bzdiff.1.bz2
+/usr/share/man/man1/bzgrep.1.bz2
+/usr/share/man/man1/bzegrep.1.bz2
+/usr/share/man/man1/bzfgrep.1.bz2
+/usr/share/man/man1/bzip2.1.bz2
+/usr/share/man/man1/bzmore.1.bz2
+/usr/share/man/man1/bzless.1.bz2
 """

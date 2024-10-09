@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>.build
-#    `date --utc`
+#    app-arch/lz4/lz4-1.10.0.build.py
+#    Tue Oct  8 21:47:45 UTC 2024
 
-#    Copyright:: (c) 2024 <name>
-#    Author:: <name> (mailto:<email>)
+#    Copyright:: (c) 2024 Darren Kirby
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,52 +18,44 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment this line out,
-# otherwise, add all dependencies to this list as strings ie:
-# depend=['dev-lang/ruby', 'dev-editor/nano']
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are already installed.
-depend = []
+def make(self):
+    return os.system(f"make BUILD_STATIC=no PREFIX={self.seg_dir}")
 
-
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook(self):
-#     pass
-#
-# def fetch_posthook(self):
-#     pass
-
-
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook(self):
-#     pass
-#
-# def install_source_posthook(self):
-#     pass
-
-
-# make_install MUST be defined in the build file.
-# Use the helper functions in common_functions.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
 def make_install(self):
-    pass
+    return os.system(f"make BUILD_STATIC=no PREFIX={self.seg_dir} install")
 
+def install(self):
+    cf.do_lib(f"{self.seg_dir}/lib/liblz4.so.1.10.0", cf.paths['ul'])
+    cf.do_sym(f"{cf.paths['ul']}/liblz4.so.1.10.0", f"{cf.paths['ul']}/liblz4.so.1")
+    cf.do_sym(f"{cf.paths['ul']}/liblz4.so.1.10.0", f"{cf.paths['ul']}/liblz4.so")
 
-# Use these two as pre/post hooks into the cleanup process
-# def fetch_prehook(self):
-#     pass
-#
-# def fetch_posthook(self):
-#     pass
+    cf.do_hdr(f"{self.seg_dir}/include/lz4.h", cf.paths['ui'])
+    cf.do_hdr(f"{self.seg_dir}/include/lz4frame.h", cf.paths['ui'])
+    cf.do_hdr(f"{self.seg_dir}/include/lz4hc.h", cf.paths['ui'])
 
+    cf.do_bin(f"{self.seg_dir}/bin/lz4", f"{cf.paths['ub']}")
+    cf.do_sym(f"{cf.paths['ub']}/lz4", f"{cf.paths['ub']}/lz4c")
+    cf.do_sym(f"{cf.paths['ub']}/lz4", f"{cf.paths['ub']}/lz4cat")
+    cf.do_sym(f"{cf.paths['ub']}/lz4", f"{cf.paths['ub']}/unlz4")
 
-# Write each installed file one per line in the commented section below.
-# This is the list that `bld uninstall` uses to know which files to remove.
+    cf.do_man(f"{self.seg_dir}/share/man/man1/lz4.1", cf.paths['man1'])
+    cf.do_sym(f"{cf.paths['man1']}/lz4.1.bz2", f"{cf.paths['man1']}/lz4c.1")
+    cf.do_sym(f"{cf.paths['man1']}/lz4.1.bz2", f"{cf.paths['man1']}/lz4cat.1")
+    cf.do_sym(f"{cf.paths['man1']}/lz4.1.bz2", f"{cf.paths['man1']}/unlz4.1")
+
 """
-/etc/foo.conf
-/usr/bin/foo
-/usr/lib/libfoo.so
-/usr/lib/libfoo.so.5.2
-/usr/share/man/man1/foo.1
+/usr/lib/liblz4.so.1.10.0
+/usr/lib/liblz4.so.1
+/usr/lib/liblz4.so
+/usr/include/lz4.h
+/usr/include/lz4frame.h
+/usr/include/lz4hc.h
+/usr/bin/lz4
+/usr/bin/lz4c
+/usr/bin/lz4cat
+/usr/bin/unlz4
+/usr/share/man/man1/lz4.1.bz2
+/usr/share/man/man1/lz4c.1
+/usr/share/man/man1/lz4cat.1
+/usr/share/man/man1/unlz4.1
 """

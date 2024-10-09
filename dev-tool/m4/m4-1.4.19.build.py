@@ -1,5 +1,5 @@
-#    app-arch/zlib/zlib-1.3.1.build.py
-#    Thu Oct 3 20:44:51 UTC 2024
+#    dev-tool/m4/m4-1.4.19.build.py
+#    Tue Oct  8 23:59:38 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -28,18 +28,10 @@ def make_install(self):
     return os.system("make install")
 
 def install(self):
-    cf.do_lib(f"{self.seg_dir}/lib/libz.so.1.3.1", cf.paths['ul'])
-    cf.do_sym(f"{cf.paths['ul']}/libz.so.1.3.1", f"{cf.paths['ul']}/libz.so.1")
-    cf.do_sym(f"{cf.paths['ul']}/libz.so.1.3.1", f"{cf.paths['ul']}/libz.so")
-    cf.do_hdr(f"{self.seg_dir}/include/zconf.h", cf.paths['ui'])
-    cf.do_hdr(f"{self.seg_dir}/include/zlib.h", cf.paths['ui'])
-    cf.do_man(f"{self.seg_dir}/share/man/man3/zlib.3", cf.paths['man3'])
+    cf.do_bin(f"{self.seg_dir}/bin/m4", f"{cf.paths['ub']}")
+    cf.do_man(f"{self.seg_dir}/share/man/man1/m4.1", cf.paths['man1'])
 
 """
-/usr/lib/libz.so.1.3.1
-/usr/lib/libz.so.1
-/usr/lib/libz.so
-/usr/include/zconf.h
-/usr/include/zlib.h
-/usr/share/man/man3/zlib.3.bz2
+/usr/bin/m4
+/usr/share/man/man1/m4.1.bz2
 """
