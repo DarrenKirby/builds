@@ -278,3 +278,24 @@ def do_initdb(args: list, config: dict) -> None:
                 reader = csv.reader(f)
                 for row in reader:
                     db[row[0]] = ','.join(row[1:])
+
+
+def get_manifest(build_file):
+    """
+    Open the build file and retrieve file manifest
+    """
+    manifest = []
+    in_manifest = False
+    with open(build_file, 'r') as f:
+        for line in f:
+
+            if '"""' in line and not in_manifest:
+                in_manifest = True
+                continue
+            elif '"""' in line and in_manifest:
+                break
+
+            if in_manifest:
+                manifest.append(line.strip())
+
+    return manifest
