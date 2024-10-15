@@ -20,7 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+import argparse
 import hashlib
 import sys
 import subprocess as sp
@@ -37,7 +37,7 @@ import tqdm
 # These are a bunch of common paths to be used in
 # tandem with the helper functions in the next section
 # Install paths
-paths = {}
+paths = dict()
 paths['b'] = "/bin"
 paths['s'] = "/sbin"
 paths['l'] = "/lib"
@@ -74,7 +74,7 @@ clr = {
 # version does not include a newline.
 def bold(msg: str) -> None:
     """Print bold text """
-    print(f"{clr['bold'] if config['color'] else ''}>>>  {msg}{clr['end']}")
+    print(f"{clr['bold'] if config['color'] else ''}>>> {msg}{clr['end']}")
 
 
 def print_bold(msg: str) -> None:
@@ -84,7 +84,7 @@ def print_bold(msg: str) -> None:
 
 def green(msg: str) -> None:
     """Print green text """
-    print(f"{clr['green']}>>>  {msg}{clr['end']}")
+    print(f"{clr['green']}>>> {msg}{clr['end']}")
 
 
 def print_green(msg: str) -> None:
@@ -94,7 +94,7 @@ def print_green(msg: str) -> None:
 
 def yellow(msg: str) -> None:
     """Print yellow text """
-    print(f"{clr['yellow']}***  {msg}{clr['end']}")
+    print(f"{clr['yellow']}*** {msg}{clr['end']}")
 
 
 def print_yellow(msg: str) -> None:
@@ -104,7 +104,7 @@ def print_yellow(msg: str) -> None:
 
 def red(msg: str) -> None:
     """Print red text """
-    print(f"{clr['red']}!!!  {msg}{clr['end']}")
+    print(f"{clr['red']}!!! {msg}{clr['end']}")
 
 
 def print_red(msg: str) -> None:
@@ -141,11 +141,11 @@ log.basicConfig(
         encoding="utf-8",
         filemode="a",
         format="%(asctime)s - %(levelname)s - %(message)s",
-        #format="{asctime} - {levelname} - {message}",
         style="%",
         datefmt="%Y-%m-%d %H:%M:%S",
         level=log.INFO
 )
+
 
 # These helper functions are intended to be used in the
 # install() function in the package.build file.
@@ -156,9 +156,9 @@ def do_bin(frm: str, to: str) -> None:
     try:
         sp.run(shlex.split(f"install -S -v -o root -g root -m 755 -s {frm} {to}"), check=True)
     except sp.CalledProcessError as e:
-        red(f"Install of {frm} failed:")
+        red(f"Install of {frm} failed: ")
         print(e)
-        log_fail(config['logfile'], f"install of {frm} failed.")
+        log.error(f"install of {frm} failed.")
         sys.exit(-1)
 
 
@@ -169,9 +169,9 @@ def do_scr(frm: str, to: str) -> None:
     try:
         sp.run(shlex.split(f"install -S -v -o root -g root -m 755 {frm} {to}"), check=True)
     except sp.CalledProcessError as e:
-        red(f"Install of {frm} failed:")
+        red(f"Install of {frm} failed: ")
         print(e)
-        log_fail(config['logfile'], f"install of {frm} failed.")
+        log.error(f"install of {frm} failed.")
         sys.exit(-1)
 
 
@@ -182,9 +182,9 @@ def do_lib(frm: str, to: str) -> None:
     try:
         sp.run(shlex.split(f"install -S -v -o root -g root -m 755 {frm} {to}"), check=True)
     except sp.CalledProcessError as e:
-        red(f"Install of {frm} failed:")
+        red(f"Install of {frm} failed: ")
         print(e)
-        log_fail(config['logfile'], f"install of {frm} failed.")
+        log.error(f"install of {frm} failed.")
         sys.exit(-1)
 
 
@@ -195,9 +195,9 @@ def do_hdr(frm: str, to: str) -> None:
     try:
         sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm} {to}"), check=True)
     except sp.CalledProcessError as e:
-        red(f"Install of {frm} failed:")
+        red(f"Install of {frm} failed: ")
         print(e)
-        log_fail(config['logfile'], f"install of {frm} failed: {e}")
+        log.error(f"install of {frm} failed: {e}")
         sys.exit(-1)
 
 
@@ -209,9 +209,9 @@ def do_man(frm: str, to: str) -> None:
         sp.run(shlex.split(f"bzip2 {frm}"), check=True)
         sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm}.bz2 {to}"), check=True)
     except sp.CalledProcessError as e:
-        red(f"Install of {frm} failed:")
+        red(f"Install of {frm} failed: ")
         print(e)
-        log_fail(config['logfile'], f"install of {frm} failed: {e}")
+        log.error(f"install of {frm} failed: {e}")
         sys.exit(-1)
 
 
@@ -222,9 +222,9 @@ def do_sym(target: str, name: str) -> None:
     try:
         sp.run(shlex.split(f"ln -svf {target} {name}"), check=True)
     except sp.CalledProcessError as e:
-        red(f"Install of {name} failed:")
+        red(f"Install of {name} failed: ")
         print(e)
-        log_fail(config['logfile'], f"install of {name} failed: {e}")
+        log.error(f"install of {name} failed: {e}")
         sys.exit(-1)
 
 
@@ -256,7 +256,7 @@ def download(url: str, filename: str) -> None:
         except requests.exceptions.Timeout:
             yellow("Download timed out")
             print("Perhaps try a mirror?")
-            #log_fail(config['logfile'], f"Download of {filename} timed out")
+            log.error(f"Download of {filename} timed out")
 
 
 def get_sha256sum(file_name: str) -> str:
@@ -268,16 +268,26 @@ def get_sha256sum(file_name: str) -> str:
         return digest.hexdigest()
 
 
-def do_initdb(args: list, config: dict) -> None:
+def do_initdb(args: argparse.Namespace, _config: dict) -> None:
     """
     Initialize a db file from a csv file
     """
     for csv_file in args:
-        with dbm.open(f'{BUILDS_ROOT}/scripts/{csv_file[:-4]}', 'c') as db:
-            with open(csv_file, newline='', encoding='UTF8') as f:
-                reader = csv.reader(f)
-                for row in reader:
-                    db[row[0]] = ','.join(row[1:])
+        try:
+            with dbm.open(f'{_config["builds_root"]}/scripts/{csv_file[:-4]}', 'c') as db:
+                with open(csv_file, newline='', encoding='UTF8') as f:
+                    reader = csv.reader(f)
+                    for row in reader:
+                        db[row[0]] = ','.join(row[1:])
+
+        except FileNotFoundError:
+            red(f"The file {csv_file} was not found.")
+        except PermissionError:
+            red(f"You don't have permission to read {csv_file}.")
+        except csv.Error as e:
+            red(f"Error while reading {csv_file}: {e}")
+        except Exception as e:
+            red(f"An unexpected error occurred: {e}")
 
 
 def get_manifest(build_file):
