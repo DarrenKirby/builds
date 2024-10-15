@@ -23,11 +23,12 @@
 import dbm
 import sys
 import glob
+import argparse
 
 import common_functions as cf
 
 
-def resolve_dependencies(args: list, config: dict) -> list:
+def resolve_dependencies(args: argparse.Namespace, config: dict) -> list:
     """
     Translate package names into atoms, and check for dependencies
     """
@@ -56,7 +57,7 @@ def resolve_dependencies(args: list, config: dict) -> list:
             db_list = db_string.split(',')
             atoms.append((db_list[0], db_list[1]))
 
-    # This is a _REALLY_ naive implementation of a dependancy tree
+    # This is a _REALLY_ naive implementation of a dependency tree
     # This will have to be refactored and improved when the rest
     # of the scaffolding is up...
     for atom in atoms:
@@ -72,7 +73,7 @@ def resolve_dependencies(args: list, config: dict) -> list:
 
                             # We do not yet distinguish between build depends and run depends,
                             # (let alone optional depends) so for now we just insert dependencies
-                            # at the begining of the list so that they get built first.
+                            # at the beginning of the list so that they get built first.
                             pkgs_to_build.insert(0, (pkg, db_string.split()[1]))
     pkgs_to_build += atoms
     return pkgs_to_build
