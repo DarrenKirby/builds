@@ -132,9 +132,6 @@ def do_main() -> None:
     else:
         builds_to_build = dep_resolve.resolve_dependencies(args, config)
 
-
-
-
     n_builds = len(builds_to_build)
     this_build = 1
 
@@ -160,9 +157,9 @@ def do_main() -> None:
         cf.log.info('Starting build of %s', build[0])
 
         cf.print_bold("starting build ")
-        cf.print_green(this_build)
+        cf.print_green(str(this_build))
         cf.print_bold(" of ")
-        cf.print_green(n_builds)
+        cf.print_green(str(n_builds))
         cf.print_bold(f" {build[0]}\n")
         print()
         this_build += 1
@@ -186,6 +183,19 @@ def do_main() -> None:
     print()
     cf.green("Finished all builds. Exiting...")
     sys.exit(0)
+
+
+def do_uninstall(args: argparse.Namespace, config: dict) -> None:
+    """
+    Uninstall a package
+    """
+    if args.pretend:
+        print("Uninstalling:")
+        for arg in args.pkg_atom:
+            cf.yellow(f"\t{arg}")
+        sys.exit(0)
+
+
 
 
 def show_usage() -> None:
