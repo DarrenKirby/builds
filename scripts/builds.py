@@ -65,6 +65,7 @@ def process_args():
     install_parser.add_argument('-f', '--fetch', action='store_true')
     install_parser.add_argument('-p', '--pretend', action='store_true')
     install_parser.add_argument('-a', '--ask', action='store_true')
+    install_parser.add_argument('-b', '--buildonly', action='store_true')
     install_parser.add_argument("pkg_atom", action="extend", nargs="+", type=str)
 
     # 'uninstall' command options
@@ -172,6 +173,8 @@ def do_main() -> None:
         bld.configure_src()
         bld.make_src()
         bld.make_inst()
+        if args.buildonly:
+            continue
         #bld.inst()
         #bld.cleanup()
 
@@ -220,5 +223,6 @@ Usage: {APPNAME} [general options] command [command options] arg [arg2...]
         '-f'   or '--fetch'                 download packages but do not install
         '-p'   or '--pretend'               only show which packages would be built
         '-a'   or '--ask'                   prompt before installing/uninstalling package(s)
+        '-b'   or '--buildonly'             build the package, but do not install
 
 """)
