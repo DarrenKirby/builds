@@ -62,13 +62,14 @@ def resolve_dependencies(args: argparse.Namespace, config: dict) -> list:
     # of the scaffolding is up...
     for atom in atoms:
         build_file = glob.glob(f"{config['builds_root']}/{atom[0]}/*.build.py")[0]
-        with open(build_file, 'r', encoding='UTF8') as fh:
+        with open(build_file, 'r', encoding='utf-8') as fh:
             lines = fh.readlines()
             for line in lines:
                 if line.startswith('depend'):
                     pkgs = line.split('=')[-1]
                     for pkg in pkgs.split(','):
                         with dbm.open(config['db_file']) as db:
+                            print(arg)
                             db_string = db[arg.split('/')[1]].decode()
 
                             # We do not yet distinguish between build depends and run depends,
