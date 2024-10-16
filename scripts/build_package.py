@@ -71,7 +71,7 @@ class BuildPackage:
         self.config = config
         self.build = build
         self.name = build.split('/')[1]
-        with dbm.open(f"{self.config['builds_root']}/scripts/{self.config['db_file']}") as db:
+        with dbm.open(self.config['db_file']) as db:
             a = db[self.name].decode().split(",")
 
         self.version = a[1]
