@@ -2,3 +2,6 @@ distfiles/
 .flake8
 __pycache__/
 scripts/*.db
+builds.log
+scripts/builds-stable
+.idea
