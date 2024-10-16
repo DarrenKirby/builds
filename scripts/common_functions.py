@@ -114,12 +114,15 @@ def print_red(msg: str) -> None:
 
 def get_config():
     """Read the configuration file """
-    if not os.path.exists("/Users/darrenkirby/code/builds/scripts/builds.conf"):
+    conf_file = f'{os.path.expanduser("~")}/.builds.conf'
+    if not os.path.exists(conf_file):
+        conf_file = '/etc/builds.conf'
+    if not os.path.exists(conf_file):
         red("Cannot find builds.conf")
         sys.exit(-1)
 
     _config = {}
-    with open("/Users/darrenkirby/code/builds/scripts/builds.conf", "r", encoding='UTF8') as f:
+    with open(conf_file, "r", encoding='utf-8') as f:
         for line in f.readlines():
             if line.startswith("#"):
                 pass
@@ -137,7 +140,7 @@ config = get_config()
 #   call: logging.warning("File: '%s' does not exist", filename)
 # output: 2024-07-22 09:55 - WARNING - File 'foo.txt' does not exist
 log.basicConfig(
-        filename=config['logfile'],
+        filename=config['log_file'],
         encoding="utf-8",
         filemode="a",
         format="%(asctime)s - %(levelname)s - %(message)s",
@@ -282,12 +285,15 @@ def do_initdb(args: argparse.Namespace, _config: dict) -> None:
 
         except FileNotFoundError:
             red(f"The file {csv_file} was not found.")
+            log.error(f"{csv_file} was not found")
         except PermissionError:
             red(f"You don't have permission to read {csv_file}.")
+            log.error("No permission to read {csv_file}")
         except csv.Error as e:
             red(f"Error while reading {csv_file}: {e}")
         except Exception as e:
             red(f"An unexpected error occurred: {e}")
+        green(f"Initialized {csv_file[:-4]}")
 
 
 def get_manifest(build_file):
