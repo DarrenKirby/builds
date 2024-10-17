@@ -190,7 +190,7 @@ class BuildPackage:
         This is also a good place to perform any other necessary
         post-installation tasks
         """
-        if hasattr(self,'cleanup_prehook'):
+        if hasattr(self, 'cleanup_prehook'):
             self.cleanup_prehook()
 
         cf.bold("Cleaning up work directory...")
