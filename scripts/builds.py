@@ -25,7 +25,6 @@
 import argparse
 import datetime
 import sys
-#import logging as log
 
 import common_functions as cf
 import build_package
@@ -34,7 +33,7 @@ import dep_resolve
 
 
 APPNAME = "bld"
-APPVERSION = "0.3.1"
+APPVERSION = "0.4.0"
 QUIP = "By far the best software available for turtle stacking"
 
 
@@ -113,8 +112,6 @@ def do_main() -> None:
     if args.help:
         show_usage()
         sys.exit(0)
-
-    #print(args)
 
     config = cf.get_config()
 
@@ -198,7 +195,26 @@ def do_uninstall(args: argparse.Namespace, config: dict) -> None:
             cf.yellow(f"\t{arg}")
         sys.exit(0)
 
+    for pkg in args.pkg_atom:
+        pkg_info = cf.get_installed_version(pkg)
+        build_file = f"{config['builds_root']}/{pkg_info[1]}/{pkg_info[0]}-{pkg_info[2]}.build.py"
 
+        files_to_uninstall = cf.get_manifest(build_file)
+        if files_to_uninstall == [None]:
+            continue
+
+        if args.verbose:
+            print(f"Files to be uninstalled for {pkg}:")
+            for file in files_to_uninstall:
+                cf.bold(f"\t{file}")
+            print()
+
+        if args.ask:
+            print(f"Uninstall package {pkg}? (y/n)")
+            if input() in ['n', 'N', 'no', 'No']:
+                cf.yellow(f"skipping uninstall of {pkg}")
+                # or should this be 'sys.exit()'?
+                continue
 
 
 def show_usage() -> None:
