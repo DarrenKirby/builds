@@ -37,7 +37,7 @@ import tqdm
 # These are a bunch of common paths to be used in
 # tandem with the helper functions in the next section
 # Install paths
-paths = dict()
+paths = {}
 paths['b'] = "/bin"
 paths['s'] = "/sbin"
 paths['l'] = "/lib"
@@ -140,13 +140,13 @@ config = get_config()
 #   call: logging.warning("File: '%s' does not exist", filename)
 # output: 2024-07-22 09:55 - WARNING - File 'foo.txt' does not exist
 log.basicConfig(
-        filename=config['log_file'],
-        encoding="utf-8",
-        filemode="a",
-        format="%(asctime)s - %(levelname)s - %(message)s",
-        style="%",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        level=log.INFO
+    filename=config['log_file'],
+    encoding="utf-8",
+    filemode="a",
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    style="%",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    level=log.INFO
 )
 
 
@@ -161,7 +161,7 @@ def do_bin(frm: str, to: str) -> None:
     except sp.CalledProcessError as e:
         red(f"Install of {frm} failed: ")
         print(e)
-        log.error(f"install of {frm} failed.")
+        log.error("install of %s failed.", frm)
         sys.exit(-1)
 
 
@@ -174,7 +174,7 @@ def do_scr(frm: str, to: str) -> None:
     except sp.CalledProcessError as e:
         red(f"Install of {frm} failed: ")
         print(e)
-        log.error(f"install of {frm} failed.")
+        log.error("install of %s failed.", frm)
         sys.exit(-1)
 
 
@@ -187,7 +187,7 @@ def do_lib(frm: str, to: str) -> None:
     except sp.CalledProcessError as e:
         red(f"Install of {frm} failed: ")
         print(e)
-        log.error(f"install of {frm} failed.")
+        log.error("install of %s failed.", frm)
         sys.exit(-1)
 
 
@@ -200,7 +200,7 @@ def do_hdr(frm: str, to: str) -> None:
     except sp.CalledProcessError as e:
         red(f"Install of {frm} failed: ")
         print(e)
-        log.error(f"install of {frm} failed: {e}")
+        log.error("install of %s failed.", frm)
         sys.exit(-1)
 
 
@@ -214,7 +214,7 @@ def do_man(frm: str, to: str) -> None:
     except sp.CalledProcessError as e:
         red(f"Install of {frm} failed: ")
         print(e)
-        log.error(f"install of {frm} failed: {e}")
+        log.error("install of %s failed: %s.", frm, e)
         sys.exit(-1)
 
 
@@ -227,7 +227,7 @@ def do_sym(target: str, name: str) -> None:
     except sp.CalledProcessError as e:
         red(f"Install of {name} failed: ")
         print(e)
-        log.error(f"install of {name} failed: {e}")
+        log.error("symbolic link of %s failed: %s.", name, e)
         sys.exit(-1)
 
 
@@ -259,7 +259,7 @@ def download(url: str, filename: str) -> None:
         except requests.exceptions.Timeout:
             yellow("Download timed out")
             print("Perhaps try a mirror?")
-            log.error(f"Download of {filename} timed out")
+            log.error("Download of %s timed out", filename)
 
 
 def get_sha256sum(file_name: str) -> str:
@@ -285,33 +285,65 @@ def do_initdb(args: argparse.Namespace, _config: dict) -> None:
 
         except FileNotFoundError:
             red(f"The file {csv_file} was not found.")
-            log.error(f"{csv_file} was not found")
+            log.error("%s was not found", csv_file)
         except PermissionError:
             red(f"You don't have permission to read {csv_file}.")
-            log.error("No permission to read {csv_file}")
+            log.error("No permission to read %s", csv_file)
         except csv.Error as e:
             red(f"Error while reading {csv_file}: {e}")
-        except Exception as e:
-            red(f"An unexpected error occurred: {e}")
+
         green(f"Initialized {csv_file[:-4]}")
 
 
-def get_manifest(build_file):
+def get_manifest(build_file: str) -> list:
     """
     Open the build file and retrieve file manifest
     """
     manifest = []
     in_manifest = False
-    with open(build_file, 'r') as f:
+    with open(build_file, 'r', encoding='utf-8') as f:
         for line in f:
 
             if '"""' in line and not in_manifest:
                 in_manifest = True
                 continue
-            elif '"""' in line and in_manifest:
+            if '"""' in line and in_manifest:
                 break
 
             if in_manifest:
                 manifest.append(line.strip())
 
     return manifest
+
+
+def get_db_info(package: str) -> list:
+    """
+    Retrieve the database info for a given package
+    """
+    if package.find('/') != -1:
+        package = package.split('/')[0]
+
+    with dbm.open(config['db_file']) as db:
+        string = db[package].decode()
+
+    lst = string.split(',')
+    lst.insert(0, package)
+    return lst
+
+
+def get_installed_version(package: str) -> list:
+    """
+    Retrieve the installed version from installed file
+    """
+    if package.find('/') != -1:
+        package = package.split('/')[0]
+
+    with open(f"{config['builds_root']}/sets/installed", "r", encoding="utf-8") as f:
+        lines = f.readlines()
+        for line in lines:
+            if line.startswith(package):
+                line = line.strip('\n')
+                return line.split(',')
+
+    yellow(f"{package} does not appear to be installed")
+    return [None]
