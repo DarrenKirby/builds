@@ -49,7 +49,7 @@ else:
 print(f"Writing configuration file at '{CONF_PATH}'")
 current_time = datetime.datetime.now(datetime.UTC)
 
-header = f"""
+HEADER = f"""
 #    {CONF_PATH}
 #    {current_time.strftime('%a %b %d %H:%M:%S UTC %Y')}
 
@@ -82,7 +82,7 @@ if os.path.isfile(CONF_PATH):
 print(f"Writing {CONF_PATH}...")
 print("...please check default values.")
 with open(CONF_PATH, 'w', encoding="utf-8") as conf_file:
-    conf_file.write(header)
+    conf_file.write(HEADER)
     conf_file.write(f"builds_root={BUILDS_ROOT}\n")
     conf_file.write(f"distfiles={BUILDS_ROOT}/distfiles\n")
     conf_file.write(f"log_file={LOG_PATH}\n")
