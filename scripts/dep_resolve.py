@@ -1,3 +1,4 @@
+"""
 #    /usr/builds/scripts/dep_resolve.py
 #    Mon Sep 30 02:10:47 UTC 2024
 
@@ -18,7 +19,7 @@
 
 #    You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
-
+"""
 
 import dbm
 import sys
@@ -44,11 +45,11 @@ def resolve_dependencies(args: argparse.Namespace, config: dict) -> list:
                     cf.red(f"{arg} does not appear to be a valid package atom.")
                     cf.yellow(f"Try: 'bld search {arg}'")
                     sys.exit(2)
-                #atoms.append(arg)
+
             else:
                 try:
                     db_string = db[arg].decode()
-                    #atoms.append(a.split(',')[0])
+
                 except IndexError:
                     cf.red(f"'{arg}' does not appear to be a valid package name.")
                     cf.yellow(f"Try: 'bld search {arg}'")
@@ -69,8 +70,7 @@ def resolve_dependencies(args: argparse.Namespace, config: dict) -> list:
                     pkgs = line.split('=')[-1]
                     for pkg in pkgs.split(','):
                         with dbm.open(config['db_file']) as db:
-                            print(arg)
-                            db_string = db[arg.split('/')[1]].decode()
+                            db_string = db[pkg.split('/')[1]].decode()
 
                             # We do not yet distinguish between build depends and run depends,
                             # (let alone optional depends) so for now we just insert dependencies
