@@ -1,5 +1,5 @@
 #    lib-util/readline/readline-8.2.13.build.py
-#    Wed Oct  9 01:29:57 UTC 2024
+#    Sat Oct 19 21:45:00 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -25,11 +25,14 @@ def configure(self):
 
     return os.system(f"./configure --prefix={self.seg_dir} --disable-static --with-curses")
 
+
 def make(self):
     return os.system('make SHLIB_LIBS="-lncursesw"')
 
+
 def make_install(self):
     return os.system('make SHLIB_LIBS="-lncursesw" install')
+
 
 def install(self):
     cf.do_lib(f"{self.seg_dir}/lib/libhistory.so.8.2", cf.paths['ul'])
@@ -40,10 +43,11 @@ def install(self):
     cf.do_sym(f"{cf.paths['ul']}/libreadline.so.8.2", f"{cf.paths['ul']}/libreadline.so.8")
 
     # Recursively copy the header directory
-    os.system(f"cp -a {self.seg_dir}/include/readline {cf.paths['ui']}/readline")
+    cf.do_dir(f"{self.seg_dir}/include/readline/", f"{cf.paths['ui']}/readline/")
 
     cf.do_man(f"{self.seg_dir}/share/man/man3/history.3", cf.paths['man3'])
     cf.do_man(f"{self.seg_dir}/share/man/man3/readlines.3", cf.paths['man3'])
+
 
 """
 /usr/lib/libhistory.so
