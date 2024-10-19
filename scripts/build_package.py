@@ -1,6 +1,6 @@
 """
     /usr/builds/scripts/build_package.py
-    Wed Sep 25 23:30:16 UTC 2024
+    Sat Oct 19 20:30:34 UTC 2024
 
     Class definition of BuildPackage, which builds and installs
     software from source code
@@ -44,31 +44,32 @@ class BuildPackage:
          The '__init__' and '_resolve_paths' methods create a bunch of useful
          instance variables which can be used in the build scripts.
          Assuming package 'tar' and source tarball 'tar-1.28.tar.xz' they expand
-         as such (also assuming $builds_root is '/usr/builds'):
+         as such (also assuming $builds_root is '/var/builds'):
 
          build       = 'app-arch/tar'
          name        = 'tar'
          version     = '1.28'
          sha256sum   = '9599b22ecd1d5787ad7d3b7bf0c59f312b3396d1e281175dd1f8a4014da621ff'
          src_url     = 'http://ftp.gnu.org/gnu/tar/tar-1.28.tar.xz'
-         build_dir   = '/usr/builds/app-arch/tar'
-         build_file  = '/usr/builds/app-arch/tar/tar-1.28.build.py'
-         work_dir    = '/usr/builds/app-arch/tar/work'
-         seg_dir     - '/usr/builds/app-arch/tar/work/seg'
+         build_dir   = '/var/builds/app-arch/tar'
+         build_file  = '/var/builds/app-arch/tar/tar-1.28.build.py'
+         work_dir    = '/var/builds/app-arch/tar/work'
+         seg_dir     - '/var/builds/app-arch/tar/work/seg'
          package     = 'tar-1.28.tar.xz'
          package_dir = 'tar-1.28'
 
          The config dictionary passed to __init__ also contains some useful
          system-wide values:
 
-         config['builds_root'] = '/usr/builds' (default)
-         config['distfiles']   = '/usr/builds/distfiles'
+         config['builds_root'] = '/var/builds' (default)
+         config['distfiles']   = '/var/builds/distfiles' (default)
          config['db_file']     = 'builds-stable' (default)
-         config['logfile']     = '/usr/builds/builds.log'
+         config['logfile']     = '/var/log/builds.log' (default)
          config['cflags']      = empty by default
          config['cxxflags']    = empty by default
         """
         self.config = config
+        self.args = args
         self.build = build
         self.name = build.split('/')[1]
         with dbm.open(self.config['db_file']) as db:
@@ -85,7 +86,7 @@ class BuildPackage:
 
     def fetch(self) -> None:
         """
-        Fetch the package source code and check sha256sum
+        Fetch the package source and check sha256sum
         """
 
         if hasattr(self, 'fetch_prehook'):
@@ -186,16 +187,22 @@ class BuildPackage:
         """
         Install the program and files into the live filesystem.
 
-        make_install() MUST be defined in the package.build file.
+        make_install() MUST be defined in the package.build.py file.
         """
         if hasattr(self, 'install'):
             self.install()
         else:
-            cf.red(f"{self.build_file} has no `install()` method defined")
+            cf.red(f"{self.build_file} has no 'install()' method defined")
             cf.yellow("All build files must define `install()`")
             cf.log.critical(f"{self.build_file} has no install() method defined - aborting")
             self.cleanup()
             sys.exit(5)
+
+        if self.args.verbose:
+            files = cf.get_manifest(self.build_file)
+            cf.green(f"Files installed for {self.name} {self.version}: ")
+            for file in files:
+                cf.bold(f"\t{file}")
 
     def cleanup(self) -> None:
         """
