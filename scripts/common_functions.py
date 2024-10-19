@@ -37,29 +37,29 @@ import tqdm
 # These are a bunch of common paths to be used in
 # tandem with the helper functions in the next section
 # Install paths
-paths = {}
-paths['b'] = "/bin"
-paths['s'] = "/sbin"
-paths['l'] = "/lib"
-paths['ub'] = "/usr/bin"
-paths['us'] = "/usr/sbin"
-paths['ui'] = "/usr/include"
-paths['ul'] = "/usr/lib"
-paths['ulb'] = "/usr/local/bin"
-paths['uls'] = "/usr/local/sbin"
-paths['uli'] = "/usr/local/include"
-paths['ull'] = "/usr/local/lib"
+paths = {
+    'b': "/bin",
+    's': "/sbin",
+    'l': "/lib",
+    'ub': "/usr/bin",
+    'us': "/usr/sbin",
+    'ui': "/usr/include",
+    'ul': "/usr/lib",
+    'ulb': "/usr/local/bin",
+    'uls': "/usr/local/sbin",
+    'uli': "/usr/local/include",
+    'ull': "/usr/local/lib",
 
-# Man paths
-paths['man1'] = "/usr/share/man/man1"
-paths['man2'] = "/usr/share/man/man2"
-paths['man3'] = "/usr/share/man/man3"
-paths['man4'] = "/usr/share/man/man4"
-paths['man5'] = "/usr/share/man/man5"
-paths['man6'] = "/usr/share/man/man6"
-paths['man7'] = "/usr/share/man/man7"
-paths['man8'] = "/usr/share/man/man8"
-
+    # Man paths
+    'man1': "/usr/share/man/man1",
+    'man2': "/usr/share/man/man2",
+    'man3': "/usr/share/man/man3",
+    'man4': "/usr/share/man/man4",
+    'man5': "/usr/share/man/man5",
+    'man6': "/usr/share/man/man6",
+    'man7': "/usr/share/man/man7",
+    'man8': "/usr/share/man/man8"
+}
 
 clr = {
     'green': '\033[1;32m',
@@ -117,7 +117,7 @@ def get_config():
 
     if os.path.isfile(f'{os.path.expanduser("~")}/.builds.conf'):
         conf_file = f'{os.path.expanduser("~")}/.builds.conf'
-    elif os.path.isfile(conf_file = '/etc/builds.conf'):
+    elif os.path.isfile('/etc/builds.conf'):
         conf_file = '/etc/builds.conf'
     else:
         red("Cannot find builds.conf")
@@ -153,7 +153,7 @@ log.basicConfig(
 
 
 # These helper functions are intended to be used in the
-# install() function in the package.build file.
+# 'install()' function in the package.build file.
 def do_bin(frm: str, to: str) -> None:
     """
     Install a binary to the live filesystem
@@ -233,6 +233,22 @@ def do_sym(target: str, name: str) -> None:
         sys.exit(-1)
 
 
+def do_dir(src: str, dst: str) -> None:
+    """
+    Recursively install a directory of files
+
+    This is intended to be used with packages that create
+    deep nested directories of library files
+    """
+    try:
+        os.rename(src, dst)
+    except OSError as e:
+        red("Call to do_dir failed: ")
+        print(e)
+        log.error("call to do_dir failed. Aborting install")
+        sys.exit(-1)
+
+
 def download(url: str, filename: str) -> None:
     """
     Download package with nice progress bar
@@ -268,7 +284,7 @@ def download(url: str, filename: str) -> None:
             print("Are you sure you're connected to the Internet?")
             log.error("Download of %s failed", filename)
             # tqdm (or requests) leaves a zero-length stub file
-            # which we need to cleanup if the download fails
+            # which we need to clean up if the download fails
             os.remove(f"{config['builds_root']}/distfiles/{filename}")
             sys.exit(12)
 
@@ -277,9 +293,17 @@ def get_sha256sum(file_name: str) -> str:
     """
     Produce checksum of downloaded file
     """
+    #with open(file_name, "rb") as f:
+    #    digest = hashlib.file_digest(f, "sha256")
+    #    return digest.hexdigest()
+    # file_digest only available on Python 3.11+
+    #
+    sha256_hash = hashlib.sha256()
     with open(file_name, "rb") as f:
-        digest = hashlib.file_digest(f, "sha256")
-        return digest.hexdigest()
+        # Read the file in chunks to avoid memory issues with large files
+        for chunk in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(chunk)
+    return sha256_hash.hexdigest()
 
 
 def do_initdb(args: argparse.Namespace, _config: dict) -> None:
