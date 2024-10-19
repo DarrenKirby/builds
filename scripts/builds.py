@@ -164,19 +164,22 @@ def do_main() -> None:
 
         bld = build_package.BuildPackage(build[0], config, args)
         bld.fetch()
+
         if args.fetch:
             continue
+
         bld.install_source()
         bld.configure_src()
         bld.make_src()
         bld.make_inst()
-        if args.buildonly:
-            continue
-        #bld.inst()
-        #bld.cleanup()
+
+        if not args.buildonly:
+            bld.inst()
+            bld.cleanup()
 
         finish_time = datetime.datetime.now()
         elapsed = finish_time - start_time
+        print()
         cf.bold(f"build of {build[0]} version {build[1]} complete in {elapsed}.")
         cf.log.info('build of %s version %s complete in %s', build[0], build[1], elapsed)
 
@@ -204,7 +207,7 @@ def do_uninstall(args: argparse.Namespace, config: dict) -> None:
             continue
 
         if args.verbose:
-            print(f"Files to be uninstalled for {pkg}:")
+            print(f"Files to be uninstalled for {pkg}: ")
             for file in files_to_uninstall:
                 cf.bold(f"\t{file}")
             print()
@@ -237,7 +240,7 @@ Usage: {APPNAME} [general options] command [command options] arg [arg2...]
 
     install/uninstall Options:
         '-f'   or '--fetch'                 download packages but do not install
-        '-p'   or '--pretend'               only show which packages would be built
+        '-p'   or '--pretend'               show which packages would be built then exit
         '-a'   or '--ask'                   prompt before installing/uninstalling package(s)
         '-b'   or '--buildonly'             build the package, but do not install
 
