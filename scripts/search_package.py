@@ -53,7 +53,7 @@ def do_search(args: argparse.Namespace, config: dict) -> None:
                     match = True
 
     if not match:
-        print(f"Could not find package(s) matching `{', '.join(to_search)}`")
+        print(f"Could not find package(s) matching '{', '.join(to_search)}'")
         print()
 
 
