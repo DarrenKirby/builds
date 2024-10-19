@@ -67,14 +67,17 @@ def resolve_dependencies(args: argparse.Namespace, config: dict) -> list:
             lines = fh.readlines()
             for line in lines:
                 if line.startswith('depend'):
-                    pkgs = line.split('=')[-1]
+                    pkgs = line.split('=')[-1].strip()
+                    pkgs = pkgs[1:-1] # remove quotes
                     for pkg in pkgs.split(','):
                         with dbm.open(config['db_file']) as db:
-                            db_string = db[pkg.split('/')[1]].decode()
+                            db_string = db[pkg].decode()
+                            db_list = db_string.split(",")
 
                             # We do not yet distinguish between build depends and run depends,
                             # (let alone optional depends) so for now we just insert dependencies
                             # at the beginning of the list so that they get built first.
-                            pkgs_to_build.insert(0, (pkg, db_string.split()[1]))
+                            pkgs_to_build.insert(0, (db_list[0], db_list[1]))
+
     pkgs_to_build += atoms
     return pkgs_to_build
