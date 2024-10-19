@@ -21,15 +21,19 @@
 def configure(self):
     return os.system(f"./configure --prefix={self.seg_dir}")
 
+
 def make(self):
     return os.system("make")
+
 
 def make_install(self):
     return os.system("make install install.man")
 
+
 def install(self):
     cf.do_bin(f"{self.seg_dir}/bin/tcsh", cf.paths['ub'])
     cf.do_man(f"{self.seg_dir}share/man/man1/tcsh.1", cf.paths['man1'])
+
 
 """
 /usr/bin/tcsh

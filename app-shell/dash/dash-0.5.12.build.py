@@ -20,15 +20,19 @@
 def configure(self):
     return os.system(f"./configure --prefix={self.seg_dir}")
 
+
 def make(self):
     return os.system("make")
+
 
 def make_install(self):
     return os.system("make install")
 
+
 def install(self):
     cf.do_bin(f"{self.seg_dir}/bin/dash", cf.paths['b'])
     cf.do_man(f"{self.seg_dir}share/man/man1/dash.1", cf.paths['man1'])
+
 
 def cleanup_prehook(self):
     print()
@@ -40,6 +44,7 @@ def cleanup_prehook(self):
     print("/bin/dash")
     print("EOF")
     print()
+
 
 """
 /bin/dash
