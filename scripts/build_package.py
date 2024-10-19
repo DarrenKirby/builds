@@ -121,6 +121,14 @@ class BuildPackage:
 
         cf.bold(f"Extracting {self.package} into {self.work_dir}")
 
+        if os.path.exists(self.work_dir):
+            cf.yellow(f"{self.work_dir} already exists!")
+            if input("Overwrite (y/n) ") in ['n', 'N', 'no', 'No']:
+                cf.red("Aborting...")
+                sys.exit(5)
+            else:
+                rmtree(self.work_dir)
+
         os.mkdir(self.work_dir)
         os.chdir(self.work_dir)
         unpack_archive(f"{self.config['distfiles']}/{self.package}", ".")
@@ -135,8 +143,10 @@ class BuildPackage:
         """
         os.chdir(self.package_dir)
         cf.bold("Configuring package...")
+        print()
         if hasattr(self, 'configure'):
             if self.configure() == 0:
+                print()
                 cf.green("Package successfully configured.")
             else:
                 cf.red("Configure failed")
@@ -150,9 +160,11 @@ class BuildPackage:
         Compile and link the source code.
         """
         cf.bold("Running `make`...")
+        print()
 
         if hasattr(self, 'make'):
             if self.make() == 0:
+                print()
                 cf.green("`make` successful.")
             else:
                 cf.red("`make` failed")
@@ -166,6 +178,8 @@ class BuildPackage:
         Install the compiled program into a segregated directory.
         """
         if hasattr(self, 'make_install'):
+            cf.green("Installing components into segregated directory...")
+            print()
             self.make_install()
 
     def inst(self) -> None:
