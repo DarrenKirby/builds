@@ -114,10 +114,12 @@ def print_red(msg: str) -> None:
 
 def get_config():
     """Read the configuration file """
-    conf_file = f'{os.path.expanduser("~")}/.builds.conf'
-    if not os.path.exists(conf_file):
+
+    if os.path.isfile(f'{os.path.expanduser("~")}/.builds.conf'):
+        conf_file = f'{os.path.expanduser("~")}/.builds.conf'
+    elif os.path.isfile(conf_file = '/etc/builds.conf'):
         conf_file = '/etc/builds.conf'
-    if not os.path.exists(conf_file):
+    else:
         red("Cannot find builds.conf")
         sys.exit(-1)
 
@@ -260,6 +262,15 @@ def download(url: str, filename: str) -> None:
             yellow("Download timed out")
             print("Perhaps try a mirror?")
             log.error("Download of %s timed out", filename)
+            sys.exit(12)
+        except requests.exceptions.ConnectionError:
+            red("Name resolution error!")
+            print("Are you sure you're connected to the Internet?")
+            log.error("Download of %s failed", filename)
+            # tqdm (or requests) leaves a zero-length stub file
+            # which we need to cleanup if the download fails
+            os.remove(f"{config['builds_root']}/distfiles/{filename}")
+            sys.exit(12)
 
 
 def get_sha256sum(file_name: str) -> str:
