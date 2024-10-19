@@ -42,6 +42,7 @@ def make_install(self):
 
 def install(self):
     cf.do_bin(f"{self.seg_dir}/bin/zsh", cf.paths['ub'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/zsh.1", cf.paths['man1'])
     cf.do_man(f"{self.seg_dir}/share/man/man1/zshall.1", cf.paths['man1'])
     cf.do_man(f"{self.seg_dir}/share/man/man1/zshbuiltins.1", cf.paths['man1'])
     cf.do_man(f"{self.seg_dir}/share/man/man1/zshcalsys.1", cf.paths['man1'])
