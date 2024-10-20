@@ -1,5 +1,5 @@
 #    app-arch/bzip2/bzip2-1.0.8.build.py
-#    Tue Oct  8 18:43:05 UTC 2024
+#    Sun Oct 20 00:41:16 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -18,15 +18,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-def configure(self):
-    # Ensure symbolic links are relative
-    exit1 = os.system("sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile")
-    # Fix manpage installation PATH
-    exit2 = os.system('sed -i "s@(PREFIX)/man@(PREFIX/share/man@g)" Makefile')
-    if (exit1 == 0) and (exit2 == 0):
-        return 0
-    return 1
-
 def make(self):
     # Build shared lib, and use Makefile which links binaries against it
     exit1 = os.system("make -f Makefile-libbz2_so")
@@ -35,8 +26,10 @@ def make(self):
         return 1
     return os.system("make")
 
+
 def make_install(self):
     return os.system(f"make PREFIX={self.seg_dir} install")
+
 
 def install(self):
     cf.do_lib("libbz2.so.1.0.8", cf.paths['ul'])
@@ -58,14 +51,15 @@ def install(self):
     cf.do_sym(f"{cf.paths['ub']}/bzgrep", f"{cf.paths['ub']}/bzfgrep")
     cf.do_sym(f"{cf.paths['ub']}/bzmore", f"{cf.paths['ub']}/bzless")
 
-    cf.do_man(f"{self.seg_dir}/share/man/man1/bzcmp.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/bzdiff.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/bzegrep.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/bzfgrep.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/bzgrep.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/bzip2.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/bzless.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/bzmore.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/man/man1/bzcmp.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/man/man1/bzdiff.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/man/man1/bzegrep.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/man/man1/bzfgrep.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/man/man1/bzgrep.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/man/man1/bzip2.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/man/man1/bzless.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/man/man1/bzmore.1", cf.paths['man1'])
+
 
 """
 /usr/lib/libbz2.so.1.0.8
