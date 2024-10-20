@@ -1,5 +1,5 @@
 #    app-arch/tar/tar-1.35.build.py
-#    Fri Sep 27 20:45:32 UTC 2024
+#    Sun Oct 20 00:41:16 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -18,20 +18,24 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+def configure(self):
+    return os.system(f"./configure --prefix={self.seg_dir}")
 
-def configure_source(self):
-    os.chdir(f"{self.work_dir}/{self.package_dir}")
-    os.system(f"./configure --prefix={self.work_dir} --bindir={self.work_dir}/bin")
 
-def make_source(self):
-    os.system("make")
+def make(self):
+    return os.system("make")
+
+
+def make_install(self):
+    return os.system("make install")
+
 
 def install():
-    os.chdir(work_dir)
-    do_bin(f"./bin/tar", "{b}/tar")
-    do_bin(f"./libexec/rmt", "{sb}/rmt")
-    do_man(f"./share/man/man1/tar.1" "{man1}/tar.1.bz2")
-    do_man(f"./share/man/man8/rmt.8" "{man8}/rmt.8.bz2")
+    cf.do_bin(f"{self.seg_dir}/bin/tar", cf.paths['b'])
+    cf.do_bin(f"{self.seg_dir}/libexec/rmt", cf.paths['sb'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/tar.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/rmt.8", cf.paths['man8'])
+
 
 """
 /bin/tar
