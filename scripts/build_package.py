@@ -28,6 +28,7 @@ import sys
 import types
 import argparse
 import os
+import subprocess
 from os.path import exists
 from shutil import unpack_archive, rmtree
 
@@ -252,6 +253,7 @@ class BuildPackage:
         module_globals = module.__dict__
         module_globals['os'] = os  # Inject os into the namespace
         module_globals['cf'] = cf  # Inject cf into the namespace
+        module_globals['subprocess'] = subprocess  # Inject subprocess into the namespace
 
         # Iterate over methods defined in the module
         for name in dir(module):
