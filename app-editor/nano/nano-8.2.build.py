@@ -1,5 +1,5 @@
 #    app-editor/nano/nano-8.2.build.py
-#    Fri Sep 27 20:45:32 UTC 2024
+#    Sun Oct 20 02:21:00 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -18,20 +18,30 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-def configure_source(self):
-    os.chdir(f"{self.work_dir}/{self.package_dir}")
-    os.system(f"./configure --prefix={self.work_dir} --bindir={self.work_dir}/bin")
+def configure(self):
+    return os.system(f"./configure --prefix={self.seg_dir} --enable-utf8")
 
-def make_source(self):
-    os.system("make")
+
+def make(self):
+    return os.system("make")
+
+
+def make_install(self):
+    return os.system("make install")
+
 
 def install(self):
-    os.chdir(work_dir)
-    cf.do_bin(f"./bin/tar", "{cf.b}/tar")
-    cf.do_bin(f"./libexec/rmt", "{cf.sb}/rmt")
-    cf.do_man(f"./share/man/man1/tar.1" "{cf.man1}/tar.1.bz2")
-    cf.do_man(f"./share/man/man8/rmt.8" "{cf.man8}/rmt.8.bz2")
+    cf.do_bin(f"{self.seg_dir}/bin/nano", cf.paths['ub'])
+    cf.do_sym(f"{cf.paths['ub']}/nano", f"{cf.paths['ub']}/rnano")
+    cf.do_man(f"{self.seg_dir}/share/man/man1/nano.1", {cf.paths['man1']})
+    cf.do_man(f"{self.seg_dir}/share/man/man1/rnano.1", {cf.paths['man1']})
+    cf.do_man(f"{self.seg_dir}/share/man/man5/nanorc.5", {cf.paths['man8']})
+
 
 """
-
+/usr/bin/nano
+/usr/bin/rnano
+/usr/share/man/man1/nano.1.bz2
+/usr/share/man/man1/rnano.1.bz2
+/usr/share/man/man5/nanorc.5.bz2
 """
