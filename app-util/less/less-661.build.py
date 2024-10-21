@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>.build
-#    `date --utc`
+#    app-util/less/less-661.build.py
+#    Mon Oct 21 22:52:42 UTC 2024
 
-#    Copyright:: (c) 2024 <name>
-#    Author:: <name> (mailto:<email>)
+#    Copyright:: (c) 2024 Darren Kirby
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,64 +18,33 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment this line out,
-# otherwise, add all dependencies to this list as strings ie:
-# depend=['dev-lang/ruby', 'dev-editor/nano']
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are already installed.
-depend = []
+def configure(self):
+    return os.system(f"./configure --prefix={self.seg_dir}")
 
 
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
+def make(self):
+    return os.system("make")
 
 
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook():
-#     pass
-#
-# def install_source_posthook():
-#     pass
+def make_install(self):
+    return os.system("make install")
 
 
-# configure_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def configure_source():
-    print("Nothing to configure")
 
+def install(self):
+    cf.do_bin(f"{self.seg_dir}/bin/less", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/lessecho", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/lesskey", cf.paths['ub'])
 
-# make_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def make_source():
-    print("Nothing to configure")
+    cf.do_man(f"{self.seg_dir}/share/man/man1/less.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/lessecho.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/lesskey.1", cf.paths['man1'])
 
-
-# make_install MUST be defined in the build file.
-# Use the helper functions in common_functions.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
-def make_install():
-    pass
-
-
-# Use these two as pre/post hooks into the cleanup process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
-
-
-# Write each installed file one per line in the commented section below.
-# This is the list that `bld uninstall` uses to know which files to remove.
 """
-/etc/foo.conf
-/usr/bin/foo
-/usr/lib/libfoo.so
-/usr/lib/libfoo.so.5.2
-/usr/share/man/man1/foo.1
+/usr/bin/less
+/usr/bin/lessecho
+/usr/bin/lesskey
+/usr/share/man/man1/less.1.bz2
+/usr/share/man/man1/lessecho.1.bz2
+/usr/share/man/man1/lesskey.1.bz2
 """
