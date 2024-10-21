@@ -41,6 +41,7 @@ paths = {
     'b': "/bin",
     's': "/sbin",
     'l': "/lib",
+    'e': "/etc",
     'ub': "/usr/bin",
     'us': "/usr/sbin",
     'ui': "/usr/include",
@@ -249,6 +250,19 @@ def do_dir(src: str, dst: str) -> None:
         sys.exit(-1)
 
 
+def do_con(frm: str, to: str) -> None:
+    """
+    Install a configureation file to the live filesystem.
+    """
+    try:
+        sp.run(shlex.split(f"install -b -v -o root -g root -m 644 {frm} {to}"), check=True)
+    except sp.CalledProcessError as e:
+        red(f"Install of {frm} failed: ")
+        print(e)
+        log.error("install of %s failed.", frm)
+        sys.exit(-1)
+
+
 def download(url: str, filename: str) -> None:
     """
     Download package with nice progress bar
@@ -310,9 +324,10 @@ def do_initdb(args: argparse.Namespace, _config: dict) -> None:
     """
     Initialize a db file from a csv file
     """
-    for csv_file in args:
+    for csv_file in args.db_file:
         try:
-            with dbm.open(f'{_config["builds_root"]}/scripts/{csv_file[:-4]}', 'c') as db:
+            db_file_name = csv_file.split('/')[-1]
+            with dbm.open(f'{_config["builds_root"]}/scripts/{db_file_name[:-4]}', 'c') as db:
                 with open(csv_file, newline='', encoding='UTF8') as f:
                     reader = csv.reader(f)
                     for row in reader:
@@ -321,12 +336,14 @@ def do_initdb(args: argparse.Namespace, _config: dict) -> None:
         except FileNotFoundError:
             red(f"The file {csv_file} was not found.")
             log.error("%s was not found", csv_file)
+            sys.exit(6)
         except PermissionError:
             red(f"You don't have permission to read {csv_file}.")
             log.error("No permission to read %s", csv_file)
+            sys.exit(7)
         except csv.Error as e:
             red(f"Error while reading {csv_file}: {e}")
-
+            sys.exit(8)
         green(f"Initialized {csv_file[:-4]}")
 
 
