@@ -21,11 +21,14 @@
 def configure(self):
     return os.system(f"./configure --prefix={self.seg_dir}")
 
+
 def make(self):
     return os.system("make")
 
+
 def make_install(self):
     return os.system("make install")
+
 
 def install(self):
     cf.do_lib(f"{self.seg_dir}/lib/libz.so.1.3.1", cf.paths['ul'])
@@ -34,6 +37,7 @@ def install(self):
     cf.do_hdr(f"{self.seg_dir}/include/zconf.h", cf.paths['ui'])
     cf.do_hdr(f"{self.seg_dir}/include/zlib.h", cf.paths['ui'])
     cf.do_man(f"{self.seg_dir}/share/man/man3/zlib.3", cf.paths['man3'])
+
 
 """
 /usr/lib/libz.so.1.3.1
