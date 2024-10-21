@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>.build
-#    `date --utc`
+#    app-util/acl/acl-2.3.2.build.py
+#    Mon Oct 21 18:02:24 UTC 2024
 
-#    Copyright:: (c) 2024 <name>
-#    Author:: <name> (mailto:<email>)
+#    Copyright:: (c) 2024 Darren
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,64 +18,93 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment this line out,
-# otherwise, add all dependencies to this list as strings ie:
-# depend=['dev-lang/ruby', 'dev-editor/nano']
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are already installed.
-depend = []
+
+def configure(self):
+    return os.system(f"./configure --prefix={self.seg_dir} --disable-static")
 
 
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
+def make(self):
+    return os.system("make")
 
 
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook():
-#     pass
-#
-# def install_source_posthook():
-#     pass
+def make_install(self):
+    return os.system("make install")
 
 
-# configure_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def configure_source():
-    print("Nothing to configure")
+def install(self):
+    cf.do_bin(f"{self.seg_dir}/bin/", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/", cf.paths['ub'])
+
+    os.mkdir("/usr/include/acl", 0o755)
+    cf.do_hdr(f"{self.seg_dir}/include/acl/libacl.h", f"{cf.paths['ui']}/acl/")
+    cf.do_hdr(f"{self.seg_dir}/include/sys/acl.h", f"{cf.paths['ui']}/sys/")
+
+    cf.do_lib(f"{self.seg_dir}/lib/libacl.so.1.1.2302", cf.paths['ul'])
+    cf.do_sym(f"{cf.paths['ul']}/libacl.so.1.1.2302", f"{cf.paths['ul']}/libacl.so.1")
+    cf.do_sym(f"{cf.paths['ul']}/libacl.so.1.1.2302", f"{cf.paths['ul']}/libacl.so")
+
+    cf.do_man(f"{self.seg_dir}/share/man/man1/chacl.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/getfacl.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/setfacl.1", cf.paths['man1'])
+
+    for manpage in glob.glob(f"{self.seg_dir}/share/man/man3/acl_*.3"):
+        cf.do_man(manpage, cf.paths['man3'])
+
+    cf.do_man(f"{self.seg_dir}/share/man/man5/acl.5", cf.paths['man5'])
 
 
-# make_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def make_source():
-    print("Nothing to configure")
 
-
-# make_install MUST be defined in the build file.
-# Use the helper functions in common_functions.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
-def make_install():
-    pass
-
-
-# Use these two as pre/post hooks into the cleanup process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
-
-
-# Write each installed file one per line in the commented section below.
-# This is the list that `bld uninstall` uses to know which files to remove.
 """
-/etc/foo.conf
-/usr/bin/foo
-/usr/lib/libfoo.so
-/usr/lib/libfoo.so.5.2
-/usr/share/man/man1/foo.1
+/usr/bin/chacl
+/usr/bin/getfacl
+/usr/bin/setfacl
+/usr/include/acl/libacl.h
+/usr/include/sys/acl.h
+/usr/lib/libacl.so
+/usr/lib/libacl.so.1
+/usr/lib/libacl.so.1.1.2302
+/usr/share/man/man1/chacl.1.bz2
+/usr/share/man/man1/getfacl.1.bz2
+/usr/share/man/man1/setfacl.1.bz2
+/usr/share/man/man3/acl_add_perm.3.bz2
+/usr/share/man/man3/acl_calc_mask.3.bz2
+/usr/share/man/man3/acl_check.3.bz2
+/usr/share/man/man3/acl_clear_perms.3.bz2
+/usr/share/man/man3/acl_cmp.3.bz2
+/usr/share/man/man3/acl_copy_entry.3.bz2
+/usr/share/man/man3/acl_copy_ext.3.bz2
+/usr/share/man/man3/acl_copy_int.3.bz2
+/usr/share/man/man3/acl_create_entry.3.bz2
+/usr/share/man/man3/acl_delete_def_file.3.bz2
+/usr/share/man/man3/acl_delete_entry.3.bz2
+/usr/share/man/man3/acl_delete_perm.3.bz2
+/usr/share/man/man3/acl_dup.3.bz2
+/usr/share/man/man3/acl_entries.3.bz2
+/usr/share/man/man3/acl_equiv_mode.3.bz2
+/usr/share/man/man3/acl_error.3.bz2
+/usr/share/man/man3/acl_extended_fd.3.bz2
+/usr/share/man/man3/acl_extended_file.3.bz2
+/usr/share/man/man3/acl_extended_file_nofollow.3.bz2
+/usr/share/man/man3/acl_free.3.bz2
+/usr/share/man/man3/acl_from_mode.3.bz2
+/usr/share/man/man3/acl_from_text.3.bz2
+/usr/share/man/man3/acl_get_entry.3.bz2
+/usr/share/man/man3/acl_get_fd.3.bz2
+/usr/share/man/man3/acl_get_file.3.bz2
+/usr/share/man/man3/acl_get_perm.3.bz2
+/usr/share/man/man3/acl_get_permset.3.bz2
+/usr/share/man/man3/acl_get_qualifier.3.bz2
+/usr/share/man/man3/acl_get_tag_type.3.bz2
+/usr/share/man/man3/acl_init.3.bz2
+/usr/share/man/man3/acl_set_fd.3.bz2
+/usr/share/man/man3/acl_set_file.3.bz2
+/usr/share/man/man3/acl_set_permset.3.bz2
+/usr/share/man/man3/acl_set_qualifier.3.bz2
+/usr/share/man/man3/acl_set_tag_type.3.bz2
+/usr/share/man/man3/acl_size.3.bz2
+/usr/share/man/man3/acl_to_any_text.3.bz2
+/usr/share/man/man3/acl_to_text.3.bz2
+/usr/share/man/man3/acl_valid.3.bz2
+/usr/share/man/man5/acl.5.bz2
 """
