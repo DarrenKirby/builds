@@ -34,6 +34,7 @@ def install(self):
     cf.do_bin(f"{self.seg_dir}/bin/sed", cf.paths['ub'])
     cf.do_man(f"{self.seg_dir}/share/man/man1/sed.1", cf.paths['man1'])
 
+
 """
 /usr/bin/sed
 /usr/share/man/man1/sed.1.bz2
