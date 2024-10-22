@@ -1,5 +1,5 @@
 #    app-util/file/file-5.45.build.py
-#    Wed Oct  9 00:40:11 UTC 2024
+#    Tue Oct 22 21:19:20 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -21,11 +21,14 @@
 def configure(self):
     return os.system(f"./configure --prefix={self.seg_dir}")
 
+
 def make(self):
     return os.system("make")
 
+
 def make_install(self):
     return os.system("make install")
+
 
 def install(self):
     cf.do_lib(f"{self.seg_dir}/lib/libmagic.so.1.0.0", cf.paths['ul'])
@@ -43,14 +46,15 @@ def install(self):
     os.system("mkdir -p /usr/share/misc")
     cf.do_bin(f"{self.seg_dir}/share/misc/magic.mgc", "/usrshare/misc/magic.mgc")
 
+
 """
 /usr/bin/file
-/usr/inlude/magic.h
+/usr/include/magic.h
 /usr/lib/libmagic.so
 /usr/lib/libmagic.so.1
 /usr/lib/libmagic.so.1.0.0
 /usr/share/man/man1/file.1.bz2
 /usr/share/man/man3/libmagic.3.bz2
 /usr/share/man/man4/magic.4.bz2
-/usr/share/miscmagic.mgc
+/usr/share/misc/magic.mgc
 """
