@@ -29,6 +29,10 @@ import os
 import csv
 import dbm
 import logging as log
+import shutil
+import urllib.request as request
+from contextlib import closing
+from urllib.error import URLError
 
 import requests
 import tqdm
@@ -269,6 +273,12 @@ def download(url: str, filename: str) -> None:
 
     This requires requests and tqdm
     """
+
+    # requests doesn't do FTP
+    if url[0:4] == "ftp:":
+        download_ftp(url, filename)
+        return
+
     with open(filename, 'wb') as f:
         try:
             with requests.get(url, stream=True, timeout=10) as r:
@@ -301,6 +311,36 @@ def download(url: str, filename: str) -> None:
             # which we need to clean up if the download fails
             os.remove(f"{config['builds_root']}/distfiles/{filename}")
             sys.exit(12)
+
+
+
+class DownloadProgressBar(tqdm.tqdm):
+    def update_to(self, b=1, bsize=1, tsize=None):
+        if tsize is not None:
+            self.total = tsize
+        self.update(b * bsize - self.n)
+
+
+def download_ftp(url: str, filename: str) -> None:
+    """
+    Download using ftp protocol
+    """
+    try:
+        with DownloadProgressBar(unit='B',
+                                unit_scale=True,
+                                miniters=1,
+                                desc=url.split('/')[-1]) as t:
+            request.urlretrieve(url, filename=filename, reporthook=t.update_to)
+    # try:
+    #     with closing(request.urlopen(url)) as r:
+    #         with open(filename, 'wb') as f:
+    #             shutil.copyfileobj(r, f)
+    except URLError as e:
+        if e.reason.find('No such file or directory') >= 0:
+            red(f"File: {filename.split('/')[-1]} not found on server")
+            sys.exit(23)
+        else:
+            raise Exception(f'Something else happened. "{e.reason}"')
 
 
 def get_sha256sum(file_name: str) -> str:
@@ -385,10 +425,10 @@ def get_db_info(package: str) -> list:
 
 def get_installed_version(package: str) -> list:
     """
-    Retrieve the installed version from installed file
+    Retrieve the installed version from 'installed' file
     """
-    if package.find('/') != -1:
-        package = package.split('/')[0]
+    #if package.find('/') != -1:
+    #    package = package.split('/')[0]
 
     with open(f"{config['builds_root']}/sets/installed", "r", encoding="utf-8") as f:
         lines = f.readlines()
@@ -397,5 +437,18 @@ def get_installed_version(package: str) -> list:
                 line = line.strip('\n')
                 return line.split(',')
 
-    yellow(f"{package} does not appear to be installed")
+    #yellow(f"{package} does not appear to be installed")
     return [None]
+
+
+def add_to_install_file(name: str, version: str) -> int:
+    """
+    Add a newly installed package to the 'installed' file
+    """
+    try:
+        with open(f"{config['builds_root']}/sets/installed", "a", encoding="utf-8") as f:
+            f.write(f"{name},{version}\n")
+            return 0
+    except IOError:
+        return 1
+
