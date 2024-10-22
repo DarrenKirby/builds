@@ -134,7 +134,6 @@ def do_main() -> None:
     this_build = 1
 
     cf.green("builds to build:")
-    print()
     for name, version in builds_to_build:
         cf.print_bold(f">>> {name} ")
         cf.print_green(f"{version}\n")
@@ -143,10 +142,18 @@ def do_main() -> None:
     if args.pretend:
         sys.exit(0)
 
+    if args.ask:
+        cont = input("...continue with these builds? [y/n] ")
+        if cont in ['n', 'N']:
+            cf.red("aborting")
+            sys.exit(1)
+
     for build in builds_to_build:
-        if args.ask:
-            cont = input("...continue with these builds? [y/n] ")
-            if cont in ['n', 'N']:
+        check = cf.get_installed_version(build[0])
+        if check != [None] and build[1] == check[1]:
+            cf.yellow(f"{build[0]} version {build[1]} already installed!")
+            print("Install again? ")
+            if input() in ['n', 'N']:
                 cf.red("aborting")
                 sys.exit(1)
 
@@ -176,6 +183,11 @@ def do_main() -> None:
         if not args.buildonly:
             bld.inst()
             bld.cleanup()
+
+        print()
+        cf.green(f"Recording {build[0]} {build[1]} in 'sets/installed'...")
+        if cf.add_to_install_file(build[0], build[1]) == 0:
+            cf.green("...done!")
 
         finish_time = datetime.datetime.now()
         elapsed = finish_time - start_time
