@@ -203,8 +203,8 @@ class BuildPackage:
         if self.args.verbose:
             files = cf.get_manifest(self.build_file)
             cf.green(f"Files installed for {self.name} {self.version}: ")
-            for file in files:
-                cf.bold(f"\t{file}")
+            for filename in files:
+                cf.bold(f"\t{filename}")
 
     def cleanup(self) -> None:
         """
@@ -222,7 +222,6 @@ class BuildPackage:
         rmtree(self.work_dir)
 
         cf.green("Clean up successful")
-        cf.green(f"Build of {self.name} {self.version} complete.")
 
         if hasattr(self, 'cleanup_posthook'):
             self.cleanup_posthook()
