@@ -54,6 +54,7 @@ paths = {
     'uls': "/usr/local/sbin",
     'uli': "/usr/local/include",
     'ull': "/usr/local/lib",
+    'ush': "/usr/share",
 
     # Man paths
     'man1': "/usr/share/man/man1",
@@ -256,7 +257,7 @@ def do_dir(src: str, dst: str) -> None:
 
 def do_con(frm: str, to: str) -> None:
     """
-    Install a configureation file to the live filesystem.
+    Install a configuration file to the live filesystem.
     """
     try:
         sp.run(shlex.split(f"install -b -v -o root -g root -m 644 {frm} {to}"), check=True)
