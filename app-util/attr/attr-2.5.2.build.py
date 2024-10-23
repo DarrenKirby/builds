@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>.build
-#    `date --utc`
+#    app-util/attr/attr-2.5.2.build.py
+#    Wed Oct 23 00:11:26 UTC 2024
 
-#    Copyright:: (c) 2024 <name>
-#    Author:: <name> (mailto:<email>)
+#    Copyright:: (c) 2024 Darren Kirby
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,64 +18,65 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment this line out,
-# otherwise, add all dependencies to this list as strings ie:
-# depend=['dev-lang/ruby', 'dev-editor/nano']
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are already installed.
-depend = []
+def configure(self):
+    return os.system(f"./configure --prefix={self.seg_dir} --disable-static")
 
 
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
+def make(self):
+    return os.system("make")
 
 
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook():
-#     pass
-#
-# def install_source_posthook():
-#     pass
+def make_install(self):
+    return os.system("make install")
 
 
-# configure_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def configure_source():
-    print("Nothing to configure")
+def install(self):
+    cf.do_bin(f"{self.seg_dir}/bin/attr", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/getfattr", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/setfattr", cf.paths['ub'])
+
+    cf.do_con(f"{self.seg_dir}/etc/xattr.conf", cf.paths['e'])
+
+    cf.do_lib(f"{self.seg_dir}/lib/libattr.so.1.1.2502", cf.paths['ul'])
+    cf.do_sym(f"{cf.paths['ul']}/libattr.so.1.1.2502", f"{cf.paths['ul']}/libattr.so")
+    cf.do_sym(f"{cf.paths['ul']}/libattr.so.1.1.2502", f"{cf.paths['ul']}/libattr.so.1")
+
+    cf.do_man(f"{self.seg_dir}/share/man/man1/attr.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/getfattr.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/setfattr.1", cf.paths['man1'])
+
+    cf.do_man(f"{self.seg_dir}/share/man/man3/attr_get.3", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/attr_list.3", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/attr_multi.3", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/attr_remove.3", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/attr_set.3", cf.paths['man3'])
+
+    cf.do_sym(f"{cf.paths['man3']}/attr_get.3", f"{cf.paths['man3']}/attr_getf.3")
+    cf.do_sym(f"{cf.paths['man3']}/attr_list.3", f"{cf.paths['man3']}/attr_listf.3")
+    cf.do_sym(f"{cf.paths['man3']}/attr_multi.3", f"{cf.paths['man3']}/attr_multif.3")
+    cf.do_sym(f"{cf.paths['man3']}/attr_remove.3", f"{cf.paths['man3']}/attr_removef.3")
+    cf.do_sym(f"{cf.paths['man3']}/attr_set.3", f"{cf.paths['man3']}/attr_setf.3")
 
 
-# make_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def make_source():
-    print("Nothing to configure")
-
-
-# make_install MUST be defined in the build file.
-# Use the helper functions in common_functions.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
-def make_install():
-    pass
-
-
-# Use these two as pre/post hooks into the cleanup process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
-
-
-# Write each installed file one per line in the commented section below.
-# This is the list that `bld uninstall` uses to know which files to remove.
 """
-/etc/foo.conf
-/usr/bin/foo
-/usr/lib/libfoo.so
-/usr/lib/libfoo.so.5.2
-/usr/share/man/man1/foo.1
+/usr/bin/attr
+/usr/bin/getfattr
+/usr/bin/setfattr
+/etc/xattr.conf
+/usr/lib/libattr.so
+/usr/lib/libattr.so.1
+/usr/lib/libattr.so.1.1.2502
+/usr/share/man/man1/attr.1
+/usr/share/man/man1/getfattr.1
+/usr/share/man/man1/setfattr.1
+/usr/share/man/man3/attr_get.3
+/usr/share/man/man3/attr_getf.3
+/usr/share/man/man3/attr_list.3
+/usr/share/man/man3/attr_listf.3
+/usr/share/man/man3/attr_multi.3
+/usr/share/man/man3/attr_multif.3
+/usr/share/man/man3/attr_remove.3
+/usr/share/man/man3/attr_removef.3
+/usr/share/man/man3/attr_set.3
+/usr/share/man/man3/attr_setf.3
 """
