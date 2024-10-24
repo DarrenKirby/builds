@@ -1,10 +1,10 @@
 """
-    /usr/builds/scripts/builds.py
-    Mon Sep 30 03:13:31 UTC 2024
+    /var/builds/scripts/builds.py
+    Thu Oct 24 02:16:07 UTC 2024
 
     Core functionality of the bld command
 
-    Copyright:: (c) 2024 Darren Kirby
+    Copyright:: (c) 2024
     Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
@@ -25,11 +25,13 @@
 import argparse
 import datetime
 import sys
+import logging as log
 
 import common_functions as cf
 import build_package
 import search_package
 import dep_resolve
+from config import config
 
 
 APPNAME = "bld"
@@ -58,6 +60,7 @@ def process_args():
     # Global options
     global_parser.add_argument('-h', '--help', action='store_true')
     global_parser.add_argument('-v', '--verbose', action='store_true')
+    global_parser.add_argument('-n', '--nocolor', action='store_true')
 
     # 'install' command options
     install_parser = subparsers.add_parser("install")
@@ -98,6 +101,13 @@ def do_main() -> None:
     or builds the list of packages to install and feeds them one by one
     to the BuildPackage class.
     """
+    args = process_args()
+    if args.help:
+        show_usage()
+        sys.exit(0)
+
+    if args.nocolor:
+        config['color'] = False
 
     # Print banner
     cf.print_green(f"{APPNAME} ")
@@ -108,27 +118,20 @@ def do_main() -> None:
     print(")")
     print()
 
-    args = process_args()
-    if args.help:
-        show_usage()
-        sys.exit(0)
-
-    config = cf.get_config()
-
     if args.command == 'search':
-        search_package.do_search(args, config)
+        search_package.do_search(args)
         sys.exit(0)
     elif args.command == 'info':
-        search_package.do_info(args, config)
+        search_package.do_info(args)
         sys.exit(0)
     elif args.command == 'uninstall':
-        do_uninstall(args, config)
+        do_uninstall(args)
         sys.exit(0)
     elif args.command == 'initdb':
-        cf.do_initdb(args, config)
+        cf.do_initdb(args)
         sys.exit(0)
     else:
-        builds_to_build = dep_resolve.resolve_dependencies(args, config)
+        builds_to_build = dep_resolve.resolve_dependencies(args)
 
     n_builds = len(builds_to_build)
     this_build = 1
@@ -159,7 +162,7 @@ def do_main() -> None:
 
         print()
         start_time = datetime.datetime.now()
-        cf.log.info('Starting build of %s', build[0])
+        log.info('Starting build of %s', build[0])
 
         cf.print_bold("starting build ")
         cf.print_green(str(this_build))
@@ -169,7 +172,7 @@ def do_main() -> None:
         print()
         this_build += 1
 
-        bld = build_package.BuildPackage(build[0], config, args)
+        bld = build_package.BuildPackage(build[0], args)
         bld.fetch()
 
         if args.fetch:
@@ -193,14 +196,14 @@ def do_main() -> None:
         elapsed = finish_time - start_time
         print()
         cf.bold(f"build of {build[0]} version {build[1]} complete in {elapsed}.")
-        cf.log.info('build of %s version %s complete in %s', build[0], build[1], elapsed)
+        log.info('build of %s version %s complete in %s', build[0], build[1], elapsed)
 
     print()
     cf.green("Finished all builds. Exiting...")
     sys.exit(0)
 
 
-def do_uninstall(args: argparse.Namespace, config: dict) -> None:
+def do_uninstall(args: argparse.Namespace) -> None:
     """
     Uninstall a package
     """
