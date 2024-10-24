@@ -1,7 +1,7 @@
 #    <category>/<name>/<name>.build.py
 #    `date --utc`
 
-#    Copyright:: (c) 2024 <name>
+#    Copyright:: (c) 2024
 #    Author:: <name> (mailto:<email>)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment this line out,
-# otherwise, add all dependencies to this list as strings ie:
-# depend=['dev-lang/ruby', 'dev-editor/nano']
+# If there are no dependencies then comment or delete this line
+# out, otherwise, add all dependencies to this variable as strings ie:
+# depend="dev-lang/ruby,app-editor/nano"
 # All 'system' packages are implicit dependencies, and do not
 # need to be listed here as they are already installed.
-depend = []
+# depend = ""
 
 
 # Use these two as pre/post hooks into the fetch process
@@ -59,7 +59,7 @@ def install(self):
 
 
 # Write each installed file one per line in the commented section below.
-# This is the list that `bld uninstall` uses to know which files to remove.
+# This is the manifest that `bld uninstall` uses to know which files to remove.
 """
 /etc/foo.conf
 /usr/bin/foo
