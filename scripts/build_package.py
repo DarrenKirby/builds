@@ -1,11 +1,11 @@
 """
-    /usr/builds/scripts/build_package.py
-    Sat Oct 19 20:30:34 UTC 2024
+    /var/builds/scripts/build_package.py
+    Thu Oct 24 02:21:56 UTC 2024
 
     Class definition of BuildPackage, which builds and installs
     software from source code
 
-    Copyright:: (c) 2024 Darren Kirby
+    Copyright:: (c) 2024
     Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+
 import importlib.util
 import dbm
 import sys
@@ -34,6 +35,7 @@ from os.path import exists
 from shutil import unpack_archive, rmtree
 
 import common_functions as cf
+from config import config
 
 
 # pylint: disable=too-many-instance-attributes
@@ -41,7 +43,7 @@ class BuildPackage:
     """
     Implements the main logic for building packages
     """
-    def __init__(self, build: str, config: dict, args: argparse.Namespace) -> None:
+    def __init__(self, build: str, args: argparse.Namespace) -> None:
         """
          The '__init__' and '_resolve_paths' methods create a bunch of useful
          instance variables which can be used in the build scripts.
@@ -70,11 +72,10 @@ class BuildPackage:
          config['cflags']      = empty by default
          config['cxxflags']    = empty by default
         """
-        self.config = config
         self.args = args
         self.build = build
         self.name = build.split('/')[1]
-        with dbm.open(self.config['db_file']) as db:
+        with dbm.open(config['db_file']) as db:
             a = db[self.name].decode().split(",")
 
         self.version = a[1]
@@ -96,7 +97,7 @@ class BuildPackage:
 
         cf.bold(f"Fetching {self.package}...")
 
-        os.chdir(self.config['distfiles'])
+        os.chdir(config['distfiles'])
         if exists(self.package):
             cf.bold(f"...{self.package} already downloaded.")
         else:
@@ -134,7 +135,7 @@ class BuildPackage:
 
         os.mkdir(self.work_dir)
         os.chdir(self.work_dir)
-        unpack_archive(f"{self.config['distfiles']}/{self.package}", ".")
+        unpack_archive(f"{config['distfiles']}/{self.package}", ".")
         cf.green("Source tree installed.")
 
         if hasattr(self, 'install_source_posthook'):
@@ -233,9 +234,9 @@ class BuildPackage:
         """
         Resolve pathnames and create useful instance attributes.
         """
-        self.build_dir = f"{self.config['builds_root']}/{self.build}"
+        self.build_dir = f"{config['builds_root']}/{self.build}"
         self.build_file = f"{self.build_dir}/{self.name}-{self.version}.build.py"
-        self.work_dir = f"{self.config['builds_root']}/{self.build}/work"
+        self.work_dir = f"{config['builds_root']}/{self.build}/work"
         self.seg_dir = f"{self.work_dir}/seg"
         self.src_url = self.src_url.replace("VVV", self.version)
         self.package = self.src_url.split("/")[-1]
@@ -254,7 +255,7 @@ class BuildPackage:
         module_globals['os'] = os  # Inject os into the namespace
         module_globals['cf'] = cf  # Inject cf into the namespace
         module_globals['subprocess'] = subprocess  # Inject subprocess into the namespace
-        module_globals['glob'] = glob # Inject glob into the namespace
+        module_globals['glob'] = glob  # Inject glob into the namespace
 
         # Iterate over methods defined in the module
         for name in dir(module):
