@@ -1,10 +1,10 @@
 """
-    /usr/builds/scripts/common_functions.py
+    /var/builds/scripts/common_functions.py
     Wed Sep 25 23:30:16 UTC 2024
 
     Helper module for the builds source building tree
 
-    Copyright:: (c) 2024 Darren Kirby
+    Copyright:: (c) 2024
     Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+
+
 import argparse
 import hashlib
 import sys
@@ -29,13 +31,13 @@ import os
 import csv
 import dbm
 import logging as log
-import shutil
 import urllib.request as request
-from contextlib import closing
 from urllib.error import URLError
 
 import requests
 import tqdm
+
+from config import config
 
 
 # These are a bunch of common paths to be used in
@@ -78,24 +80,37 @@ clr = {
 
 # Coloured output. For the following functions, the `print_x`
 # version does not include a newline.
+
+def colorize(color: str, msg: str) -> str:
+    s = ""
+    s += clr[color] if config['color'] else ''
+    s += msg
+    s += clr['end'] if config['color'] else ''
+    return s
+
+
 def bold(msg: str) -> None:
     """Print bold text """
-    print(f"{clr['bold'] if config['color'] else ''}>>> {msg}{clr['end']}")
+    msg = colorize("bold", msg)
+    print(f">>> {msg}")
 
 
 def print_bold(msg: str) -> None:
     """Print bold text with no newline """
-    print(f"{clr['bold']}{msg}{clr['end']}", end='')
+    msg = colorize("bold", msg)
+    print(msg, end='')
 
 
 def green(msg: str) -> None:
     """Print green text """
-    print(f"{clr['green']}>>> {msg}{clr['end']}")
+    msg = colorize("green", msg)
+    print(f">>> {msg}")
 
 
 def print_green(msg: str) -> None:
     """Print green text with no newline """
-    print(f"{clr['green']}{msg}{clr['end']}", end='')
+    msg = colorize("green", msg)
+    print(msg, end='')
 
 
 def yellow(msg: str) -> None:
@@ -116,46 +131,6 @@ def red(msg: str) -> None:
 def print_red(msg: str) -> None:
     """Print red text with no newline """
     print(f"{clr['red']}{msg}{clr['end']}", end='')
-
-
-def get_config():
-    """Read the configuration file """
-
-    if os.path.isfile(f'{os.path.expanduser("~")}/.builds.conf'):
-        conf_file = f'{os.path.expanduser("~")}/.builds.conf'
-    elif os.path.isfile('/etc/builds.conf'):
-        conf_file = '/etc/builds.conf'
-    else:
-        red("Cannot find builds.conf")
-        sys.exit(-1)
-
-    _config = {}
-    with open(conf_file, "r", encoding='utf-8') as f:
-        for line in f.readlines():
-            if line.startswith("#"):
-                pass
-            elif line in ('\n', ''):
-                pass
-            else:
-                c = line.split("=")
-                _config[c[0].strip()] = c[1].strip()
-    return _config
-
-
-config = get_config()
-
-# Initialize logger
-#   call: logging.warning("File: '%s' does not exist", filename)
-# output: 2024-07-22 09:55 - WARNING - File 'foo.txt' does not exist
-log.basicConfig(
-    filename=config['log_file'],
-    encoding="utf-8",
-    filemode="a",
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    style="%",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    level=log.INFO
-)
 
 
 # These helper functions are intended to be used in the
@@ -308,11 +283,10 @@ def download(url: str, filename: str) -> None:
             red("Name resolution error!")
             print("Are you sure you're connected to the Internet?")
             log.error("Download of %s failed", filename)
-            # tqdm (or requests) leaves a zero-length stub file
+            # requests leaves a zero-length stub file
             # which we need to clean up if the download fails
-            os.remove(f"{config['builds_root']}/distfiles/{filename}")
+            os.remove(filename)
             sys.exit(12)
-
 
 
 class DownloadProgressBar(tqdm.tqdm):
@@ -328,9 +302,9 @@ def download_ftp(url: str, filename: str) -> None:
     """
     try:
         with DownloadProgressBar(unit='B',
-                                unit_scale=True,
-                                miniters=1,
-                                desc=url.split('/')[-1]) as t:
+                                 unit_scale=True,
+                                 miniters=1,
+                                 desc=url.split('/')[-1]) as t:
             request.urlretrieve(url, filename=filename, reporthook=t.update_to)
     # try:
     #     with closing(request.urlopen(url)) as r:
@@ -348,7 +322,7 @@ def get_sha256sum(file_name: str) -> str:
     """
     Produce checksum of downloaded file
     """
-    #with open(file_name, "rb") as f:
+    # with open(file_name, "rb") as f:
     #    digest = hashlib.file_digest(f, "sha256")
     #    return digest.hexdigest()
     # file_digest only available on Python 3.11+
@@ -361,14 +335,14 @@ def get_sha256sum(file_name: str) -> str:
     return sha256_hash.hexdigest()
 
 
-def do_initdb(args: argparse.Namespace, _config: dict) -> None:
+def do_initdb(args: argparse.Namespace) -> None:
     """
     Initialize a db file from a csv file
     """
     for csv_file in args.db_file:
         try:
             db_file_name = csv_file.split('/')[-1]
-            with dbm.open(f'{_config["builds_root"]}/scripts/{db_file_name[:-4]}', 'c') as db:
+            with dbm.open(f'{config["builds_root"]}/scripts/{db_file_name[:-4]}', 'c') as db:
                 with open(csv_file, newline='', encoding='UTF8') as f:
                     reader = csv.reader(f)
                     for row in reader:
@@ -428,7 +402,7 @@ def get_installed_version(package: str) -> list:
     """
     Retrieve the installed version from 'installed' file
     """
-    #if package.find('/') != -1:
+    # if package.find('/') != -1:
     #    package = package.split('/')[0]
 
     with open(f"{config['builds_root']}/sets/installed", "r", encoding="utf-8") as f:
@@ -438,7 +412,7 @@ def get_installed_version(package: str) -> list:
                 line = line.strip('\n')
                 return line.split(',')
 
-    #yellow(f"{package} does not appear to be installed")
+    # yellow(f"{package} does not appear to be installed")
     return [None]
 
 
@@ -452,4 +426,3 @@ def add_to_install_file(name: str, version: str) -> int:
             return 0
     except IOError:
         return 1
-
