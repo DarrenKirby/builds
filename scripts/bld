@@ -23,8 +23,12 @@
 #
 
 import sys
+import os
 
-sys.path.insert(0, '/usr/builds/scripts')
+if os.path.isdir("/var/builds/scripts"):
+    sys.path.insert(0, '/usr/builds/scripts')
+elif os.path.isdir(os.path.expanduser("~/builds/scripts")):
+    sys.path.insert(0, os.path.expanduser("~/builds/scripts"))
 
 import builds
 import common_functions as cf
