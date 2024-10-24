@@ -27,13 +27,29 @@ import common_functions as cf
 from config import config
 
 
+def print_pkg_info(_a: list) -> None:
+    """
+    Print formatted package info to the screen
+    """
+    cf.print_bold("Category/Name ")
+    cf.green(_a[0])
+    cf.print_bold("      Version ")
+    cf.green(_a[1])
+    cf.print_bold("  Description ")
+    cf.green(_a[5])
+    cf.print_bold("     Homepage ")
+    cf.green(_a[4])
+    print()
+
+
 def do_search(args: argparse.Namespace) -> None:
     """Search string arguments against db names and descriptions"""
     to_search = args.pkg_atom
     match = False
 
     with dbm.open(config['db_file']) as db:
-        for pkg in to_search:
+        for search_string in to_search:
+
             for k in db.keys():
                 if isinstance(k, bytes):
                     name = k.decode('UTF-8')
@@ -41,17 +57,14 @@ def do_search(args: argparse.Namespace) -> None:
                     val = db[k].decode('UTF-8')
                 a = val.split(",")
 
-                if (name.find(pkg) != -1) or (a[5].find(pkg) != -1):
-                    cf.print_bold("Category/Name ")
-                    cf.green(a[0])
-                    cf.print_bold("      Version ")
-                    cf.green(a[1])
-                    cf.print_bold("  Description ")
-                    cf.green(a[5])
-                    cf.print_bold("     Homepage ")
-                    cf.green(a[4])
-                    print()
-                    match = True
+                if args.nameonly:
+                    if name.find(search_string) != -1:
+                        print_pkg_info(a)
+                        match = True
+                else:
+                    if (name.find(search_string) != -1) or (a[5].lower().find(search_string) != -1):
+                        print_pkg_info(a)
+                        match = True
 
     if not match:
         print(f"Could not find package(s) matching '{', '.join(to_search)}'")
@@ -59,4 +72,11 @@ def do_search(args: argparse.Namespace) -> None:
 
 
 def do_info(args):
-    pass
+    to_get_info = args.pkg_atom
+    match = False
+
+    for pkg in to_get_info:
+        pkg_info = cf.get_db_info(pkg)
+
+
+
