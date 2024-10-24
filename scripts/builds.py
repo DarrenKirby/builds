@@ -61,6 +61,7 @@ def process_args():
     global_parser.add_argument('-h', '--help', action='store_true')
     global_parser.add_argument('-v', '--verbose', action='store_true')
     global_parser.add_argument('-n', '--nocolor', action='store_true')
+    global_parser.add_argument('-V', '--version', action='store_true')
 
     # 'install' command options
     install_parser = subparsers.add_parser("install")
@@ -118,6 +119,9 @@ def do_main() -> None:
     print(")")
     print()
 
+    if args.version:
+        sys.exit(0)
+
     if args.command == 'search':
         search_package.do_search(args)
         sys.exit(0)
@@ -162,7 +166,7 @@ def do_main() -> None:
 
         print()
         start_time = datetime.datetime.now()
-        log.info('Starting build of %s', build[0])
+        log.info('%s %s build started', build[0], build[1])
 
         cf.print_bold("starting build ")
         cf.print_green(str(this_build))
@@ -196,7 +200,7 @@ def do_main() -> None:
         elapsed = finish_time - start_time
         print()
         cf.bold(f"build of {build[0]} version {build[1]} complete in {elapsed}.")
-        log.info('build of %s version %s complete in %s', build[0], build[1], elapsed)
+        log.info('%s %s build complete in %s', build[0], build[1], elapsed)
 
     print()
     cf.green("Finished all builds. Exiting...")
@@ -215,14 +219,16 @@ def do_uninstall(args: argparse.Namespace) -> None:
 
     for pkg in args.pkg_atom:
         pkg_info = cf.get_installed_version(pkg)
-        build_file = f"{config['builds_root']}/{pkg_info[1]}/{pkg_info[0]}-{pkg_info[2]}.build.py"
+        c, n = pkg_info[0].split('/')
+        build_file = f"{config['builds_root']}/{c}/{n}/{n}-{pkg_info[1]}.build.py"
 
         files_to_uninstall = cf.get_manifest(build_file)
+        files_to_uninstall.sort()
         if files_to_uninstall == [None]:
             continue
 
         if args.verbose:
-            print(f"Files to be uninstalled for {pkg}: ")
+            cf.yellow(f"Files to be uninstalled for {pkg}: ")
             for file in files_to_uninstall:
                 cf.bold(f"\t{file}")
             print()
@@ -252,11 +258,16 @@ Usage: {APPNAME} [general options] command [command options] arg [arg2...]
     General Options:
         '-h'   or '--help'                  show these usage details
         '-v'   or '--verbose'               make bld more chatty
+        '-n'   or '--nocolor'               disable color output
+        '-V'   or '--version'               print version information and exit
 
     install/uninstall Options:
         '-f'   or '--fetch'                 download packages but do not install
         '-p'   or '--pretend'               show which packages would be built then exit
         '-a'   or '--ask'                   prompt before installing/uninstalling package(s)
         '-b'   or '--buildonly'             build the package, but do not install
+        
+    search Options:
+        '-n'   or '--nameonly'              only search package names for match
 
 """)
