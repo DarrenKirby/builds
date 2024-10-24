@@ -1,10 +1,10 @@
 """
-#    /usr/builds/scripts/dep_resolve.py
-#    Mon Sep 30 02:10:47 UTC 2024
+#    /var/builds/scripts/dep_resolve.py
+#    Thu Oct 24 02:23:33 UTC 2024
 
 #    Naïve dependency resolver
 #
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -27,9 +27,10 @@ import glob
 import argparse
 
 import common_functions as cf
+from config import config
 
 
-def resolve_dependencies(args: argparse.Namespace, config: dict) -> list:
+def resolve_dependencies(args: argparse.Namespace) -> list:
     """
     Translate package names into atoms, and check for dependencies
     """
