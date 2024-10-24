@@ -1,9 +1,9 @@
-#    /usr/builds/scripts/search_package.py
-#    Wed Sep 25 23:30:16 UTC 2024
+#    /var/builds/scripts/search_package.py
+#    Thu Oct 24 02:29:05 UTC 2024
 
-#    Core functionality of the bld command
+#    Search the db file for package information
 #
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -24,9 +24,10 @@ import dbm
 import argparse
 
 import common_functions as cf
+from config import config
 
 
-def do_search(args: argparse.Namespace, config: dict) -> None:
+def do_search(args: argparse.Namespace) -> None:
     """Search string arguments against db names and descriptions"""
     to_search = args.pkg_atom
     match = False
@@ -57,5 +58,5 @@ def do_search(args: argparse.Namespace, config: dict) -> None:
         print()
 
 
-def do_info(args, config):
+def do_info(args):
     pass
