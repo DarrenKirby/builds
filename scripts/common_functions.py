@@ -115,22 +115,26 @@ def print_green(msg: str) -> None:
 
 def yellow(msg: str) -> None:
     """Print yellow text """
-    print(f"{clr['yellow']}*** {msg}{clr['end']}")
+    msg = colorize("yellow", msg)
+    print(f"*** {msg}")
 
 
 def print_yellow(msg: str) -> None:
     """Print yellow text with no newline """
-    print(f"{clr['yellow']}{msg}{clr['end']}", end='')
+    msg = colorize("yellow", msg)
+    print(msg, end='')
 
 
 def red(msg: str) -> None:
     """Print red text """
-    print(f"{clr['red']}!!! {msg}{clr['end']}")
+    msg = colorize("red", msg)
+    print(f"!!! {msg}")
 
 
 def print_red(msg: str) -> None:
     """Print red text with no newline """
-    print(f"{clr['red']}{msg}{clr['end']}", end='')
+    msg = colorize("red", msg)
+    print(msg, end='')
 
 
 # These helper functions are intended to be used in the
@@ -402,8 +406,8 @@ def get_installed_version(package: str) -> list:
     """
     Retrieve the installed version from 'installed' file
     """
-    # if package.find('/') != -1:
-    #    package = package.split('/')[0]
+    if package.find('/') == -1:
+        package = get_db_info(package)[1]
 
     with open(f"{config['builds_root']}/sets/installed", "r", encoding="utf-8") as f:
         lines = f.readlines()
