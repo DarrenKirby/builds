@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>.build
-#    `date --utc`
+#    app-util/e2fsprogs/e2fsprogs-1.47.1.build.py
+#    Thu Oct 24 23:51:59 UTC 2024
 
-#    Copyright:: (c) 2024 <name>
-#    Author:: <name> (mailto:<email>)
+#    Copyright:: (c) 2024
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,64 +18,152 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment this line out,
-# otherwise, add all dependencies to this list as strings ie:
-# depend=['dev-lang/ruby', 'dev-editor/nano']
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are already installed.
-depend = []
+def configure(self):
+    # The E2fsprogs documentation recommends that the package
+    # be built in a subdirectory of the source tree
+    os.mkdir("build")
+    os.chdir("build")
+
+    return os.system(f"../configure --prefix={self.seg_dir} "
+                    f"--enable-elf-shlibs "
+                    f"--disable-libblkid "
+                    f"--disable-libuuid "
+                    f"--disable-uuidd "
+                    f"--disable-fsck")
 
 
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
+def make(self):
+    return os.system("make")
 
 
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook():
-#     pass
-#
-# def install_source_posthook():
-#     pass
+def make_install(self):
+    return os.system("make install")
 
 
-# configure_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def configure_source():
-    print("Nothing to configure")
+def install(self):
+    cf.do_bin(f"{self.seg_dir}/bin/chattr", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/fuse2fs", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/lsattr", cf.paths['ub'])
+
+    cf.do_bin(f"{self.seg_dir}/sbin/badblocks", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/debugfs", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/dumpe2fs", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/e2freefrag", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/e2fsck", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/e2image", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/e2label", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/e2mmpstatus", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/e2undo", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/e4crypt", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/e4defrag", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/filefrag", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/fsck.ext2", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/fsck.ext3", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/fsck.ext4", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/logsave", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/mke2fs", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/mkfs.ext2", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/mkfs.ext3", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/mkfs.ext4", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/mklost+found", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/resize2fs", cf.paths['us'])
+    cf.do_bin(f"{self.seg_dir}/sbin/tune2fs", cf.paths['us'])
+
+    cf.do_lib(f"{self.seg_dir}/lib/e2initrd_helper", cf.paths['ul'])
+
+    cf.do_con(f"{self.seg_dir}/etc/mke2fs.conf", cf.paths['e'])
+
+    cf.do_man(f"{self.seg_dir}/share/man/man1/chattr.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/fuse2fs.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/lsattr.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man5/e2fsck.conf.5", cf.paths['man5'])
+    cf.do_man(f"{self.seg_dir}/share/man/man5/ext2.5", cf.paths['man5'])
+    cf.do_man(f"{self.seg_dir}/share/man/man5/ext3.5", cf.paths['man5'])
+    cf.do_man(f"{self.seg_dir}/share/man/man5/ext4.5", cf.paths['man5'])
+    cf.do_man(f"{self.seg_dir}/share/man/man5/mke2fs.conf.5", cf.paths['man5'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/badblocks.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/debugfs.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/dumpe2fs.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/e2freefrag.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/e2fsck.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/e2image.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/e2label.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/e2mmpstatus.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/e2undo.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/e4crypt.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/e4defrag.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/filefrag.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/fsck.ext2.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/fsck.ext3.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/fsck.ext4.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/logsave.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/mke2fs.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/mkfs.ext2.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/mkfs.ext3.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/mkfs.ext4.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/mklost+found.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/resize2fs.8", cf.paths['man8'])
+    cf.do_man(f"{self.seg_dir}/share/man/man8/tune2fs.8", cf.paths['man8'])
 
 
-# make_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def make_source():
-    print("Nothing to configure")
-
-
-# make_install MUST be defined in the build file.
-# Use the helper functions in common_functions.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
-def make_install():
-    pass
-
-
-# Use these two as pre/post hooks into the cleanup process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
-
-
-# Write each installed file one per line in the commented section below.
-# This is the list that `bld uninstall` uses to know which files to remove.
 """
-/etc/foo.conf
-/usr/bin/foo
-/usr/lib/libfoo.so
-/usr/lib/libfoo.so.5.2
-/usr/share/man/man1/foo.1
+/usr/bin/chattr
+/usr/bin/fuse2fs
+/usr/bin/lsattr
+/etc/mke2fs.conf
+/usr/lib/e2initrd_helper
+/usr/sbin/badblocks
+/usr/sbin/debugfs
+/usr/sbin/dumpe2fs
+/usr/sbin/e2freefrag
+/usr/sbin/e2fsck
+/usr/sbin/e2image
+/usr/sbin/e2label
+/usr/sbin/e2mmpstatus
+/usr/sbin/e2undo
+/usr/sbin/e4crypt
+/usr/sbin/e4defrag
+/usr/sbin/filefrag
+/usr/sbin/fsck.ext2
+/usr/sbin/fsck.ext3
+/usr/sbin/fsck.ext4
+/usr/sbin/logsave
+/usr/sbin/mke2fs
+/usr/sbin/mkfs.ext2
+/usr/sbin/mkfs.ext3
+/usr/sbin/mkfs.ext4
+/usr/sbin/mklost+found
+/usr/sbin/resize2fs
+/usr/sbin/tune2fs
+/usr/share/man/man1/chattr.1.bz2
+/usr/share/man/man1/fuse2fs.1.bz2
+/usr/share/man/man1/lsattr.1.bz2
+/usr/share/man/man5/e2fsck.conf.5.bz2
+/usr/share/man/man5/ext2.5.bz2
+/usr/share/man/man5/ext3.5.bz2
+/usr/share/man/man5/ext4.5.bz2
+/usr/share/man/man5/mke2fs.conf.5.bz2
+/usr/share/man/man8/badblocks.8.bz2
+/usr/share/man/man8/debugfs.8.bz2
+/usr/share/man/man8/dumpe2fs.8.bz2
+/usr/share/man/man8/e2freefrag.8.bz2
+/usr/share/man/man8/e2fsck.8.bz2
+/usr/share/man/man8/e2image.8.bz2
+/usr/share/man/man8/e2label.8.bz2
+/usr/share/man/man8/e2mmpstatus.8.bz2
+/usr/share/man/man8/e2undo.8.bz2
+/usr/share/man/man8/e4crypt.8.bz2
+/usr/share/man/man8/e4defrag.8.bz2
+/usr/share/man/man8/filefrag.8.bz2
+/usr/share/man/man8/fsck.ext2.8.bz2
+/usr/share/man/man8/fsck.ext3.8.bz2
+/usr/share/man/man8/fsck.ext4.8.bz2
+/usr/share/man/man8/logsave.8.bz2
+/usr/share/man/man8/mke2fs.8.bz2
+/usr/share/man/man8/mkfs.ext2.8.bz2
+/usr/share/man/man8/mkfs.ext3.8.bz2
+/usr/share/man/man8/mkfs.ext4.8.bz2
+/usr/share/man/man8/mklost+found.8.bz2
+/usr/share/man/man8/resize2fs.8.bz2
+/usr/share/man/man8/tune2fs.8.bz2
 """
