@@ -184,7 +184,10 @@ class BuildPackage:
         if hasattr(self, 'make_install'):
             cf.green("Installing components into segregated directory...")
             print()
-            self.make_install()
+            if self.make_install() != 0:
+                cf.red("`make install` failed")
+                cf.log.critical(f"make of {self.name} v. {self.version} failed")
+                sys.exit(13)
 
     def inst(self) -> None:
         """
