@@ -38,7 +38,10 @@ def install_source_posthook(self):
 
 def configure(self):
     es1 = os.system("autoreconf -fiv")
-    es2 = os.system(f"FORCE_UNSAFE_CONFIGURE=1 ./configure --prefix={self.seg_dir} --enable-no-install-program=kill,uptime")
+    es2 = os.system(f"FORCE_UNSAFE_CONFIGURE=1 "
+                    f"./configure --prefix={self.seg_dir} "
+                    f"--enable-no-install-program=kill,uptime")
+
     if es1 == 0 and es2 == 0:
         return 0
     return 12
