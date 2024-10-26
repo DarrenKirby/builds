@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>.build
-#    `date --utc`
+#    app-util/psmisc/psmisc-23.7.build.py
+#    Fri Oct 25 20:43:30 UTC 2024
 
-#    Copyright:: (c) 2024 <name>
-#    Author:: <name> (mailto:<email>)
+#    Copyright:: (c) 2024
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,64 +18,49 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment this line out,
-# otherwise, add all dependencies to this list as strings ie:
-# depend=['dev-lang/ruby', 'dev-editor/nano']
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are already installed.
-depend = []
+
+def configure(self):
+    return os.system(f"./configure --prefix={self.seg_dir}")
 
 
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
+def make(self):
+    return os.system("make")
 
 
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook():
-#     pass
-#
-# def install_source_posthook():
-#     pass
+def make_install(self):
+    return os.system("make install")
 
 
-# configure_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def configure_source():
-    print("Nothing to configure")
+def install(self):
+    cf.do_bin(f"{self.seg_dir}/bin/fuser", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/killall", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/peekfd", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/prtstat", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/pslog", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/pstree", cf.paths['ub'])
+
+    cf.do_sym(f"{cf.paths['ub']}/pstree", f"{cf.paths['ub']}/pstree.x11")
+
+    cf.do_man(f"{self.seg_dir}/share/man/man1/fuser.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/killall.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/peekfd.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/prtstat.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/pslog.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/pstree.1", cf.paths['man1'])
 
 
-# make_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def make_source():
-    print("Nothing to configure")
-
-
-# make_install MUST be defined in the build file.
-# Use the helper functions in common_functions.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
-def make_install():
-    pass
-
-
-# Use these two as pre/post hooks into the cleanup process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
-
-
-# Write each installed file one per line in the commented section below.
-# This is the list that `bld uninstall` uses to know which files to remove.
 """
-/etc/foo.conf
-/usr/bin/foo
-/usr/lib/libfoo.so
-/usr/lib/libfoo.so.5.2
-/usr/share/man/man1/foo.1
+/usr/bin/fuser
+/usr/bin/killall
+/usr/bin/peekfd
+/usr/bin/prtstat
+/usr/bin/pslog
+/usr/bin/pstree
+/usr/bin/pstree.x11
+/usr/share/man/man1/fuser.1
+/usr/share/man/man1/killall.1
+/usr/share/man/man1/peekfd.1
+/usr/share/man/man1/prtstat.1
+/usr/share/man/man1/pslog.1
+/usr/share/man/man1/pstree.1
 """
