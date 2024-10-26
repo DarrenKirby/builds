@@ -37,10 +37,10 @@ def install(self):
     cf.do_bin(f"{self.seg_dir}/bin/diff3", cf.paths['ub'])
     cf.do_bin(f"{self.seg_dir}/bin/sdiff", cf.paths['ub'])
 
-    cf.do_man(f"{self.seg_dir}/share/man/man1/cmp.1.bz2", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/diff.1.bz2", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/diff3.1.bz2", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/sdiff.1.bz2", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/cmp.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/diff.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/diff3.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/sdiff.1", cf.paths['man1'])
 
 
 """
@@ -48,8 +48,8 @@ def install(self):
 /usr/bin/diff
 /usr/bin/diff3
 /usr/bin/sdiff
-/usr/share/man/man1/cmp.1
-/usr/share/man/man1/diff.1
-/usr/share/man/man1/diff3.1
-/usr/share/man/man1/sdiff.1
+/usr/share/man/man1/cmp.1.bz2
+/usr/share/man/man1/diff.1.bz2
+/usr/share/man/man1/diff3.1.bz2
+/usr/share/man/man1/sdiff.1.bz2
 """
