@@ -19,7 +19,8 @@
 
 
 # BUG: Default db location must be specified at compile time.
-#      How to resolve with temp install directory?
+#      How to resolve with temp install directory? As-is, the
+#      make_install step will fail on permissions for non-system install
 def configure(self):
     return os.system(f"./configure --prefix={self.seg_dir} "
                      f"--localstatedir={self.seg_dir}/var/lib/locate")
