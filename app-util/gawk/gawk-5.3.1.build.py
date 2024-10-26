@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>.build
-#    `date --utc`
+#    app-util/gawk/gawk-5.3.1.build.py
+#    Fri Oct 25 16:48:44 UTC 2024
 
-#    Copyright:: (c) 2024 <name>
-#    Author:: <name> (mailto:<email>)
+#    Copyright:: (c) 2024
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,64 +18,91 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment this line out,
-# otherwise, add all dependencies to this list as strings ie:
-# depend=['dev-lang/ruby', 'dev-editor/nano']
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are already installed.
-depend = []
+
+def configure(self):
+    cf.bold("Removing gawk extras from makefile...")
+    try:
+        os.system("sed -i 's/extras//' Makefile.in")
+    except:
+        cf.yellow("sed command failed: non fatal")
+    return os.system(f"./configure --prefix={self.seg_dir}")
 
 
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
+def make(self):
+    return os.system("make")
 
 
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook():
-#     pass
-#
-# def install_source_posthook():
-#     pass
+def make_install(self):
+    return os.system("make install")
 
 
-# configure_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def configure_source():
-    print("Nothing to configure")
+def install(self):
+    cf.do_bin(f"{self.seg_dir}/bin/gawk", cf.paths['ub'])
+    cf.do_bin(f"{self.seg_dir}/bin/gawk-5.3.1", cf.paths['ub'])
+    cf.do_scr(f"{self.seg_dir}/bin/gawkbug", cf.paths['ub'])
+    # link awk -> gawk
+    cf.do_sym(f"{cf.paths['ub']}/gawk", f"{cf.paths['ub']}/awk")
+
+    cf.do_hdr(f"{self.seg_dir}/include/gawkapi.h", cf.paths['ui'])
+
+    cf.do_dir(f"{self.seg_dir}/lib/gawk/", f"{cf.paths['ul']}/gawk/")
+
+    cf.do_dir(f"{self.seg_dir}/libexec/awk/", f"{cf.paths['ule']}/awk/")
+
+    cf.do_man(f"{self.seg_dir}/share/man/man1/gawk.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/gawkbug.1", cf.paths['man1'])
+    cf.do_man(f"{self.seg_dir}/share/man/man1/pm-gawk.1", cf.paths['man1'])
+    # link  awk.1 -> gawk1.bz2
+    cf.do_sym(f"{cf.paths['man1']}/gawk.1.bz2", f"{cf.paths['man1']}/awk.1")
+
+    cf.do_man(f"{self.seg_dir}/share/man/man3/filefuncs.3am", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/fnmatch.3am", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/fork.3am", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/inplace.3am", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/ordchr.3am", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/readdir.3am", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/readfile.3am", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/revoutput.3am", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/revtwoway.3am", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/rwarray.3am", cf.paths['man3'])
+    cf.do_man(f"{self.seg_dir}/share/man/man3/time.3am", cf.paths['man3'])
 
 
-# make_source MUST be defined in the build file.
-# If there is nothing to configure then just do:
-def make_source():
-    print("Nothing to configure")
-
-
-# make_install MUST be defined in the build file.
-# Use the helper functions in common_functions.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
-def make_install():
-    pass
-
-
-# Use these two as pre/post hooks into the cleanup process
-# def fetch_prehook():
-#     pass
-#
-# def fetch_posthook():
-#     pass
-
-
-# Write each installed file one per line in the commented section below.
-# This is the list that `bld uninstall` uses to know which files to remove.
 """
-/etc/foo.conf
-/usr/bin/foo
-/usr/lib/libfoo.so
-/usr/lib/libfoo.so.5.2
-/usr/share/man/man1/foo.1
+/usr/bin/awk
+/usr/bin/gawk
+/usr/bin/gawk-5.3.1
+/usr/bin/gawkbug
+/usr/include/gawkapi.h
+/usr/lib/gawk/
+/usr/lib/gawk/filefuncs.so
+/usr/lib/gawk/fnmatch.so
+/usr/lib/gawk/fork.so
+/usr/lib/gawk/inplace.so
+/usr/lib/gawk/intdiv.so
+/usr/lib/gawk/ordchr.so
+/usr/lib/gawk/readdir.so
+/usr/lib/gawk/readfile.so
+/usr/lib/gawk/revoutput.so
+/usr/lib/gawk/revtwoway.so
+/usr/lib/gawk/rwarray.so
+/usr/lib/gawk/time.so
+/usr/libexec/awk/
+/usr/libexec/awk/grcat
+/usr/libexec/awk/pwcat
+/usr/share/man/man1/gawk.1.bz2
+/usr/share/man/man1/awk.1
+/usr/share/man/man1/gawkbug.1.bz2
+/usr/share/man/man1/pm-gawk.1.bz2
+/usr/share/man/man3/filefuncs.3am.bz2
+/usr/share/man/man3/fnmatch.3am.bz2
+/usr/share/man/man3/fork.3am.bz2
+/usr/share/man/man3/inplace.3am.bz2
+/usr/share/man/man3/ordchr.3am.bz2
+/usr/share/man/man3/readdir.3am.bz2
+/usr/share/man/man3/readfile.3am.bz2
+/usr/share/man/man3/revoutput.3am.bz2
+/usr/share/man/man3/revtwoway.3am.bz2
+/usr/share/man/man3/rwarray.3am.bz2
+/usr/share/man/man3/time.3am.bz2
 """
