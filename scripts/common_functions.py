@@ -52,6 +52,7 @@ paths = {
     'us': "/usr/sbin",
     'ui': "/usr/include",
     'ul': "/usr/lib",
+    'ule': "/usr/libexec",
     'ulb': "/usr/local/bin",
     'uls': "/usr/local/sbin",
     'uli': "/usr/local/include",
