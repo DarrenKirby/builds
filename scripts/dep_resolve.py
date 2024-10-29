@@ -30,6 +30,15 @@ import common_functions as cf
 from config import config
 
 
+def already_installed(p):
+    """
+    Check to see if dependency is already installed
+    """
+    if cf.get_installed_version(p) == [None]:
+        return False
+    return True
+
+
 def resolve_dependencies(args: argparse.Namespace) -> list:
     """
     Translate package names into atoms, and check for dependencies
@@ -71,14 +80,20 @@ def resolve_dependencies(args: argparse.Namespace) -> list:
                     pkgs = line.split('=')[-1].strip()
                     pkgs = pkgs[1:-1]  # remove quotes
                     for pkg in pkgs.split(','):
-                        with dbm.open(config['db_file']) as db:
-                            db_string = db[pkg].decode()
-                            db_list = db_string.split(",")
+                        if not already_installed(pkg):
+                            with dbm.open(config['db_file']) as db:
+                                if pkg.find('/') != -1:
+                                    db_string = db[pkg.split('/')[1]].decode()
+                                else:
+                                    db_string = db[pkg].decode()
+                                db_list = db_string.split(",")
 
-                            # We do not yet distinguish between build dependencies and run dependencies,
-                            # (let alone optional dependencies) so for now we just insert dependencies
-                            # at the beginning of the list so that they get built first.
-                            pkgs_to_build.insert(0, (db_list[0], db_list[1]))
+                                # We do not yet distinguish between build dependencies and run dependencies,
+                                # (let alone optional dependencies) so for now we just insert dependencies
+                                # at the beginning of the list so that they get built first.
+                                pkgs_to_build.insert(0, (db_list[0], db_list[1]))
+                        else:
+                            continue
 
     pkgs_to_build += atoms
     return pkgs_to_build
