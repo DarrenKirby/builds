@@ -40,4 +40,3 @@ except KeyboardInterrupt:
     cf.red("keyboard interupt received...")
     cf.red("temporary build files possibly left on filesystem")
     sys.exit(-1)
-
