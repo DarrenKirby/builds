@@ -21,7 +21,6 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import argparse
 import datetime
 import sys
@@ -33,7 +32,6 @@ import search_package
 import dep_resolve
 from config import config
 
-
 APPNAME = "bld"
 APPVERSION = "0.4.0"
 QUIP = "By far the best software available for turtle stacking"
@@ -43,7 +41,9 @@ class CustomArgumentParser(argparse.ArgumentParser):
     """
     Overrides the default argparse error handling
     """
+
     def error(self, message):
+        """Print argparse error in red"""
         cf.red(message)
         show_usage()
         sys.exit(-1)
@@ -68,7 +68,8 @@ def process_args():
     install_parser.add_argument('-f', '--fetch', action='store_true')
     install_parser.add_argument('-p', '--pretend', action='store_true')
     install_parser.add_argument('-a', '--ask', action='store_true')
-    install_parser.add_argument('-b', '--buildonly', action='store_true')
+    install_parser.add_argument('-d', '--dontclean', action='store_true')
+    install_parser.add_argument('-t', '--test', action='store_true')
     install_parser.add_argument("pkg_atom", action="extend", nargs="+", type=str)
 
     # 'uninstall' command options
@@ -186,15 +187,13 @@ def do_main() -> None:
         bld.configure_src()
         bld.make_src()
         bld.make_inst()
-
-        if not args.buildonly:
-            bld.inst()
-            bld.cleanup()
+        bld.inst()
+        bld.cleanup()
 
         print()
         cf.green(f"Recording {build[0]} {build[1]} in 'sets/installed'...")
         if cf.add_to_install_file(build[0], build[1]) == 0:
-            cf.green("...done!")
+            print(">>> ...done!")
 
         finish_time = datetime.datetime.now()
         elapsed = finish_time - start_time
@@ -265,9 +264,10 @@ Usage: {APPNAME} [general options] command [command options] arg [arg2...]
         '-f'   or '--fetch'                 download packages but do not install
         '-p'   or '--pretend'               show which packages would be built then exit
         '-a'   or '--ask'                   prompt before installing/uninstalling package(s)
-        '-b'   or '--buildonly'             build the package, but do not install
+        '-d'   or '--dontclean'             don't delete the package source tree after installation
+        '-t'   or '--test'                  build source but do not install to live filesystem
         
     search Options:
-        '-n'   or '--nameonly'              only search package names for match
+        '-n'   or '--nameonly'              only search package names for match, skip descriptions
 
 """)
