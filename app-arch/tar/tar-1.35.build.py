@@ -1,5 +1,5 @@
 #    app-arch/tar/tar-1.35.build.py
-#    Sun Oct 20 00:41:16 UTC 2024
+#    Thu Oct 31 02:40:37 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -30,16 +30,8 @@ def make_install(self):
     return os.system("make install")
 
 
-def install():
-    cf.do_bin(f"{self.seg_dir}/bin/tar", cf.paths['b'])
-    cf.do_bin(f"{self.seg_dir}/libexec/rmt", cf.paths['sb'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/tar.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/rmt.8", cf.paths['man8'])
-
-
-"""
-/bin/tar
-/sbin/rmt
-/usr/share/man/man1/tar.1.bz2
-/usr/share/man/man8/rmt.8.bz2
-"""
+def install(self):
+    self.inst_binary(f"{self.seg_dir}/bin/tar", cf.paths['b'])
+    self.inst_binary(f"{self.seg_dir}/libexec/rmt", cf.paths['s'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/tar.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man8/rmt.8", cf.paths['man8'])

@@ -1,7 +1,7 @@
 #    app-shell/tcsh/tcsh-6.24.13.build.py
-#    Fri Oct 18 22:15:18 UTC 2024
+#    Thu Oct 31 03:40:54 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:Darren Kirby)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -31,11 +31,5 @@ def make_install(self):
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/tcsh", cf.paths['ub'])
-    cf.do_man(f"{self.seg_dir}share/man/man1/tcsh.1", cf.paths['man1'])
-
-
-"""
-/usr/bin/tcsh
-/usr/share/man/man1/tcsh.1.bz2
-"""
+    self.inst_binary(f"{self.seg_dir}/bin/tcsh", cf.paths['ub'])
+    self.inst_manpage(f"{self.seg_dir}share/man/man1/tcsh.1", cf.paths['man1'])

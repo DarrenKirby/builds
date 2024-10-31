@@ -1,6 +1,7 @@
 #    app-shell/dash/dash-0.5.12.build.py
-#    Fri Oct 18 21:02:47 UTC 2024
-#    Copyright:: (c) 2024 Darren Kirby
+#    Thu Oct 31 03:43:21 UTC 2024
+
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -30,8 +31,8 @@ def make_install(self):
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/dash", cf.paths['b'])
-    cf.do_man(f"{self.seg_dir}share/man/man1/dash.1", cf.paths['man1'])
+    self.inst_binary(f"{self.seg_dir}/bin/dash", cf.paths['b'])
+    self.inst_manpage(f"{self.seg_dir}share/man/man1/dash.1", cf.paths['man1'])
 
 
 def cleanup_prehook(self):
@@ -44,9 +45,3 @@ def cleanup_prehook(self):
     print("/bin/dash")
     print("EOF")
     print()
-
-
-"""
-/bin/dash
-/usr/share/man/man1/dash.1.bz2
-"""

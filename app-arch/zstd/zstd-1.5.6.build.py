@@ -1,5 +1,5 @@
 #    app-arch/zstd/zstd-1.5.6-.build.py
-#    Tue Oct  8 23:59:38 UTC 2024
+#    Thu Oct 31 02:40:37 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -25,45 +25,25 @@ def make_install(self):
     return os.system(f"make prefix={self.seg_dir} install")
 
 def install(self):
-    cf.do_lib(f"{self.seg_dir}/lib/libzstd.so.1.5.6", cf.paths['ul'])
-    cf.do_sym(f"{cf.paths['ul']}/libzstd.so.1.5.6", f"{cf.paths['ul']}/libzstd.so")
-    cf.do_sym(f"{cf.paths['ul']}/libzstd.so.1.5.6", f"{cf.paths['ul']}/libzstd.so.1")
+    self.inst_library(f"{self.seg_dir}/lib/libzstd.so.1.5.6", cf.paths['ul'])
+    self.inst_symlink(f"{cf.paths['ul']}/libzstd.so.1.5.6", f"{cf.paths['ul']}/libzstd.so")
+    self.inst_symlink(f"{cf.paths['ul']}/libzstd.so.1.5.6", f"{cf.paths['ul']}/libzstd.so.1")
 
-    cf.do_hdr(f"{self.seg_dir}/include/zdict.h", cf.paths['ui'])
-    cf.do_hdr(f"{self.seg_dir}/include/zstd.h", cf.paths['ui'])
-    cf.do_hdr(f"{self.seg_dir}/include/zstd_errors.h", cf.paths['ui'])
+    self.inst_header(f"{self.seg_dir}/include/zdict.h", cf.paths['ui'])
+    self.inst_header(f"{self.seg_dir}/include/zstd.h", cf.paths['ui'])
+    self.inst_header(f"{self.seg_dir}/include/zstd_errors.h", cf.paths['ui'])
 
-    cf.do_bin(f"{self.seg_dir}/bin/zstd", f"{cf.paths['ub']}")
-    cf.do_bin(f"{self.seg_dir}/bin/zstdgrep", f"{cf.paths['ub']}")
-    cf.do_bin(f"{self.seg_dir}/bin/zsrdless", f"{cf.paths['ub']}")
+    self.inst_binary(f"{self.seg_dir}/bin/zstd", f"{cf.paths['ub']}")
+    self.inst_binary(f"{self.seg_dir}/bin/zstdgrep", f"{cf.paths['ub']}")
+    self.inst_binary(f"{self.seg_dir}/bin/zsrdless", f"{cf.paths['ub']}")
 
-    cf.do_sym(f"{cf.paths['ub']}/zstd", f"{cf.paths['ub']}/unzstd")
-    cf.do_sym(f"{cf.paths['ub']}/zstd", f"{cf.paths['ub']}/zstdcat")
-    cf.do_sym(f"{cf.paths['ub']}/zstd", f"{cf.paths['ub']}/zstdmt")
+    self.inst_symlink(f"{cf.paths['ub']}/zstd", f"{cf.paths['ub']}/unzstd")
+    self.inst_symlink(f"{cf.paths['ub']}/zstd", f"{cf.paths['ub']}/zstdcat")
+    self.inst_symlink(f"{cf.paths['ub']}/zstd", f"{cf.paths['ub']}/zstdmt")
 
-    cf.do_man(f"{self.seg_dir}/share/man/man1/zstd.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/zstdgrep.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/zstdless.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zstd.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zstdgrep.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zstdless.1", cf.paths['man1'])
 
-    cf.do_sym(f"{cf.paths['man1']}/zstd.1.bz2", f"{cf.paths['man1']}/unzstd.1")
-    cf.do_sym(f"{cf.paths['man1']}/zstd.1.bz2", f"{cf.paths['man1']}/zstdcat.1")
-
-"""
-/usr/bin/zstd
-/usr/bin/zstdgrep
-/usr/bin/zstdless
-/usr/bin/unzstd
-/usr/bin/zstdcat
-/usr/bin/zstdmt
-/usr/include/zdict.h
-/usr/include/zstd.h
-/usr/include/zstd_errors.h
-/usr/lib/libzstd.so.1.5.6
-/usr/lib/libzstd.so.1
-/usr/lib/libzstd.so
-/usr/share/man/man1/zstd.1.bz2
-/usr/share/man/man1/zstdgrep.1.bz2
-/usr/share/man/man1/zstdless.1.bz2
-/usr/share/man/man1/unzstd.1
-/usr/share/man/man1/zstdcat.1
-"""
+    self.inst_symlink(f"{cf.paths['man1']}/zstd.1.bz2", f"{cf.paths['man1']}/unzstd.1")
+    self.inst_symlink(f"{cf.paths['man1']}/zstd.1.bz2", f"{cf.paths['man1']}/zstdcat.1")
