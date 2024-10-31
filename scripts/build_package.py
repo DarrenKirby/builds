@@ -1,6 +1,6 @@
 """
     /var/builds/scripts/build_package.py
-    Thu Oct 24 02:21:56 UTC 2024
+    Wed Oct 30 22:26:43 UTC 2024
 
     Class definition of BuildPackage, which builds and installs
     software from source code
@@ -22,7 +22,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import importlib.util
 import dbm
 import sys
@@ -33,16 +32,202 @@ import glob
 import subprocess
 from os.path import exists
 from shutil import unpack_archive, rmtree
+import subprocess as sp
+import shlex
+import logging as log
 
 import common_functions as cf
 from config import config
 
 
+class FileInstaller:
+    """
+    Implements several methods for installing files to the live filesystem
+    and keeps track of these files to write a manifest
+    """
+
+    def __init__(self, args, seg):
+        self.manifest = []
+        self.args = args
+        # Needed for inst_directory()
+        self.seg = seg
+
+    def inst_binary(self, frm: str, to: str) -> None:
+        """
+        Install a binary to the live filesystem
+        """
+        if not self.args.test:
+            try:
+                sp.run(shlex.split(f"install -S -v -o root -g root -m 755 -s {frm} {to}"), check=True)
+            except sp.CalledProcessError as e:
+                cf.red(f"Install of {frm} failed: ")
+                print(e)
+                log.error("install of %s failed.", frm)
+                sys.exit(-1)
+
+        abspath = f"{to}/{frm.split('/')[-1]}"
+        self.manifest.append(abspath)
+
+    def inst_script(self, frm: str, to: str) -> None:
+        """
+        Install a script to the live filesystem
+        """
+        if not self.args.test:
+            try:
+                sp.run(shlex.split(f"install -S -v -o root -g root -m 755 {frm} {to}"), check=True)
+            except sp.CalledProcessError as e:
+                cf.red(f"Install of {frm} failed: ")
+                print(e)
+                log.error("install of %s failed.", frm)
+                sys.exit(-1)
+
+        abspath = f"{to}/{frm.split('/')[-1]}"
+        self.manifest.append(abspath)
+
+    def inst_library(self, frm: str, to: str) -> None:
+        """
+        Install a library to the live filesystem
+        """
+        if not self.args.test:
+            try:
+                sp.run(shlex.split(f"install -S -v -o root -g root -m 755 {frm} {to}"), check=True)
+            except sp.CalledProcessError as e:
+                cf.red(f"Install of {frm} failed: ")
+                print(e)
+                log.error("install of %s failed.", frm)
+                sys.exit(-1)
+
+        abspath = f"{to}/{frm.split('/')[-1]}"
+        self.manifest.append(abspath)
+
+    def inst_header(self, frm: str, to: str) -> None:
+        """
+        Install a header file to the live filesystem
+        """
+        if not self.args.test:
+            try:
+                sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm} {to}"), check=True)
+            except sp.CalledProcessError as e:
+                cf.red(f"Install of {frm} failed: ")
+                print(e)
+                log.error("install of %s failed.", frm)
+                sys.exit(-1)
+
+        abspath = f"{to}/{frm.split('/')[-1]}"
+        self.manifest.append(abspath)
+
+    def inst_manpage(self, frm: str, to: str) -> None:
+        """
+        Compress and install a manpage to the live filesystem
+        """
+        if not self.args.test:
+            try:
+                sp.run(shlex.split(f"bzip2 {frm}"), check=True)
+                sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm}.bz2 {to}"), check=True)
+            except sp.CalledProcessError as e:
+                cf.red(f"Install of {frm} failed: ")
+                print(e)
+                log.error("install of %s failed: %s.", frm, e)
+                sys.exit(-1)
+
+        abspath = f"{to}/{frm.split('/')[-1]}.bz2"
+        self.manifest.append(abspath)
+
+    def inst_symlink(self, target: str, name: str) -> None:
+        """
+        Make a symbolic link in the live filesystem
+        """
+        if not self.args.test:
+            try:
+                sp.run(shlex.split(f"ln -svf {target} {name}"), check=True)
+            except sp.CalledProcessError as e:
+                cf.red(f"Install of {name} failed: ")
+                print(e)
+                log.error("symbolic link of %s failed: %s.", name, e)
+                sys.exit(-1)
+
+        abspath = name
+        self.manifest.append(abspath)
+
+    def inst_directory(self, src: str, dst: str) -> None:
+        """
+        Recursively install a directory of files
+
+        This is intended to be used with packages that create
+        deep nested directories of library files or other data
+        """
+        if not self.args.test:
+            try:
+                os.rename(src, dst)
+            except OSError as e:
+                cf.red("Call to do_dir failed: ")
+                print(e)
+                log.error("call to do_dir failed. Aborting install")
+                sys.exit(-1)
+
+        # FIXME: This is not ideal, but how else to generate a manifest
+        # without actually installing the files to the live filesystem?
+        seg_files = self._list_all_paths(src)
+        real_paths = []
+        for file in seg_files:
+            file = file.replace(self.seg, '/usr')
+            real_paths.append(file)
+        self.manifest += real_paths
+
+    def inst_config(self, frm: str, to: str) -> None:
+        """
+        Install a configuration file to the live filesystem.
+        """
+        if not self.args.test:
+            try:
+                sp.run(shlex.split(f"install -b -v -o root -g root -m 644 {frm} {to}"), check=True)
+            except sp.CalledProcessError as e:
+                cf.red(f"Install of {frm} failed: ")
+                print(e)
+                log.error("install of %s failed.", frm)
+                sys.exit(-1)
+
+        abspath = f"{to}/{frm.split('/')[-1]}"
+        self.manifest.append(abspath)
+
+    def inst_file(self, frm: str, to: str) -> None:
+        """
+        Install a generic file to the live filesystem
+        with 644 permisions
+        """
+        if not self.args.test:
+            try:
+                sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm} {to}"), check=True)
+            except sp.CalledProcessError as e:
+                cf.red(f"Install of {frm} failed: ")
+                print(e)
+                log.error("install of %s failed.", frm)
+                sys.exit(-1)
+
+        if to[-1] == '/':
+            abspath = f"{to}/{frm.split('/')[-1]}"
+        else:
+            abspath = to
+        self.manifest.append(abspath)
+
+    @staticmethod
+    def _list_all_paths(directory_path):
+        all_paths = []
+        for root, dirs, files in os.walk(directory_path):
+            # Add directories with a trailing slash
+            for dir_name in dirs:
+                all_paths.append(os.path.join(root, dir_name) + '/')
+            for file_name in files:
+                all_paths.append(os.path.join(root, file_name))
+        return all_paths
+
+
 # pylint: disable=too-many-instance-attributes
-class BuildPackage:
+class BuildPackage(FileInstaller):
     """
     Implements the main logic for building packages
     """
+
     def __init__(self, build: str, args: argparse.Namespace) -> None:
         """
          The '__init__' and '_resolve_paths' methods create a bunch of useful
@@ -62,17 +247,8 @@ class BuildPackage:
          package     = 'tar-1.28.tar.xz'
          package_dir = 'tar-1.28'
 
-         The config dictionary passed to __init__ also contains some useful
-         system-wide values:
-
-         config['builds_root'] = '/var/builds' (default)
-         config['distfiles']   = '/var/builds/distfiles' (default)
-         config['db_file']     = 'builds-stable' (default)
-         config['logfile']     = '/var/log/builds.log' (default)
-         config['cflags']      = empty by default
-         config['cxxflags']    = empty by default
         """
-        self.args = args
+        # self.args = args
         self.build = build
         self.name = build.split('/')[1]
         with dbm.open(config['db_file']) as db:
@@ -83,7 +259,7 @@ class BuildPackage:
         self.src_url = a[3]
 
         self._resolve_paths()
-
+        super().__init__(args, self.seg_dir)
         # Load build_file methods as a module
         self._load_buildfile_methods()
 
@@ -212,7 +388,7 @@ class BuildPackage:
 
     def cleanup(self) -> None:
         """
-        Remove the source tree and work directory.
+        Remove the source tree and work directory, and write the manifest
 
         This is also a good place to perform any other necessary
         post-installation tasks
@@ -220,18 +396,38 @@ class BuildPackage:
         if hasattr(self, 'cleanup_prehook'):
             self.cleanup_prehook()
 
-        cf.bold("Cleaning up work directory...")
+        print()
+        cf.green("Writing manifest file...")
+        if self._write_manifest_file():
+            print(">>> ...done.")
 
-        os.chdir(self.build_dir)
-        rmtree(self.work_dir)
-
-        cf.green("Clean up successful")
+        if not self.args.dontclean:
+            cf.bold("Cleaning up work directory...")
+            os.chdir(self.build_dir)
+            rmtree(self.work_dir)
 
         if hasattr(self, 'cleanup_posthook'):
             self.cleanup_posthook()
 
+        cf.green("Clean up successful")
+
     # The following methods are 'private', that is, they are
     # not intended for use outside this class.
+
+    def _write_manifest_file(self):
+        manifest = f"{config['builds_root']}/{self.build}/"
+        manifest += f"{self.package_dir}.manifest"
+
+        try:
+            with open(manifest, 'w', encoding='utf-8') as f:
+                for file in sorted(self.manifest):
+                    f.write(f"{file}\n")
+        except IOError as e:
+            cf.red(f"Error writing: {manifest}")
+            log.warning(f"Could not write: {manifest}")
+            print(e)
+            return False
+        return True
 
     def _resolve_paths(self) -> None:
         """
