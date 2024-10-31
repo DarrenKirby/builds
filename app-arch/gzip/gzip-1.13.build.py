@@ -31,49 +31,20 @@ def make_install(self):
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/gzip", cf.paths['b'])
-    cf.do_scr(f"{self.seg_dir}/bin/gunzip", cf.paths['b'])
-    cf.do_scr(f"{self.seg_dir}/bin/gzexe", cf.paths['b'])
-    cf.do_scr(f"{self.seg_dir}/bin/uncompress", cf.paths['b'])
-    cf.do_scr(f"{self.seg_dir}/bin/zcat", cf.paths['b'])
-    cf.do_scr(f"{self.seg_dir}/bin/zcmp", cf.paths['b'])
-    cf.do_scr(f"{self.seg_dir}/bin/zdiff", cf.paths['b'])
-    cf.do_scr(f"{self.seg_dir}/bin/zegrep", cf.paths['b'])
-    cf.do_scr(f"{self.seg_dir}/bin/zfgrep", cf.paths['b'])
-    cf.do_scr(f"{self.seg_dir}/bin/zforce", cf.paths['b'])
-    cf.do_scr(f"{self.seg_dir}/bin/zgrep", cf.paths['b'])
-    cf.do_scr(f"{self.seg_dir}/bin/zless", cf.paths['b'])
-    cf.do_scr(f"{self.seg_dir}/bin/zmore", cf.paths['b'])
-    cf.do_scr(f"{self.seg_dir}/bin/znew", cf.paths['b'])
+    self.inst_binary(f"{self.seg_dir}/bin/gzip", cf.paths['b'])
+    self.inst_script(f"{self.seg_dir}/bin/gunzip", cf.paths['b'])
+    self.inst_script(f"{self.seg_dir}/bin/gzexe", cf.paths['b'])
+    self.inst_script(f"{self.seg_dir}/bin/uncompress", cf.paths['b'])
+    self.inst_script(f"{self.seg_dir}/bin/zcat", cf.paths['b'])
+    self.inst_script(f"{self.seg_dir}/bin/zcmp", cf.paths['b'])
+    self.inst_script(f"{self.seg_dir}/bin/zdiff", cf.paths['b'])
+    self.inst_script(f"{self.seg_dir}/bin/zegrep", cf.paths['b'])
+    self.inst_script(f"{self.seg_dir}/bin/zfgrep", cf.paths['b'])
+    self.inst_script(f"{self.seg_dir}/bin/zforce", cf.paths['b'])
+    self.inst_script(f"{self.seg_dir}/bin/zgrep", cf.paths['b'])
+    self.inst_script(f"{self.seg_dir}/bin/zless", cf.paths['b'])
+    self.inst_script(f"{self.seg_dir}/bin/zmore", cf.paths['b'])
+    self.inst_script(f"{self.seg_dir}/bin/znew", cf.paths['b'])
 
     for manpage in glob.glob(f"{self.seg_dir}/share/man/man1/*.1"):
-        cf.do_man(manpage, cf.paths['man1'])
-
-
-"""
-/bin/gunzip
-/bin/gzexe
-/bin/gzip
-/bin/uncompress
-/bin/zcat
-/bin/zcmp
-/bin/zdiff
-/bin/zegrep
-/bin/zfgrep
-/bin/zforce
-/bin/zgrep
-/bin/zless
-/bin/zmore
-/bin/znew
-/usr/share/man/man1/gunzip.1.bz2
-/usr/share/man/man1/gzexe.1.bz2
-/usr/share/man/man1/gzip.1.bz2
-/usr/share/man/man1/zcat.1.bz2
-/usr/share/man/man1/zcmp.1.bz2
-/usr/share/man/man1/zdiff.1.bz2
-/usr/share/man/man1/zforce.1.bz2
-/usr/share/man/man1/zgrep.1.bz2
-/usr/share/man/man1/zless.1.bz2
-/usr/share/man/man1/zmore.1.bz2
-/usr/share/man/man1/znew.1.bz2
-"""
+        self.inst_manpage(manpage, cf.paths['man1'])

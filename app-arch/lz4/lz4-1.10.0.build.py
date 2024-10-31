@@ -25,37 +25,20 @@ def make_install(self):
     return os.system(f"make BUILD_STATIC=no PREFIX={self.seg_dir} install")
 
 def install(self):
-    cf.do_lib(f"{self.seg_dir}/lib/liblz4.so.1.10.0", cf.paths['ul'])
-    cf.do_sym(f"{cf.paths['ul']}/liblz4.so.1.10.0", f"{cf.paths['ul']}/liblz4.so.1")
-    cf.do_sym(f"{cf.paths['ul']}/liblz4.so.1.10.0", f"{cf.paths['ul']}/liblz4.so")
+    self.inst_library(f"{self.seg_dir}/lib/liblz4.so.1.10.0", cf.paths['ul'])
+    self.inst_symlink(f"{cf.paths['ul']}/liblz4.so.1.10.0", f"{cf.paths['ul']}/liblz4.so.1")
+    self.inst_symlink(f"{cf.paths['ul']}/liblz4.so.1.10.0", f"{cf.paths['ul']}/liblz4.so")
 
-    cf.do_hdr(f"{self.seg_dir}/include/lz4.h", cf.paths['ui'])
-    cf.do_hdr(f"{self.seg_dir}/include/lz4frame.h", cf.paths['ui'])
-    cf.do_hdr(f"{self.seg_dir}/include/lz4hc.h", cf.paths['ui'])
+    self.inst_header(f"{self.seg_dir}/include/lz4.h", cf.paths['ui'])
+    self.inst_header(f"{self.seg_dir}/include/lz4frame.h", cf.paths['ui'])
+    self.inst_header(f"{self.seg_dir}/include/lz4hc.h", cf.paths['ui'])
 
-    cf.do_bin(f"{self.seg_dir}/bin/lz4", f"{cf.paths['ub']}")
-    cf.do_sym(f"{cf.paths['ub']}/lz4", f"{cf.paths['ub']}/lz4c")
-    cf.do_sym(f"{cf.paths['ub']}/lz4", f"{cf.paths['ub']}/lz4cat")
-    cf.do_sym(f"{cf.paths['ub']}/lz4", f"{cf.paths['ub']}/unlz4")
+    self.inst_binary(f"{self.seg_dir}/bin/lz4", f"{cf.paths['ub']}")
+    self.inst_symlink(f"{cf.paths['ub']}/lz4", f"{cf.paths['ub']}/lz4c")
+    self.inst_symlink(f"{cf.paths['ub']}/lz4", f"{cf.paths['ub']}/lz4cat")
+    self.inst_symlink(f"{cf.paths['ub']}/lz4", f"{cf.paths['ub']}/unlz4")
 
-    cf.do_man(f"{self.seg_dir}/share/man/man1/lz4.1", cf.paths['man1'])
-    cf.do_sym(f"{cf.paths['man1']}/lz4.1.bz2", f"{cf.paths['man1']}/lz4c.1")
-    cf.do_sym(f"{cf.paths['man1']}/lz4.1.bz2", f"{cf.paths['man1']}/lz4cat.1")
-    cf.do_sym(f"{cf.paths['man1']}/lz4.1.bz2", f"{cf.paths['man1']}/unlz4.1")
-
-"""
-/usr/lib/liblz4.so.1.10.0
-/usr/lib/liblz4.so.1
-/usr/lib/liblz4.so
-/usr/include/lz4.h
-/usr/include/lz4frame.h
-/usr/include/lz4hc.h
-/usr/bin/lz4
-/usr/bin/lz4c
-/usr/bin/lz4cat
-/usr/bin/unlz4
-/usr/share/man/man1/lz4.1.bz2
-/usr/share/man/man1/lz4c.1
-/usr/share/man/man1/lz4cat.1
-/usr/share/man/man1/unlz4.1
-"""
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/lz4.1", cf.paths['man1'])
+    self.inst_symlink(f"{cf.paths['man1']}/lz4.1.bz2", f"{cf.paths['man1']}/lz4c.1")
+    self.inst_symlink(f"{cf.paths['man1']}/lz4.1.bz2", f"{cf.paths['man1']}/lz4cat.1")
+    self.inst_symlink(f"{cf.paths['man1']}/lz4.1.bz2", f"{cf.paths['man1']}/unlz4.1")

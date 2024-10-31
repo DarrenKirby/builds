@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>.build
-#    `date --utc`
+#    app-editor/vim/vim-9.0.build.py
+#    Tue Oct 29 22:28:55 UTC 2024
 
-#    Copyright:: (c) 2024 <name>
-#    Author:: <name> (mailto:<email>)
+#    Copyright:: (c) 2024
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,52 +18,51 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment this line out,
-# otherwise, add all dependencies to this list as strings ie:
-# depend=['dev-lang/ruby', 'dev-editor/nano']
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are already installed.
-depend = []
+def install_source_posthook(self):
+    # extracted directory does not match tarball
+    os.rename(self.package_dir.replace('-', '').replace('.', ''), self.package_dir)
+
+def configure(self):
+
+    # change the default location of the vimrc configuration file to /etc
+    with open("src/feature.h", 'a', encoding='utf-8') as f:
+        f.write('#define SYS_VIMRC_FILE "/etc/vimrc"')
+
+    return os.system(f"./configure --prefix={self.seg_dir} --with-x=no --disable-gui")
 
 
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook(self):
-#     pass
-#
-# def fetch_posthook(self):
-#     pass
+def make(self):
+    return os.system("make")
 
 
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook(self):
-#     pass
-#
-# def install_source_posthook(self):
-#     pass
-
-
-# make_install MUST be defined in the build file.
-# Use the helper functions in common_functions.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
 def make_install(self):
-    pass
+    return os.system("make install")
 
 
-# Use these two as pre/post hooks into the cleanup process
-# def fetch_prehook(self):
-#     pass
-#
-# def fetch_posthook(self):
-#     pass
+def install(self):
+    self.inst_binary(f"{self.seg_dir}/bin/vim", cf.paths['ub'])
+    self.inst_binary(f"{self.seg_dir}/bin/vimtutor", cf.paths['ub'])
+    self.inst_binary(f"{self.seg_dir}/bin/xxf", cf.paths['ub'])
 
+    self.inst_symlink(f"{cf.paths['ub']}/vim", f"{cf.paths['ub']}/ex")
+    self.inst_symlink(f"{cf.paths['ub']}/vim", f"{cf.paths['ub']}/rview")
+    self.inst_symlink(f"{cf.paths['ub']}/vim", f"{cf.paths['ub']}/rvim")
+    self.inst_symlink(f"{cf.paths['ub']}/vim", f"{cf.paths['ub']}/view")
+    self.inst_symlink(f"{cf.paths['ub']}/vim", f"{cf.paths['ub']}/vimdiff")
 
-# Write each installed file one per line in the commented section below.
-# This is the list that `bld uninstall` uses to know which files to remove.
-"""
-/etc/foo.conf
-/usr/bin/foo
-/usr/lib/libfoo.so
-/usr/lib/libfoo.so.5.2
-/usr/share/man/man1/foo.1
-"""
+    # make the vi symlink
+    self.inst_symlink(f"{cf.paths['ub']}/vim", f"{cf.paths['ub']}/vi")
+
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/evim.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/vim.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/vimdiff.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/vimtutor.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/xxd.1", cf.paths['man1'])
+
+    self.inst_symlink(f"{cf.paths['man1']}/vim.1.bz2", f"{cf.paths['man1']}/ex.1")
+    self.inst_symlink(f"{cf.paths['man1']}/vim.1.bz2", f"{cf.paths['man1']}/rview.1")
+    self.inst_symlink(f"{cf.paths['man1']}/vim.1.bz2", f"{cf.paths['man1']}/rvim.1")
+    self.inst_symlink(f"{cf.paths['man1']}/vim.1.bz2", f"{cf.paths['man1']}/view.1")
+    self.inst_symlink(f"{cf.paths['man1']}/vim.1.bz2", f"{cf.paths['man1']}/vi.1")
+
+    self.inst_directory(f"{self.seg_dir}/share/vim/", f"{cf.paths['ush']}/vim/")

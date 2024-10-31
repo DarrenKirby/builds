@@ -1,5 +1,7 @@
 #    app-arch/bzip2/bzip2-1.0.8.build.py
 #    Sun Oct 20 00:41:16 UTC 2024
+import os
+
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -32,56 +34,32 @@ def make_install(self):
 
 
 def install(self):
-    cf.do_lib("libbz2.so.1.0.8", cf.paths['ul'])
-    cf.do_sym(f"{cf.paths['ul']}/libbz2.so.1.0.8", f"{cf.paths['ul']}/libbz2.so")
-    cf.do_sym(f"{cf.paths['ul']}/libbz2.so.1.0.8", f"{cf.paths['ul']}/libbz2.so.1.0")
+    self.inst_library("libbz2.so.1.0.8", cf.paths['ul'])
+    self.inst_symlink(f"{cf.paths['ul']}/libbz2.so.1.0.8", f"{cf.paths['ul']}/libbz2.so")
+    self.inst_symlink(f"{cf.paths['ul']}/libbz2.so.1.0.8", f"{cf.paths['ul']}/libbz2.so.1.0")
 
-    cf.do_hdr(f"{self.seg_dir}/include/bzlib.h", cf.paths['ui'])
+    self.inst_header(f"{self.seg_dir}/include/bzlib.h", cf.paths['ui'])
 
-    cf.do_bin("bzip2-shared", f"{cf.paths['ub']}/bzip2")
-    cf.do_sym(f"{cf.paths['ub']}/bzip2", f"{cr.paths['ub']}/bzat")
-    cf.do_sym(f"{cf.paths['ub']}/bzip2", f"{cr.paths['ub']}/bunzip2")
+    os.rename("bzip2-shared", f"{self.seg_dir}/bin/bzip2")
+    self.inst_binary(f"{self.seg_dir}/bin/bzip2", f"{cf.paths['ub']}")
+    self.inst_symlink(f"{cf.paths['ub']}/bzip2", f"{cf.paths['ub']}/bzat")
+    self.inst_symlink(f"{cf.paths['ub']}/bzip2", f"{cf.paths['ub']}/bunzip2")
 
-    cf.do_bin(f"{self.seg_dir}/bin/bzdiff", f"{cf.paths['ub']}")
-    cf.do_bin(f"{self.seg_dir}/bin/bzgrep", f"{cf.paths['ub']}")
-    cf.do_bin(f"{self.seg_dir}/bin/bzmore", f"{cf.paths['ub']}")
+    self.inst_binary(f"{self.seg_dir}/bin/bzdiff", f"{cf.paths['ub']}")
+    self.inst_binary(f"{self.seg_dir}/bin/bzgrep", f"{cf.paths['ub']}")
+    self.inst_binary(f"{self.seg_dir}/bin/bzmore", f"{cf.paths['ub']}")
+    self.inst_binary(f"{self.seg_dir}/bin/bzip2recover", f"{cf.paths['ub']}")
 
-    cf.do_sym(f"{cf.paths['ub']}/bzdiff", f"{cf.paths['ub']}/bzcmp")
-    cf.do_sym(f"{cf.paths['ub']}/bzgrep", f"{cf.paths['ub']}/bzegrep")
-    cf.do_sym(f"{cf.paths['ub']}/bzgrep", f"{cf.paths['ub']}/bzfgrep")
-    cf.do_sym(f"{cf.paths['ub']}/bzmore", f"{cf.paths['ub']}/bzless")
+    self.inst_symlink(f"{cf.paths['ub']}/bzdiff", f"{cf.paths['ub']}/bzcmp")
+    self.inst_symlink(f"{cf.paths['ub']}/bzgrep", f"{cf.paths['ub']}/bzegrep")
+    self.inst_symlink(f"{cf.paths['ub']}/bzgrep", f"{cf.paths['ub']}/bzfgrep")
+    self.inst_symlink(f"{cf.paths['ub']}/bzmore", f"{cf.paths['ub']}/bzless")
 
-    cf.do_man(f"{self.seg_dir}/man/man1/bzcmp.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/man/man1/bzdiff.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/man/man1/bzegrep.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/man/man1/bzfgrep.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/man/man1/bzgrep.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/man/man1/bzip2.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/man/man1/bzless.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/man/man1/bzmore.1", cf.paths['man1'])
-
-
-"""
-/usr/lib/libbz2.so.1.0.8
-/usr/lib/libbz2.so.1.0
-/usr/lib/libbz2.so
-/usr/include/bzlib.h
-/usr/bin/bzip2
-/usr/bin/bzcat
-/usr/bin/bunzip2
-/usr/bin/bzdiff
-/usr/bin/bzgrep
-/usr/bin/bzegrep
-/usr/bin/bzfgrep
-/usr/bin/bzmore
-/usr/bin/bzless
-/usr/bin/bzcmp
-/usr/share/man/man1/bzcmp.1.bz2
-/usr/share/man/man1/bzdiff.1.bz2
-/usr/share/man/man1/bzgrep.1.bz2
-/usr/share/man/man1/bzegrep.1.bz2
-/usr/share/man/man1/bzfgrep.1.bz2
-/usr/share/man/man1/bzip2.1.bz2
-/usr/share/man/man1/bzmore.1.bz2
-/usr/share/man/man1/bzless.1.bz2
-"""
+    self.inst_manpage(f"{self.seg_dir}/man/man1/bzcmp.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/man/man1/bzdiff.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/man/man1/bzegrep.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/man/man1/bzfgrep.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/man/man1/bzgrep.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/man/man1/bzip2.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/man/man1/bzless.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/man/man1/bzmore.1", cf.paths['man1'])

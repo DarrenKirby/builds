@@ -18,7 +18,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
 def configure(self):
     os.mkdir("build")
     os.chdir("build")
@@ -35,20 +34,10 @@ def make_install(self):
 
 
 def install(self):
-    cf.do_hdr(f"{self.seg_dir}/include/INIReader.h", cf.paths['ui'])
-    cf.do_hdr(f"{self.seg_dir}/include/ini.h", cf.paths['ui'])
+    self.inst_header(f"{self.seg_dir}/include/INIReader.h", cf.paths['ui'])
+    self.inst_header(f"{self.seg_dir}/include/ini.h", cf.paths['ui'])
 
-    cf.do_lib(f"{self.seg_dir}/lib64/libINIReader.so.0", cf.paths['ul'])
-    cf.do_sym(f"{cf.paths['ul']}/libINIReader.so.0", f"{cf.paths['ul']}/libINIReader.so")
-    cf.do_lib(f"{self.seg_dir}/lib64/libinih.so.0", cf.paths['ul'])
-    cf.do_sym(f"{cf.paths['ul']}/libinih.so.0", f"{cf.paths['ul']}/libinih.so")
-
-
-"""
-/usr/include/INIReader.h
-/usr/include/ini.h
-/usr/lib/libINIReader.so.0
-/usr/lib/libINIReader.so
-/usr/lib/libINIReader.so.0
-/usr/lib/libINIReader.so
-"""
+    self.inst_library(f"{self.seg_dir}/lib64/libINIReader.so.0", cf.paths['ul'])
+    self.inst_symlink(f"{cf.paths['ul']}/libINIReader.so.0", f"{cf.paths['ul']}/libINIReader.so")
+    self.inst_library(f"{self.seg_dir}/lib64/libinih.so.0", cf.paths['ul'])
+    self.inst_symlink(f"{cf.paths['ul']}/libinih.so.0", f"{cf.paths['ul']}/libinih.so")
