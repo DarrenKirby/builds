@@ -5,3 +5,4 @@ scripts/*.db
 builds.log
 scripts/builds-stable
 .idea
+*.manifest
