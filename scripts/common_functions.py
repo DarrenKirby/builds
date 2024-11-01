@@ -1,6 +1,6 @@
 """
     /var/builds/scripts/common_functions.py
-    Wed Sep 25 23:30:16 UTC 2024
+    Wed Oct 30 22:26:43 UTC 2024
 
     Helper module for the builds source building tree
 
@@ -21,7 +21,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import argparse
 import hashlib
 import sys
@@ -38,7 +37,6 @@ import requests
 import tqdm
 
 from config import config
-
 
 # These are a bunch of common paths to be used in
 # tandem with the helper functions in the next section
