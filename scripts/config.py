@@ -52,6 +52,9 @@ def get_config() -> dict:
     if os.environ.get("NO_COLOR"):
         _config['color'] = False
 
+    if not 'makeopts' in _config:
+        _config['makeopts'] = '-j1'
+
     return _config
 
 
