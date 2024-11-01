@@ -1,5 +1,5 @@
 #    app-util/attr/attr-2.5.2.build.py
-#    Wed Oct 23 00:11:26 UTC 2024
+#    Thu Oct 31 21:52:45 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -23,7 +23,7 @@ def configure(self):
 
 
 def make(self):
-    return os.system("make")
+    return os.system(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
@@ -31,52 +31,28 @@ def make_install(self):
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/attr", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/getfattr", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/setfattr", cf.paths['ub'])
+    self.inst_binary(f"{self.seg_dir}/bin/attr", cf.paths['ub'])
+    self.inst_binary(f"{self.seg_dir}/bin/getfattr", cf.paths['ub'])
+    self.inst_binary(f"{self.seg_dir}/bin/setfattr", cf.paths['ub'])
 
-    cf.do_con(f"{self.seg_dir}/etc/xattr.conf", cf.paths['e'])
+    self.inst_config(f"{self.seg_dir}/etc/xattr.conf", cf.paths['e'])
 
-    cf.do_lib(f"{self.seg_dir}/lib/libattr.so.1.1.2502", cf.paths['ul'])
-    cf.do_sym(f"{cf.paths['ul']}/libattr.so.1.1.2502", f"{cf.paths['ul']}/libattr.so")
-    cf.do_sym(f"{cf.paths['ul']}/libattr.so.1.1.2502", f"{cf.paths['ul']}/libattr.so.1")
+    self.inst_library(f"{self.seg_dir}/lib/libattr.so.1.1.2502", cf.paths['ul'])
+    self.inst_symlink(f"{cf.paths['ul']}/libattr.so.1.1.2502", f"{cf.paths['ul']}/libattr.so")
+    self.inst_symlink(f"{cf.paths['ul']}/libattr.so.1.1.2502", f"{cf.paths['ul']}/libattr.so.1")
 
-    cf.do_man(f"{self.seg_dir}/share/man/man1/attr.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/getfattr.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/setfattr.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/attr.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/getfattr.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/setfattr.1", cf.paths['man1'])
 
-    cf.do_man(f"{self.seg_dir}/share/man/man3/attr_get.3", cf.paths['man3'])
-    cf.do_man(f"{self.seg_dir}/share/man/man3/attr_list.3", cf.paths['man3'])
-    cf.do_man(f"{self.seg_dir}/share/man/man3/attr_multi.3", cf.paths['man3'])
-    cf.do_man(f"{self.seg_dir}/share/man/man3/attr_remove.3", cf.paths['man3'])
-    cf.do_man(f"{self.seg_dir}/share/man/man3/attr_set.3", cf.paths['man3'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man3/attr_get.3", cf.paths['man3'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man3/attr_list.3", cf.paths['man3'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man3/attr_multi.3", cf.paths['man3'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man3/attr_remove.3", cf.paths['man3'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man3/attr_set.3", cf.paths['man3'])
 
-    cf.do_sym(f"{cf.paths['man3']}/attr_get.3", f"{cf.paths['man3']}/attr_getf.3")
-    cf.do_sym(f"{cf.paths['man3']}/attr_list.3", f"{cf.paths['man3']}/attr_listf.3")
-    cf.do_sym(f"{cf.paths['man3']}/attr_multi.3", f"{cf.paths['man3']}/attr_multif.3")
-    cf.do_sym(f"{cf.paths['man3']}/attr_remove.3", f"{cf.paths['man3']}/attr_removef.3")
-    cf.do_sym(f"{cf.paths['man3']}/attr_set.3", f"{cf.paths['man3']}/attr_setf.3")
-
-
-"""
-/usr/bin/attr
-/usr/bin/getfattr
-/usr/bin/setfattr
-/etc/xattr.conf
-/usr/lib/libattr.so
-/usr/lib/libattr.so.1
-/usr/lib/libattr.so.1.1.2502
-/usr/share/man/man1/attr.1
-/usr/share/man/man1/getfattr.1
-/usr/share/man/man1/setfattr.1
-/usr/share/man/man3/attr_get.3
-/usr/share/man/man3/attr_getf.3
-/usr/share/man/man3/attr_list.3
-/usr/share/man/man3/attr_listf.3
-/usr/share/man/man3/attr_multi.3
-/usr/share/man/man3/attr_multif.3
-/usr/share/man/man3/attr_remove.3
-/usr/share/man/man3/attr_removef.3
-/usr/share/man/man3/attr_set.3
-/usr/share/man/man3/attr_setf.3
-"""
+    self.inst_symlink(f"{cf.paths['man3']}/attr_get.3", f"{cf.paths['man3']}/attr_getf.3")
+    self.inst_symlink(f"{cf.paths['man3']}/attr_list.3", f"{cf.paths['man3']}/attr_listf.3")
+    self.inst_symlink(f"{cf.paths['man3']}/attr_multi.3", f"{cf.paths['man3']}/attr_multif.3")
+    self.inst_symlink(f"{cf.paths['man3']}/attr_remove.3", f"{cf.paths['man3']}/attr_removef.3")
+    self.inst_symlink(f"{cf.paths['man3']}/attr_set.3", f"{cf.paths['man3']}/attr_setf.3")

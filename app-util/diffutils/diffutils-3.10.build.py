@@ -1,5 +1,5 @@
 #    app-util/diffutils/diffutils-3.10.build.py
-#    Thu Oct 24 23:32:27 UTC 2024
+#    Thu Oct 31 21:09:52 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -18,13 +18,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
 def configure(self):
     return os.system(f"./configure --prefix={self.seg_dir}")
 
 
 def make(self):
-    return os.system("make")
+    return os.system(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
@@ -32,24 +31,12 @@ def make_install(self):
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/cmp", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/diff", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/diff3", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/sdiff", cf.paths['ub'])
+    self.inst_binary(f"{self.seg_dir}/bin/cmp", cf.paths['ub'])
+    self.inst_binary(f"{self.seg_dir}/bin/diff", cf.paths['ub'])
+    self.inst_binary(f"{self.seg_dir}/bin/diff3", cf.paths['ub'])
+    self.inst_binary(f"{self.seg_dir}/bin/sdiff", cf.paths['ub'])
 
-    cf.do_man(f"{self.seg_dir}/share/man/man1/cmp.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/diff.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/diff3.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/sdiff.1", cf.paths['man1'])
-
-
-"""
-/usr/bin/cmp
-/usr/bin/diff
-/usr/bin/diff3
-/usr/bin/sdiff
-/usr/share/man/man1/cmp.1.bz2
-/usr/share/man/man1/diff.1.bz2
-/usr/share/man/man1/diff3.1.bz2
-/usr/share/man/man1/sdiff.1.bz2
-"""
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/cmp.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/diff.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/diff3.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/sdiff.1", cf.paths['man1'])

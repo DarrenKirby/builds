@@ -1,5 +1,5 @@
 #    app-util/e2fsprogs/e2fsprogs-1.47.1.build.py
-#    Thu Oct 24 23:51:59 UTC 2024
+#    Thu Oct 31 22:20:22 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -24,7 +24,7 @@ def configure(self):
     os.mkdir("build")
     os.chdir("build")
 
-    return os.system(f"../configure --prefix={self.seg_dir} "
+    return os.system(f"../configure --prefix=/usr "
                     f"--enable-elf-shlibs "
                     f"--disable-libblkid "
                     f"--disable-libuuid "
@@ -33,137 +33,79 @@ def configure(self):
 
 
 def make(self):
-    return os.system("make")
+    return os.system(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/chattr", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/fuse2fs", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/lsattr", cf.paths['ub'])
+    self.inst_binary(f"{self.p['_ub']}/chattr", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/fuse2fs", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/lsattr", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/compile_et", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/mk_cmds", self.p['ub'])
 
-    cf.do_bin(f"{self.seg_dir}/sbin/badblocks", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/debugfs", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/dumpe2fs", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/e2freefrag", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/e2fsck", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/e2image", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/e2label", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/e2mmpstatus", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/e2undo", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/e4crypt", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/e4defrag", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/filefrag", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/fsck.ext2", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/fsck.ext3", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/fsck.ext4", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/logsave", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/mke2fs", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/mkfs.ext2", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/mkfs.ext3", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/mkfs.ext4", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/mklost+found", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/resize2fs", cf.paths['us'])
-    cf.do_bin(f"{self.seg_dir}/sbin/tune2fs", cf.paths['us'])
+    for file in os.listdir(self.p['_us']):
+        self.inst_binary(f"{self.p['_us']}/{file}", self.p['us'])
 
-    cf.do_lib(f"{self.seg_dir}/lib/e2initrd_helper", cf.paths['ul'])
+    for file in os.listdir(f"{self.p['_ul']}/udev/rules.d/"):
+        self.inst_file(f"{self.p['_ul']}/udev/rules.d/{file}", f"{self.p['ul']}/udev/rules.d/")
 
-    cf.do_con(f"{self.seg_dir}/etc/mke2fs.conf", cf.paths['e'])
+    for file in os.listdir(f"{self.p['_ul']}/pkgconfig/"):
+        self.inst_file(f"{self.p['_ul']}/pkgconfig/{file}", f"{self.p['ul']}/pkgconfig/")
 
-    cf.do_man(f"{self.seg_dir}/share/man/man1/chattr.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/fuse2fs.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/lsattr.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man5/e2fsck.conf.5", cf.paths['man5'])
-    cf.do_man(f"{self.seg_dir}/share/man/man5/ext2.5", cf.paths['man5'])
-    cf.do_man(f"{self.seg_dir}/share/man/man5/ext3.5", cf.paths['man5'])
-    cf.do_man(f"{self.seg_dir}/share/man/man5/ext4.5", cf.paths['man5'])
-    cf.do_man(f"{self.seg_dir}/share/man/man5/mke2fs.conf.5", cf.paths['man5'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/badblocks.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/debugfs.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/dumpe2fs.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/e2freefrag.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/e2fsck.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/e2image.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/e2label.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/e2mmpstatus.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/e2undo.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/e4crypt.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/e4defrag.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/filefrag.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/fsck.ext2.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/fsck.ext3.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/fsck.ext4.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/logsave.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/mke2fs.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/mkfs.ext2.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/mkfs.ext3.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/mkfs.ext4.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/mklost+found.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/resize2fs.8", cf.paths['man8'])
-    cf.do_man(f"{self.seg_dir}/share/man/man8/tune2fs.8", cf.paths['man8'])
+    self.inst_library(f"{self.p['_ul']}/e2initrd_helper", self.p['ul'])
+    self.inst_library(f"{self.p['_ul']}/libcom_err.so.2.1", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libcom_err.so.2.1", f"{self.p['ul']}/libcom_err.so.2")
+    self.inst_symlink(f"{self.p['ul']}/libcom_err.so.2", f"{self.p['ul']}/libcom_err.so")
 
+    self.inst_library(f"{self.p['_ul']}/libe2p.so.2.3", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libe2p.so.2.3", f"{self.p['ul']}/libe2p.so.2")
+    self.inst_symlink(f"{self.p['ul']}/libe2p.so.2", f"{self.p['ul']}/libe2p.so")
 
-"""
-/usr/bin/chattr
-/usr/bin/fuse2fs
-/usr/bin/lsattr
-/etc/mke2fs.conf
-/usr/lib/e2initrd_helper
-/usr/sbin/badblocks
-/usr/sbin/debugfs
-/usr/sbin/dumpe2fs
-/usr/sbin/e2freefrag
-/usr/sbin/e2fsck
-/usr/sbin/e2image
-/usr/sbin/e2label
-/usr/sbin/e2mmpstatus
-/usr/sbin/e2undo
-/usr/sbin/e4crypt
-/usr/sbin/e4defrag
-/usr/sbin/filefrag
-/usr/sbin/fsck.ext2
-/usr/sbin/fsck.ext3
-/usr/sbin/fsck.ext4
-/usr/sbin/logsave
-/usr/sbin/mke2fs
-/usr/sbin/mkfs.ext2
-/usr/sbin/mkfs.ext3
-/usr/sbin/mkfs.ext4
-/usr/sbin/mklost+found
-/usr/sbin/resize2fs
-/usr/sbin/tune2fs
-/usr/share/man/man1/chattr.1.bz2
-/usr/share/man/man1/fuse2fs.1.bz2
-/usr/share/man/man1/lsattr.1.bz2
-/usr/share/man/man5/e2fsck.conf.5.bz2
-/usr/share/man/man5/ext2.5.bz2
-/usr/share/man/man5/ext3.5.bz2
-/usr/share/man/man5/ext4.5.bz2
-/usr/share/man/man5/mke2fs.conf.5.bz2
-/usr/share/man/man8/badblocks.8.bz2
-/usr/share/man/man8/debugfs.8.bz2
-/usr/share/man/man8/dumpe2fs.8.bz2
-/usr/share/man/man8/e2freefrag.8.bz2
-/usr/share/man/man8/e2fsck.8.bz2
-/usr/share/man/man8/e2image.8.bz2
-/usr/share/man/man8/e2label.8.bz2
-/usr/share/man/man8/e2mmpstatus.8.bz2
-/usr/share/man/man8/e2undo.8.bz2
-/usr/share/man/man8/e4crypt.8.bz2
-/usr/share/man/man8/e4defrag.8.bz2
-/usr/share/man/man8/filefrag.8.bz2
-/usr/share/man/man8/fsck.ext2.8.bz2
-/usr/share/man/man8/fsck.ext3.8.bz2
-/usr/share/man/man8/fsck.ext4.8.bz2
-/usr/share/man/man8/logsave.8.bz2
-/usr/share/man/man8/mke2fs.8.bz2
-/usr/share/man/man8/mkfs.ext2.8.bz2
-/usr/share/man/man8/mkfs.ext3.8.bz2
-/usr/share/man/man8/mkfs.ext4.8.bz2
-/usr/share/man/man8/mklost+found.8.bz2
-/usr/share/man/man8/resize2fs.8.bz2
-/usr/share/man/man8/tune2fs.8.bz2
-"""
+    self.inst_library(f"{self.p['_ul']}/libext2fs.so.2.4", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libext2fs.so.2.4", f"{self.p['ul']}/libext2fs.so.2")
+    self.inst_symlink(f"{self.p['ul']}/libext2fs.so.2", f"{self.p['ul']}/libext2fs.so")
+
+    self.inst_library(f"{self.p['_ul']}/libss.so.2.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libss.so.2.0", f"{self.p['ul']}/libss.so.2")
+    self.inst_symlink(f"{self.p['ul']}/libss.so.2", f"{self.p['ul']}/libss.so")
+
+    self.inst_config(f"{self.seg_dir}/etc/mke2fs.conf", self.p['e'])
+
+    self.inst_manpage(f"{self.p['_man1']}/chattr.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/fuse2fs.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/lsattr.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man5']}/e2fsck.conf.5", self.p['man5'])
+    self.inst_manpage(f"{self.p['_man5']}/ext2.5", self.p['man5'])
+    self.inst_manpage(f"{self.p['_man5']}/ext3.5", self.p['man5'])
+    self.inst_manpage(f"{self.p['_man5']}/ext4.5", self.p['man5'])
+    self.inst_manpage(f"{self.p['_man5']}/mke2fs.conf.5", self.p['man5'])
+
+    for file in os.listdir(self.p['_man8']):
+        self.inst_manpage(f"{self.p['_man8']}/{file}", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/badblocks.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/debugfs.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/dumpe2fs.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/e2freefrag.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/e2fsck.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/e2image.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/e2label.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/e2mmpstatus.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/e2undo.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/e4crypt.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/e4defrag.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/filefrag.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/fsck.ext2.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/fsck.ext3.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/fsck.ext4.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/logsave.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/mke2fs.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/mkfs.ext2.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/mkfs.ext3.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/mkfs.ext4.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/mklost+found.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/resize2fs.8", self.p['man8'])
+    # self.inst_manpage(f"{self.p['_man8']}/tune2fs.8", self.p['man8'])

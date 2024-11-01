@@ -23,7 +23,7 @@ def configure(self):
 
 
 def make(self):
-    return os.system("make")
+    return os.system(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
@@ -31,17 +31,8 @@ def make_install(self):
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/nano", cf.paths['ub'])
-    cf.do_sym(f"{cf.paths['ub']}/nano", f"{cf.paths['ub']}/rnano")
-    cf.do_man(f"{self.seg_dir}/share/man/man1/nano.1", {cf.paths['man1']})
-    cf.do_man(f"{self.seg_dir}/share/man/man1/rnano.1", {cf.paths['man1']})
-    cf.do_man(f"{self.seg_dir}/share/man/man5/nanorc.5", {cf.paths['man8']})
-
-
-"""
-/usr/bin/nano
-/usr/bin/rnano
-/usr/share/man/man1/nano.1.bz2
-/usr/share/man/man1/rnano.1.bz2
-/usr/share/man/man5/nanorc.5.bz2
-"""
+    self.inst_binary(f"{self.seg_dir}/bin/nano", cf.paths['ub'])
+    self.inst_symlink(f"{cf.paths['ub']}/nano", f"{cf.paths['ub']}/rnano")
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/nano.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/rnano.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man5/nanorc.5", cf.paths['man8'])
