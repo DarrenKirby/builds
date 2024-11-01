@@ -161,7 +161,7 @@ def do_main() -> None:
         if check != [None] and build[1] == check[1]:
             cf.yellow(f"{build[0]} version {build[1]} already installed!")
             print("Install again? ")
-            if input() in ['n', 'N']:
+            if input(">>> ") in ['n', 'N']:
                 cf.red("aborting")
                 sys.exit(1)
 
