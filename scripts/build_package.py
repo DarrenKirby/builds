@@ -52,6 +52,58 @@ class FileInstaller:
         # Needed for inst_directory()
         self.seg = seg
 
+        # Useful paths for install functions
+        self.p = {
+
+            'b': "/bin",
+            's': "/sbin",
+            'l': "/lib",
+            'e': "/etc",
+            'ub': "/usr/bin",
+            'us': "/usr/sbin",
+            'ui': "/usr/include",
+            'ul': "/usr/lib",
+            'ule': "/usr/libexec",
+            'ulb': "/usr/local/bin",
+            'uls': "/usr/local/sbin",
+            'uli': "/usr/local/include",
+            'ull': "/usr/local/lib",
+            'ush': "/usr/share",
+            'man1': "/usr/share/man/man1",
+            'man2': "/usr/share/man/man2",
+            'man3': "/usr/share/man/man3",
+            'man4': "/usr/share/man/man4",
+            'man5': "/usr/share/man/man5",
+            'man6': "/usr/share/man/man6",
+            'man7': "/usr/share/man/man7",
+            'man8': "/usr/share/man/man8",
+
+            '_b': self.seg + "/bin",
+            '_s': self.seg + "/sbin",
+            '_l': self.seg + "/lib",
+            '_e': self.seg + "/etc",
+            '_ub': self.seg + "/usr/bin",
+            '_us': self.seg + "/usr/sbin",
+            '_ui': self.seg + "/usr/include",
+            '_ul': self.seg + "/usr/lib",
+            '_ule': self.seg + "/usr/libexec",
+            '_ulb': self.seg + "/usr/local/bin",
+            '_uls': self.seg + "/usr/local/sbin",
+            '_uli': self.seg + "/usr/local/include",
+            '_ull': self.seg + "/usr/local/lib",
+            '_ush': self.seg + "/usr/share",
+            '_man1': self.seg + "/usr/share/man/man1",
+            '_man2': self.seg + "/usr/share/man/man2",
+            '_man3': self.seg + "/usr/share/man/man3",
+            '_man4': self.seg + "/usr/share/man/man4",
+            '_man5': self.seg + "/usr/share/man/man5",
+            '_man6': self.seg + "/usr/share/man/man6",
+            '_man7': self.seg + "/usr/share/man/man7",
+            '_man8': self.seg + "/usr/share/man/man8"
+        }
+
+
+
     def inst_binary(self, frm: str, to: str) -> None:
         """
         Install a binary to the live filesystem
@@ -205,7 +257,7 @@ class FileInstaller:
                 sys.exit(-1)
 
         if to[-1] == '/':
-            abspath = f"{to}/{frm.split('/')[-1]}"
+            abspath = f"{to}{frm.split('/')[-1]}"
         else:
             abspath = to
         self.manifest.append(abspath)
@@ -219,6 +271,7 @@ class FileInstaller:
                 all_paths.append(os.path.join(root, dir_name) + '/')
             for file_name in files:
                 all_paths.append(os.path.join(root, file_name))
+            #all_paths.append(root)
         return all_paths
 
 
