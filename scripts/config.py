@@ -67,8 +67,9 @@ log.basicConfig(
     filename=config['log_file'],
     encoding="utf-8",
     filemode="a",
-    format="%(asctime)s | %(levelname)s | %(message)s",
-    style="%",
+    format="[{levelname:^9}] | {asctime} | {message}",
+    # format="%(asctime)s | %(levelname)s | %(message)s",
+    style="{",
     datefmt="%Y-%m-%d %H:%M:%S",
     level=log.INFO
 )
