@@ -38,9 +38,9 @@ import tqdm
 
 from config import config
 
-# These are a bunch of common paths to be used in
-# tandem with the helper functions in the next section
-# Install paths
+# These paths are deprecated, and will be removed once
+# I've updated the existing build scripts. Please use
+# The path variables in the FileInstaller class instead.
 paths = {
     'b': "/bin",
     's': "/sbin",
@@ -81,6 +81,10 @@ clr = {
 # version does not include a newline.
 
 def colorize(color: str, msg: str) -> str:
+    """
+    Returns a message string in colour or
+    plain if colour is disabled.
+    """
     s = ""
     s += clr[color] if config['color'] else ''
     s += msg
@@ -293,7 +297,14 @@ def download(url: str, filename: str) -> None:
 
 
 class DownloadProgressBar(tqdm.tqdm):
+    """
+    tqdm wrapper for ftp download
+    """
+
     def update_to(self, b=1, bsize=1, tsize=None):
+        """
+        Set total size of download or None
+        """
         if tsize is not None:
             self.total = tsize
         self.update(b * bsize - self.n)
@@ -365,23 +376,14 @@ def do_initdb(args: argparse.Namespace) -> None:
         green(f"Initialized {csv_file[:-4]}")
 
 
-def get_manifest(build_file: str) -> list:
+def get_manifest(manifest_file: str) -> list:
     """
     Open the build file and retrieve file manifest
     """
     manifest = []
-    in_manifest = False
-    with open(build_file, 'r', encoding='utf-8') as f:
+    with open(manifest_file, 'r', encoding='utf-8') as f:
         for line in f:
-
-            if '"""' in line and not in_manifest:
-                in_manifest = True
-                continue
-            if '"""' in line and in_manifest:
-                break
-
-            if in_manifest:
-                manifest.append(line.strip())
+            manifest.append(line.strip())
 
     return manifest
 
