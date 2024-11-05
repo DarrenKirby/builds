@@ -1,24 +1,25 @@
-#    /var/builds/scripts/search_package.py
-#    Thu Oct 24 02:29:05 UTC 2024
+"""
+    /var/builds/scripts/search_package.py
+    Thu Oct 24 02:29:05 UTC 2024
 
-#    Search the db file for package information
-#
-#    Copyright:: (c) 2024
-#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
+    Search the db file for package information
 
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+    Copyright:: (c) 2024
+    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-#    You should have received a copy of the GNU General Public License
-#    along with this program. If not, see <http://www.gnu.org/licenses/>.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+"""
 
 import dbm
 import argparse
@@ -43,7 +44,9 @@ def print_pkg_info(_a: list) -> None:
 
 
 def do_search(args: argparse.Namespace) -> None:
-    """Search string arguments against db names and descriptions"""
+    """
+    Search string arguments against db names and descriptions
+    """
     to_search = args.pkg_atom
     match = False
 
@@ -72,11 +75,11 @@ def do_search(args: argparse.Namespace) -> None:
 
 
 def do_info(args):
+    """
+    Print information about an installed package
+    """
     to_get_info = args.pkg_atom
     match = False
 
     for pkg in to_get_info:
         pkg_info = cf.get_db_info(pkg)
-
-
-
