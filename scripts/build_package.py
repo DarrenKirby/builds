@@ -102,8 +102,6 @@ class FileInstaller:
             '_man8': self.seg + "/usr/share/man/man8"
         }
 
-
-
     def inst_binary(self, frm: str, to: str) -> None:
         """
         Install a binary to the live filesystem
@@ -271,7 +269,7 @@ class FileInstaller:
                 all_paths.append(os.path.join(root, dir_name) + '/')
             for file_name in files:
                 all_paths.append(os.path.join(root, file_name))
-            #all_paths.append(root)
+            # all_paths.append(root)
         return all_paths
 
 
@@ -434,9 +432,8 @@ class BuildPackage(FileInstaller):
             sys.exit(5)
 
         if self.args.verbose:
-            files = cf.get_manifest(self.build_file)
             cf.green(f"Files installed for {self.name} {self.version}: ")
-            for filename in files:
+            for filename in sorted(self.manifest):
                 cf.bold(f"\t{filename}")
 
     def cleanup(self) -> None:
