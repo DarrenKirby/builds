@@ -1,10 +1,10 @@
 """
-    /usr/builds/scripts/initialize_builds_tree.py
+    /var/builds/scripts/initialize_builds_tree.py
     Wed Sep 25 23:30:16 UTC 2024
 
     A script which installs the bld app, and initializes the db file
 
-    Copyright:: (c) 2024 Darren Kirby
+    Copyright:: (c) 2024
     Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
     This program is free software: you can redistribute it and/or modify
@@ -25,18 +25,16 @@ import csv
 import dbm
 import sys
 import os
-import os.path
 import datetime
 
-
-BUILDS_ROOT = os.path.abspath("..")
+BUILDS_ROOT = os.path.abspath(os.pardir)
 
 # check if root, else print message about non-privileged install
 if os.geteuid() != 0:
     print("Not root!")
     print("Can only install builds in user directory!")
     print(f"installing build root as {BUILDS_ROOT}")
-    CONF_PATH = f"{os.path.expanduser("~")}/.builds.conf"
+    CONF_PATH = f"{os.environ['HOME']}/.builds.conf"
     LOG_PATH = BUILDS_ROOT + "/builds.log"
     DB_PATH = BUILDS_ROOT + "/scripts/builds"
 else:
@@ -55,7 +53,7 @@ HEADER = f"""
 
 #    The builds system configuration file
 #
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -73,14 +71,14 @@ HEADER = f"""
 
 
 """
+
 if os.path.isfile(CONF_PATH):
     print(f"{CONF_PATH} exists...")
-    if input("overwrite? (y/n)") == 'n':
+    if input(">>> overwrite? (y/n)") in ['n', 'N', 'no', 'No']:
         sys.exit(1)
 
-
 print(f"Writing {CONF_PATH}...")
-print("...please check default values.")
+print("...please check default values, and edit as necessary")
 with open(CONF_PATH, 'w', encoding="utf-8") as conf_file:
     conf_file.write(HEADER)
     conf_file.write(f"builds_root={BUILDS_ROOT}\n")
