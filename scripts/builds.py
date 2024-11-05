@@ -219,7 +219,7 @@ def do_uninstall(args: argparse.Namespace) -> None:
     for pkg in args.pkg_atom:
         pkg_info = cf.get_installed_version(pkg)
         c, n = pkg_info[0].split('/')
-        build_file = f"{config['builds_root']}/{c}/{n}/{n}-{pkg_info[1]}.build.py"
+        build_file = f"{config['builds_root']}/{c}/{n}/{n}-{pkg_info[1]}.manifest"
 
         files_to_uninstall = cf.get_manifest(build_file)
         files_to_uninstall.sort()
