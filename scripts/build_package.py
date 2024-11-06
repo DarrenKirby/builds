@@ -432,6 +432,7 @@ class BuildPackage(FileInstaller):
             sys.exit(5)
 
         if self.args.verbose:
+            print()
             cf.green(f"Files installed for {self.name} {self.version}: ")
             for filename in sorted(self.manifest):
                 cf.bold(f"\t{filename}")
@@ -465,16 +466,16 @@ class BuildPackage(FileInstaller):
     # not intended for use outside this class.
 
     def _write_manifest_file(self):
-        manifest = f"{config['builds_root']}/{self.build}/"
-        manifest += f"{self.package_dir}.manifest"
+        manifest_file = f"{config['builds_root']}/{self.build}/"
+        manifest_file += f"{self.package_dir}.manifest"
 
         try:
-            with open(manifest, 'w', encoding='utf-8') as f:
+            with open(manifest_file, 'w', encoding='utf-8') as f:
                 for file in sorted(self.manifest):
                     f.write(f"{file}\n")
         except IOError as e:
-            cf.red(f"Error writing: {manifest}")
-            log.warning(f"Could not write: {manifest}")
+            cf.red(f"Error writing: {manifest_file}")
+            log.warning(f"Could not write: {manifest_file}")
             print(e)
             return False
         return True
