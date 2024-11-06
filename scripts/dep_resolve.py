@@ -39,14 +39,43 @@ def already_installed(p):
     return True
 
 
+def process_set(set_file: str) -> list:
+    """
+    Read a set file into a list of packages
+    """
+    with open(f"{config['builds_root']}/sets/{set_file}", 'r', encoding='utf-8') as f:
+        try:
+            lines = f.readlines()
+        except IOError as e:
+            cf.yellow(f"cannot open set: {set_file}: ")
+            print(e)
+
+    return [line[:-1] for line in lines if line[0] != "#" and line != '\n']
+
+
+def process_packages(args: argparse.Namespace) -> list:
+    """
+    Converts package args and set args into a single list
+    """
+    pkgs = []
+    for arg in args.pkg_atom:
+        if arg[0] == '@':
+            pkgs.extend(process_set(arg[1:]))
+        else:
+            pkgs.append(arg)
+    return pkgs
+
+
 def resolve_dependencies(args: argparse.Namespace) -> list:
     """
     Translate package names into atoms, and check for dependencies
     """
+    pkg_atoms = process_packages(args)
+
     atoms = []
     pkgs_to_build = []
     with dbm.open(config['db_file']) as db:
-        for arg in args.pkg_atom:
+        for arg in pkg_atoms:
             if arg.find('/') != -1:
                 db_string = db[arg.split('/')[1]].decode()
                 pkg_name = db_string.split(',')[0]
