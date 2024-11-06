@@ -1,7 +1,5 @@
 #    app-arch/bzip2/bzip2-1.0.8.build.py
-#    Sun Oct 20 00:41:16 UTC 2024
-import os
-
+#    Tue Nov  5 23:04:26 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -30,36 +28,36 @@ def make(self):
 
 
 def make_install(self):
-    return os.system(f"make PREFIX={self.seg_dir} install")
+    return os.system(f"make PREFIX={self.seg_dir}/usr install")
 
 
 def install(self):
-    self.inst_library("libbz2.so.1.0.8", cf.paths['ul'])
-    self.inst_symlink(f"{cf.paths['ul']}/libbz2.so.1.0.8", f"{cf.paths['ul']}/libbz2.so")
-    self.inst_symlink(f"{cf.paths['ul']}/libbz2.so.1.0.8", f"{cf.paths['ul']}/libbz2.so.1.0")
+    self.inst_library("libbz2.so.1.0.8", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libbz2.so.1.0.8", f"{self.p['ul']}/libbz2.so")
+    self.inst_symlink(f"{self.p['ul']}/libbz2.so.1.0.8", f"{self.p['ul']}/libbz2.so.1.0")
 
-    self.inst_header(f"{self.seg_dir}/include/bzlib.h", cf.paths['ui'])
+    self.inst_header(f"{self.seg_dir}/include/bzlib.h", self.p['ui'])
 
-    os.rename("bzip2-shared", f"{self.seg_dir}/bin/bzip2")
-    self.inst_binary(f"{self.seg_dir}/bin/bzip2", f"{cf.paths['ub']}")
-    self.inst_symlink(f"{cf.paths['ub']}/bzip2", f"{cf.paths['ub']}/bzat")
-    self.inst_symlink(f"{cf.paths['ub']}/bzip2", f"{cf.paths['ub']}/bunzip2")
+    os.rename("bzip2-shared", f"{self.p['_ub']}/bzip2")
+    self.inst_binary(f"{self.p['_ub']}/bzip2", f"{self.p['ub']}")
+    self.inst_symlink(f"{self.p['ub']}/bzip2", f"{self.p['ub']}/bzat")
+    self.inst_symlink(f"{self.p['ub']}/bzip2", f"{self.p['ub']}/bunzip2")
 
-    self.inst_binary(f"{self.seg_dir}/bin/bzdiff", f"{cf.paths['ub']}")
-    self.inst_binary(f"{self.seg_dir}/bin/bzgrep", f"{cf.paths['ub']}")
-    self.inst_binary(f"{self.seg_dir}/bin/bzmore", f"{cf.paths['ub']}")
-    self.inst_binary(f"{self.seg_dir}/bin/bzip2recover", f"{cf.paths['ub']}")
+    self.inst_binary(f"{self.p['_ub']}/bzdiff", f"{self.p['ub']}")
+    self.inst_binary(f"{self.p['_ub']}/bzgrep", f"{self.p['ub']}")
+    self.inst_binary(f"{self.p['_ub']}/bzmore", f"{self.p['ub']}")
+    self.inst_binary(f"{self.p['_ub']}/bzip2recover", f"{self.p['ub']}")
 
-    self.inst_symlink(f"{cf.paths['ub']}/bzdiff", f"{cf.paths['ub']}/bzcmp")
-    self.inst_symlink(f"{cf.paths['ub']}/bzgrep", f"{cf.paths['ub']}/bzegrep")
-    self.inst_symlink(f"{cf.paths['ub']}/bzgrep", f"{cf.paths['ub']}/bzfgrep")
-    self.inst_symlink(f"{cf.paths['ub']}/bzmore", f"{cf.paths['ub']}/bzless")
+    self.inst_symlink(f"{self.p['ub']}/bzdiff", f"{self.p['ub']}/bzcmp")
+    self.inst_symlink(f"{self.p['ub']}/bzgrep", f"{self.p['ub']}/bzegrep")
+    self.inst_symlink(f"{self.p['ub']}/bzgrep", f"{self.p['ub']}/bzfgrep")
+    self.inst_symlink(f"{self.p['ub']}/bzmore", f"{self.p['ub']}/bzless")
 
-    self.inst_manpage(f"{self.seg_dir}/man/man1/bzcmp.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/man/man1/bzdiff.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/man/man1/bzegrep.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/man/man1/bzfgrep.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/man/man1/bzgrep.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/man/man1/bzip2.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/man/man1/bzless.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/man/man1/bzmore.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/bzcmp.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/bzdiff.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/bzegrep.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/bzfgrep.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/bzgrep.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/bzip2.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/bzless.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/bzmore.1", self.p['man1'])

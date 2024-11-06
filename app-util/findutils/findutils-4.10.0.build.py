@@ -1,5 +1,5 @@
 #    app-util/findutils/findutils-4.10.0.build.py
-#    Fri Oct 25 01:31:58 UTC 2024
+#    Wed Nov  6 00:10:25 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -22,8 +22,7 @@
 #      How to resolve with temp install directory? As-is, the
 #      make_install step will fail on permissions for non-system install
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir} "
-                     f"--localstatedir={self.seg_dir}/var/lib/locate")
+    return os.system("./configure --prefix=/usr")
 
 
 def make(self):
@@ -31,22 +30,22 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    pass
+    self.inst_binary(f"{self.p['_ub']}/find", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/locate", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/updatedb", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/xargs", self.p['ub'])
+
+    self.inst_binary(f"{self.p['_ule']}/frcode", self.p['ule'])
+
+    for file in os.listdir(self.p['_man1']):
+        self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
+
+    self.inst_manpage(f"{self.p['_man5']}/locatedb.5", self.p['man5'])
 
 
-"""
-/usr/bin/find
-/usr/bin/locate
-/usr/bin/updatedb
-/usr/bin/xargs
-/usr/libexec/frcode
-/usr/share/man/man1/find.1
-/usr/share/man/man1/flocate.1
-/usr/share/man/man1/fupdatedb.1
-/usr/share/man/man1/fxargs.1
-/usr/share/man/man5/flocatedb.5
-"""
+
+

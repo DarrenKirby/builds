@@ -75,37 +75,11 @@ def install(self):
 
     self.inst_config(f"{self.seg_dir}/etc/mke2fs.conf", self.p['e'])
 
-    self.inst_manpage(f"{self.p['_man1']}/chattr.1", self.p['man1'])
-    self.inst_manpage(f"{self.p['_man1']}/fuse2fs.1", self.p['man1'])
-    self.inst_manpage(f"{self.p['_man1']}/lsattr.1", self.p['man1'])
-    self.inst_manpage(f"{self.p['_man5']}/e2fsck.conf.5", self.p['man5'])
-    self.inst_manpage(f"{self.p['_man5']}/ext2.5", self.p['man5'])
-    self.inst_manpage(f"{self.p['_man5']}/ext3.5", self.p['man5'])
-    self.inst_manpage(f"{self.p['_man5']}/ext4.5", self.p['man5'])
-    self.inst_manpage(f"{self.p['_man5']}/mke2fs.conf.5", self.p['man5'])
+    for file in os.listdir(self.p['_man1']):
+        self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
+
+    for file in os.listdir(self.p['_man5']):
+        self.inst_manpage(f"{self.p['_man5']}/{file}", self.p['man5'])
 
     for file in os.listdir(self.p['_man8']):
         self.inst_manpage(f"{self.p['_man8']}/{file}", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/badblocks.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/debugfs.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/dumpe2fs.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/e2freefrag.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/e2fsck.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/e2image.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/e2label.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/e2mmpstatus.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/e2undo.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/e4crypt.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/e4defrag.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/filefrag.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/fsck.ext2.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/fsck.ext3.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/fsck.ext4.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/logsave.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/mke2fs.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/mkfs.ext2.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/mkfs.ext3.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/mkfs.ext4.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/mklost+found.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/resize2fs.8", self.p['man8'])
-    # self.inst_manpage(f"{self.p['_man8']}/tune2fs.8", self.p['man8'])
