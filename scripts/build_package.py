@@ -381,7 +381,7 @@ class BuildPackage(FileInstaller):
                 cf.green("Package successfully configured.")
             else:
                 cf.red("Configure failed")
-                cf.log.critical(f"configure of {self.name} v. {self.version} failed")
+                cf.log.critical(f"configure of {self.name} {self.version} failed")
                 sys.exit(12)
         else:
             cf.bold("Nothing to configure.")
@@ -399,7 +399,7 @@ class BuildPackage(FileInstaller):
                 cf.green("`make` successful.")
             else:
                 cf.red("`make` failed")
-                cf.log.critical(f"make of {self.name} v. {self.version} failed")
+                cf.log.critical(f"make of {self.name} {self.version} failed")
                 sys.exit(13)
         else:
             cf.bold("Nothing to make.")
@@ -413,7 +413,7 @@ class BuildPackage(FileInstaller):
             print()
             if self.make_install() != 0:
                 cf.red("`make install` failed")
-                cf.log.critical(f"make of {self.name} v. {self.version} failed")
+                cf.log.critical(f"make of {self.name}  {self.version} failed")
                 sys.exit(13)
 
     def inst(self) -> None:
