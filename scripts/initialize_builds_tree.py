@@ -37,6 +37,10 @@ if os.geteuid() != 0:
     CONF_PATH = f"{os.environ['HOME']}/.builds.conf"
     LOG_PATH = BUILDS_ROOT + "/builds.log"
     DB_PATH = BUILDS_ROOT + "/scripts/builds"
+    print(f"!!! It is imperative to edit {CONF_PATH} and")
+    print("set 'install_root=' to where you want packages")
+    print("to be installed into the live filesystem!")
+    print("Use an absolute path without trailing directory slash.")
 else:
     print("Installing builds systemwide as root")
     print(f"configuring build root as {BUILDS_ROOT}")
@@ -74,14 +78,16 @@ HEADER = f"""
 
 if os.path.isfile(CONF_PATH):
     print(f"{CONF_PATH} exists...")
-    if input(">>> overwrite? (y/n)") in ['n', 'N', 'no', 'No']:
+    if input(">>> overwrite? (y/n) ") in ['n', 'N', 'no', 'No']:
         sys.exit(1)
 
 print(f"Writing {CONF_PATH}...")
 print("...please check default values, and edit as necessary")
+print("leave 'install_root=' for systemwide installs.")
 with open(CONF_PATH, 'w', encoding="utf-8") as conf_file:
     conf_file.write(HEADER)
     conf_file.write(f"builds_root={BUILDS_ROOT}\n")
+    conf_file.write(f'install_root=""\n')
     conf_file.write(f"distfiles={BUILDS_ROOT}/distfiles\n")
     conf_file.write(f"log_file={LOG_PATH}\n")
     conf_file.write(f"db_file={BUILDS_ROOT}/scripts/builds-stable\n")
