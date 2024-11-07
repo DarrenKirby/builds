@@ -53,30 +53,31 @@ class FileInstaller:
         self.seg = seg
 
         # Useful paths for install functions
+        ir = config['install_root']
         self.p = {
 
-            'b': "/bin",
-            's': "/sbin",
-            'l': "/lib",
-            'e': "/etc",
-            'ub': "/usr/bin",
-            'us': "/usr/sbin",
-            'ui': "/usr/include",
-            'ul': "/usr/lib",
-            'ule': "/usr/libexec",
-            'ulb': "/usr/local/bin",
-            'uls': "/usr/local/sbin",
-            'uli': "/usr/local/include",
-            'ull': "/usr/local/lib",
-            'ush': "/usr/share",
-            'man1': "/usr/share/man/man1",
-            'man2': "/usr/share/man/man2",
-            'man3': "/usr/share/man/man3",
-            'man4': "/usr/share/man/man4",
-            'man5': "/usr/share/man/man5",
-            'man6': "/usr/share/man/man6",
-            'man7': "/usr/share/man/man7",
-            'man8': "/usr/share/man/man8",
+            'b': f"{ir}/bin",
+            's': f"{ir}/sbin",
+            'l': f"{ir}/lib",
+            'e': f"{ir}/etc",
+            'ub': f"{ir}/usr/bin",
+            'us': f"{ir}/usr/sbin",
+            'ui': f"{ir}/usr/include",
+            'ul': f"{ir}/usr/lib",
+            'ule': f"{ir}/usr/libexec",
+            'ulb': f"{ir}/usr/local/bin",
+            'uls': f"{ir}/usr/local/sbin",
+            'uli': f"{ir}/usr/local/include",
+            'ull': f"{ir}/usr/local/lib",
+            'ush': f"{ir}/usr/share",
+            'man1': f"{ir}/usr/share/man/man1",
+            'man2': f"{ir}/usr/share/man/man2",
+            'man3': f"{ir}/usr/share/man/man3",
+            'man4': f"{ir}/usr/share/man/man4",
+            'man5': f"{ir}/usr/share/man/man5",
+            'man6': f"{ir}/usr/share/man/man6",
+            'man7': f"{ir}/usr/share/man/man7",
+            'man8': f"{ir}/usr/share/man/man8",
 
             '_b': self.seg + "/bin",
             '_s': self.seg + "/sbin",
@@ -220,7 +221,7 @@ class FileInstaller:
         seg_files = self._list_all_paths(src)
         real_paths = []
         for file in seg_files:
-            file = file.replace(self.seg, '/usr')
+            file = file.replace(self.seg, config['install_root'])
             real_paths.append(file)
         self.manifest += real_paths
 
