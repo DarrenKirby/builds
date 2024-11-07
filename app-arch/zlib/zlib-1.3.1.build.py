@@ -1,5 +1,5 @@
 #    app-arch/zlib/zlib-1.3.1.build.py
-#    Thu Oct 31 02:40:37 UTC 2024
+#    Thu Nov  7 02:04:05 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system("./configure --prefix=/usr")
 
 
 def make(self):
@@ -27,13 +27,13 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    self.inst_library(f"{self.seg_dir}/lib/libz.so.1.3.1", cf.paths['ul'])
-    self.inst_symlink(f"{cf.paths['ul']}/libz.so.1.3.1", f"{cf.paths['ul']}/libz.so.1")
-    self.inst_symlink(f"{cf.paths['ul']}/libz.so.1.3.1", f"{cf.paths['ul']}/libz.so")
-    self.inst_header(f"{self.seg_dir}/include/zconf.h", cf.paths['ui'])
-    self.inst_header(f"{self.seg_dir}/include/zlib.h", cf.paths['ui'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/zlib.3", cf.paths['man3'])
+    self.inst_library(f"{self.p['_ul']}/libz.so.1.3.1", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libz.so.1.3.1", f"{self.p['ul']}/libz.so.1")
+    self.inst_symlink(f"{self.p['ul']}/libz.so.1.3.1", f"{self.p['ul']}/libz.so")
+    self.inst_header(f"{self.p['_ui']}/zconf.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/zlib.h", self.p['ui'])
+    self.inst_manpage(f"{self.p['_man3']}/zlib.3", self.p['man3'])

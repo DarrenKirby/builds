@@ -1,5 +1,5 @@
 #    app-arch/gzip/gzip-1.13.build.py
-#    Sun Oct 20 22:39:54 UTC 2024
+#    Thu Nov  7 00:27:56 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system(f"./configure --prefix=/usr")
 
 
 def make(self):
@@ -27,24 +27,24 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    self.inst_binary(f"{self.seg_dir}/bin/gzip", cf.paths['b'])
-    self.inst_script(f"{self.seg_dir}/bin/gunzip", cf.paths['b'])
-    self.inst_script(f"{self.seg_dir}/bin/gzexe", cf.paths['b'])
-    self.inst_script(f"{self.seg_dir}/bin/uncompress", cf.paths['b'])
-    self.inst_script(f"{self.seg_dir}/bin/zcat", cf.paths['b'])
-    self.inst_script(f"{self.seg_dir}/bin/zcmp", cf.paths['b'])
-    self.inst_script(f"{self.seg_dir}/bin/zdiff", cf.paths['b'])
-    self.inst_script(f"{self.seg_dir}/bin/zegrep", cf.paths['b'])
-    self.inst_script(f"{self.seg_dir}/bin/zfgrep", cf.paths['b'])
-    self.inst_script(f"{self.seg_dir}/bin/zforce", cf.paths['b'])
-    self.inst_script(f"{self.seg_dir}/bin/zgrep", cf.paths['b'])
-    self.inst_script(f"{self.seg_dir}/bin/zless", cf.paths['b'])
-    self.inst_script(f"{self.seg_dir}/bin/zmore", cf.paths['b'])
-    self.inst_script(f"{self.seg_dir}/bin/znew", cf.paths['b'])
+    self.inst_binary(f"{self.p['_ub']}/gzip", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/gunzip", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/gzexe", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/uncompress", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/zcat", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/zcmp", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/zdiff", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/zegrep", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/zfgrep", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/zforce", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/zgrep", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/zless", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/zmore", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/znew", self.p['ub'])
 
-    for manpage in glob.glob(f"{self.seg_dir}/share/man/man1/*.1"):
-        self.inst_manpage(manpage, cf.paths['man1'])
+    for file in os.listdir(self.p['_man1']):
+        self.inst_manpage(file, self.p['man1'])

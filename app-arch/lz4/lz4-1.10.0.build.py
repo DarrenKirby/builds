@@ -1,5 +1,5 @@
 #    app-arch/lz4/lz4-1.10.0.build.py
-#    Tue Oct  8 21:47:45 UTC 2024
+#    Thu Nov  7 01:08:57 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -21,24 +21,26 @@
 def make(self):
     return os.system(f"make BUILD_STATIC=no PREFIX={self.seg_dir}")
 
+
 def make_install(self):
     return os.system(f"make BUILD_STATIC=no PREFIX={self.seg_dir} install")
 
+
 def install(self):
-    self.inst_library(f"{self.seg_dir}/lib/liblz4.so.1.10.0", cf.paths['ul'])
-    self.inst_symlink(f"{cf.paths['ul']}/liblz4.so.1.10.0", f"{cf.paths['ul']}/liblz4.so.1")
-    self.inst_symlink(f"{cf.paths['ul']}/liblz4.so.1.10.0", f"{cf.paths['ul']}/liblz4.so")
+    self.inst_library(f"{self.seg_dir}/lib/liblz4.so.1.10.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/liblz4.so.1.10.0", f"{self.p['ul']}/liblz4.so.1")
+    self.inst_symlink(f"{self.p['ul']}/liblz4.so.1.10.0", f"{self.p['ul']}/liblz4.so")
 
-    self.inst_header(f"{self.seg_dir}/include/lz4.h", cf.paths['ui'])
-    self.inst_header(f"{self.seg_dir}/include/lz4frame.h", cf.paths['ui'])
-    self.inst_header(f"{self.seg_dir}/include/lz4hc.h", cf.paths['ui'])
+    self.inst_header(f"{self.seg_dir}/include/lz4.h", self.p['ui'])
+    self.inst_header(f"{self.seg_dir}/include/lz4frame.h", self.p['ui'])
+    self.inst_header(f"{self.seg_dir}/include/lz4hc.h", self.p['ui'])
 
-    self.inst_binary(f"{self.seg_dir}/bin/lz4", f"{cf.paths['ub']}")
-    self.inst_symlink(f"{cf.paths['ub']}/lz4", f"{cf.paths['ub']}/lz4c")
-    self.inst_symlink(f"{cf.paths['ub']}/lz4", f"{cf.paths['ub']}/lz4cat")
-    self.inst_symlink(f"{cf.paths['ub']}/lz4", f"{cf.paths['ub']}/unlz4")
+    self.inst_binary(f"{self.seg_dir}/bin/lz4", f"{self.p['ub']}")
+    self.inst_symlink(f"{self.p['ub']}/lz4", f"{self.p['ub']}/lz4c")
+    self.inst_symlink(f"{self.p['ub']}/lz4", f"{self.p['ub']}/lz4cat")
+    self.inst_symlink(f"{self.p['ub']}/lz4", f"{self.p['ub']}/unlz4")
 
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/lz4.1", cf.paths['man1'])
-    self.inst_symlink(f"{cf.paths['man1']}/lz4.1.bz2", f"{cf.paths['man1']}/lz4c.1")
-    self.inst_symlink(f"{cf.paths['man1']}/lz4.1.bz2", f"{cf.paths['man1']}/lz4cat.1")
-    self.inst_symlink(f"{cf.paths['man1']}/lz4.1.bz2", f"{cf.paths['man1']}/unlz4.1")
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/lz4.1", self.p['man1'])
+    self.inst_symlink(f"{self.p['man1']}/lz4.1.bz2", f"{self.p['man1']}/lz4c.1")
+    self.inst_symlink(f"{self.p['man1']}/lz4.1.bz2", f"{self.p['man1']}/lz4cat.1")
+    self.inst_symlink(f"{self.p['man1']}/lz4.1.bz2", f"{self.p['man1']}/unlz4.1")

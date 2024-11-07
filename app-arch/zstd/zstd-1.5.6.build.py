@@ -1,7 +1,7 @@
 #    app-arch/zstd/zstd-1.5.6-.build.py
-#    Thu Oct 31 02:40:37 UTC 2024
+#    Thu Nov  7 02:10:02 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -21,29 +21,31 @@
 def make(self):
     return os.system(f"make prefix={self.seg_dir}")
 
+
 def make_install(self):
     return os.system(f"make prefix={self.seg_dir} install")
 
+
 def install(self):
-    self.inst_library(f"{self.seg_dir}/lib/libzstd.so.1.5.6", cf.paths['ul'])
-    self.inst_symlink(f"{cf.paths['ul']}/libzstd.so.1.5.6", f"{cf.paths['ul']}/libzstd.so")
-    self.inst_symlink(f"{cf.paths['ul']}/libzstd.so.1.5.6", f"{cf.paths['ul']}/libzstd.so.1")
+    self.inst_library(f"{self.p['_ul']}/libzstd.so.1.5.6", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libzstd.so.1.5.6", f"{self.p['ul']}/libzstd.so")
+    self.inst_symlink(f"{self.p['ul']}/libzstd.so.1.5.6", f"{self.p['ul']}/libzstd.so.1")
 
-    self.inst_header(f"{self.seg_dir}/include/zdict.h", cf.paths['ui'])
-    self.inst_header(f"{self.seg_dir}/include/zstd.h", cf.paths['ui'])
-    self.inst_header(f"{self.seg_dir}/include/zstd_errors.h", cf.paths['ui'])
+    self.inst_header(f"{self.p['_ui']}/zdict.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/zstd.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/zstd_errors.h", self.p['ui'])
 
-    self.inst_binary(f"{self.seg_dir}/bin/zstd", f"{cf.paths['ub']}")
-    self.inst_binary(f"{self.seg_dir}/bin/zstdgrep", f"{cf.paths['ub']}")
-    self.inst_binary(f"{self.seg_dir}/bin/zsrdless", f"{cf.paths['ub']}")
+    self.inst_binary(f"{self.p['_ub']}/zstd", f"{self.p['ub']}")
+    self.inst_binary(f"{self.p['_ub']}/zstdgrep", f"{self.p['ub']}")
+    self.inst_binary(f"{self.p['_ub']}/zsrdless", f"{self.p['ub']}")
 
-    self.inst_symlink(f"{cf.paths['ub']}/zstd", f"{cf.paths['ub']}/unzstd")
-    self.inst_symlink(f"{cf.paths['ub']}/zstd", f"{cf.paths['ub']}/zstdcat")
-    self.inst_symlink(f"{cf.paths['ub']}/zstd", f"{cf.paths['ub']}/zstdmt")
+    self.inst_symlink(f"{self.p['ub']}/zstd", f"{self.p['ub']}/unzstd")
+    self.inst_symlink(f"{self.p['ub']}/zstd", f"{self.p['ub']}/zstdcat")
+    self.inst_symlink(f"{self.p['ub']}/zstd", f"{self.p['ub']}/zstdmt")
 
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zstd.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zstdgrep.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zstdless.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zstd.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zstdgrep.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zstdless.1", self.p['man1'])
 
-    self.inst_symlink(f"{cf.paths['man1']}/zstd.1.bz2", f"{cf.paths['man1']}/unzstd.1")
-    self.inst_symlink(f"{cf.paths['man1']}/zstd.1.bz2", f"{cf.paths['man1']}/zstdcat.1")
+    self.inst_symlink(f"{self.p['man1']}/zstd.1.bz2", f"{self.p['man1']}/unzstd.1")
+    self.inst_symlink(f"{self.p['man1']}/zstd.1.bz2", f"{self.p['man1']}/zstdcat.1")
