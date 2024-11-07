@@ -1,5 +1,5 @@
 #    app-shell/bash/bash-5.2.37.build.py
-#    Thu Oct 31 03:43:21 UTC 2024
+#    Thu Nov  7 04:18:15 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir} "
+    return os.system("./configure --prefix=/usr "
                      f"--without-bash-malloc "
                      f"--with-installed-readline "
                      f"bash_cv_strtold_broken=no")
@@ -30,26 +30,27 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    self.inst_binary(f"{self.seg_dir}/bin/bash", cf.paths['ub'])
-    self.inst_script(f"{self.seg_dir}/bin/bashbug", cf.paths['ub'])
+    self.inst_binary(f"{self.p['_ub']}/bash", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/bashbug", self.p['ub'])
 
     # headers
-    self.inst_directory(f"{self.seg_dir}/include/bash/", f"{cf.paths['ui']}/bash/")
+    self.inst_directory(f"{self.p['_ui']}/bash/", f"{self.p['ui']}/bash/")
     # builtins
-    self.inst_directory(f"{self.seg_dir}/lib/bash/", f"{cf.paths['ul']}/bash/")
+    self.inst_directory(f"{self.p['_ul']}/bash/", f"{self.p['ul']}/bash/")
 
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/bash.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/bashbug.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/share/man/man1/bash.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/share/man/man1/bashbug.1", self.p['man1'])
 
 
 def cleanup_posthook(self):
+    print()
     cf.yellow("Make /bin/sh link to /usr/bin/bash ? (y/n)")
-    if input() not in ['n', 'N', 'No', 'no']:
-        cf.do_sym("/usr/bin/bash", "/bin/sh")
+    if input(">>> ") not in ['n', 'N', 'No', 'no']:
+        self.inst_symlink("/usr/bin/bash", "/bin/sh")
     cf.bold("Run...")
     print("\texec /usr/bin/bash --login")
     cf.bold("...to load new bash shell immediatly")

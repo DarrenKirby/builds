@@ -1,5 +1,5 @@
 #    app-shell/dash/dash-0.5.12.build.py
-#    Thu Oct 31 03:43:21 UTC 2024
+#    Thu Nov  7 04:26:15 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system(f"./configure --prefix=/usr")
 
 
 def make(self):
@@ -27,21 +27,17 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    self.inst_binary(f"{self.seg_dir}/bin/dash", cf.paths['b'])
-    self.inst_manpage(f"{self.seg_dir}share/man/man1/dash.1", cf.paths['man1'])
+    self.inst_binary(f"{self.p['_ub']}/dash", self.p['b'])
+    self.inst_manpage(f"{self.p['_man1']}/dash.1", self.p['man1'])
 
 
 def cleanup_prehook(self):
     print()
-    cf.print_yellow("Note: ")
-    cf.print_bold("If you want dash to be a link to /bin/sh,\n")
-    cf.print_bold("you must make this link yourself. Also, don't\n")
-    cf.print_bold("forget to add '/bin/dash' to /etc/shells by running:\n\n")
-    print("cat >> /etc/shells << 'EOF'")
-    print("/bin/dash")
-    print("EOF")
+    cf.yellow("Make /bin/sh link to /usr/bin/dash ? (y/n)")
+    if input(">>> ") not in ['n', 'N', 'No', 'no']:
+        self.inst_symlink("/usr/bin/dash", "/bin/sh")
     print()

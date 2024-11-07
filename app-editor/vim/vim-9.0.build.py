@@ -1,5 +1,5 @@
 #    app-editor/vim/vim-9.0.build.py
-#    Tue Oct 29 22:28:55 UTC 2024
+#    Thu Nov  7 03:47:34 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -28,7 +28,7 @@ def configure(self):
     with open("src/feature.h", 'a', encoding='utf-8') as f:
         f.write('#define SYS_VIMRC_FILE "/etc/vimrc"')
 
-    return os.system(f"./configure --prefix={self.seg_dir} --with-x=no --disable-gui")
+    return os.system(f"./configure --prefix=/usr --with-x=no --disable-gui")
 
 
 def make(self):
@@ -36,33 +36,33 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    self.inst_binary(f"{self.seg_dir}/bin/vim", cf.paths['ub'])
-    self.inst_binary(f"{self.seg_dir}/bin/vimtutor", cf.paths['ub'])
-    self.inst_binary(f"{self.seg_dir}/bin/xxf", cf.paths['ub'])
+    self.inst_binary(f"{self.p['_ub']}/vim", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/vimtutor", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/xxf", self.p['ub'])
 
-    self.inst_symlink(f"{cf.paths['ub']}/vim", f"{cf.paths['ub']}/ex")
-    self.inst_symlink(f"{cf.paths['ub']}/vim", f"{cf.paths['ub']}/rview")
-    self.inst_symlink(f"{cf.paths['ub']}/vim", f"{cf.paths['ub']}/rvim")
-    self.inst_symlink(f"{cf.paths['ub']}/vim", f"{cf.paths['ub']}/view")
-    self.inst_symlink(f"{cf.paths['ub']}/vim", f"{cf.paths['ub']}/vimdiff")
+    self.inst_symlink(f"{self.p['ub']}/vim", f"{self.p['ub']}/ex")
+    self.inst_symlink(f"{self.p['ub']}/vim", f"{self.p['ub']}/rview")
+    self.inst_symlink(f"{self.p['ub']}/vim", f"{self.p['ub']}/rvim")
+    self.inst_symlink(f"{self.p['ub']}/vim", f"{self.p['ub']}/view")
+    self.inst_symlink(f"{self.p['ub']}/vim", f"{self.p['ub']}/vimdiff")
 
     # make the vi symlink
-    self.inst_symlink(f"{cf.paths['ub']}/vim", f"{cf.paths['ub']}/vi")
+    self.inst_symlink(f"{self.p['ub']}/vim", f"{self.p['ub']}/vi")
 
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/evim.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/vim.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/vimdiff.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/vimtutor.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/xxd.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/evim.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/vim.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/vimdiff.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/vimtutor.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/xxd.1", self.p['man1'])
 
-    self.inst_symlink(f"{cf.paths['man1']}/vim.1.bz2", f"{cf.paths['man1']}/ex.1")
-    self.inst_symlink(f"{cf.paths['man1']}/vim.1.bz2", f"{cf.paths['man1']}/rview.1")
-    self.inst_symlink(f"{cf.paths['man1']}/vim.1.bz2", f"{cf.paths['man1']}/rvim.1")
-    self.inst_symlink(f"{cf.paths['man1']}/vim.1.bz2", f"{cf.paths['man1']}/view.1")
-    self.inst_symlink(f"{cf.paths['man1']}/vim.1.bz2", f"{cf.paths['man1']}/vi.1")
+    self.inst_symlink(f"{self.p['man1']}/vim.1.bz2", f"{self.p['man1']}/ex.1")
+    self.inst_symlink(f"{self.p['man1']}/vim.1.bz2", f"{self.p['man1']}/rview.1")
+    self.inst_symlink(f"{self.p['man1']}/vim.1.bz2", f"{self.p['man1']}/rvim.1")
+    self.inst_symlink(f"{self.p['man1']}/vim.1.bz2", f"{self.p['man1']}/view.1")
+    self.inst_symlink(f"{self.p['man1']}/vim.1.bz2", f"{self.p['man1']}/vi.1")
 
-    self.inst_directory(f"{self.seg_dir}/share/vim/", f"{cf.paths['ush']}/vim/")
+    self.inst_directory(f"{self.seg_dir}/share/vim/", f"{self.p['ush']}/vim/")

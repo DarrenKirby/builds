@@ -1,5 +1,5 @@
 #    app-shell/tcsh/tcsh-6.24.13.build.py
-#    Thu Oct 31 03:40:54 UTC 2024
+#    Thu Nov  7 04:29:59 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:Darren Kirby)
@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system("./configure --prefix=/usr")
 
 
 def make(self):
@@ -27,9 +27,9 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install install.man")
+    return os.system(f"make DESTDIR={self.seg_dir} install install.man")
 
 
 def install(self):
-    self.inst_binary(f"{self.seg_dir}/bin/tcsh", cf.paths['ub'])
-    self.inst_manpage(f"{self.seg_dir}share/man/man1/tcsh.1", cf.paths['man1'])
+    self.inst_binary(f"{self.p['_ub']}/tcsh", self.p['ub'])
+    self.inst_manpage(f"{self.p['_man1']}/tcsh.1", self.p['man1'])

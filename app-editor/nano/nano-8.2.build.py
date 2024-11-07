@@ -1,5 +1,5 @@
 #    app-editor/nano/nano-8.2.build.py
-#    Sun Oct 20 02:21:00 UTC 2024
+#    Thu Nov  7 03:41:03 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir} --enable-utf8")
+    return os.system(f"./configure --prefix=/usr --enable-utf8")
 
 
 def make(self):
@@ -27,12 +27,12 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    self.inst_binary(f"{self.seg_dir}/bin/nano", cf.paths['ub'])
-    self.inst_symlink(f"{cf.paths['ub']}/nano", f"{cf.paths['ub']}/rnano")
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/nano.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/rnano.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man5/nanorc.5", cf.paths['man8'])
+    self.inst_binary(f"{self.p.['_ub']}/nano", self.p['ub'])
+    self.inst_symlink(f"{self.p['ub']}/nano", f"{self.p['ub']}/rnano")
+    self.inst_manpage(f"{self.p.['_man1']}/nano.1", self.p['man1'])
+    self.inst_manpage(f"{self.p.['_man1']}/rnano.1", self.p['man1'])
+    self.inst_manpage(f"{self.p.['_man5']}/nanorc.5", self.p['man8'])

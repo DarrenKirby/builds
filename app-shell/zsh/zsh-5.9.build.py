@@ -1,7 +1,7 @@
 #    app-shell/zsh/zsh-5.9.build.py
-#    Thu Oct 31 03:40:54 UTC 2024
+#    Thu Nov  7 04:40:49 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ def configure(self):
     os.system("sed -e 's/test = /&(char**)/' -i configure.ac")
     os.system("autoconf")
 
-    return os.system(f"./configure --prefix={self.seg_dir} --enable-cap --enable-gdbm ")
+    return os.system("./configure --prefix=/usr --enable-cap --enable-gdbm ")
 
 
 def make(self):
@@ -34,26 +34,28 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    self.inst_binary(f"{self.seg_dir}/bin/zsh", cf.paths['ub'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zsh.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshall.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshbuiltins.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshcalsys.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshcompctl.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshcompsys.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshcompwid.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshcontrib.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshexpn.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshmisc.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshmodules.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshoptions.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshparam.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshroadmap.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshtcpsys.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshzftpsys.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zshzle.1", cf.paths['man1'])
-    self.inst_directory(f"{self.seg_dir}/lib/zsh/", f"{cf.paths['ul']}/zsh/")
+    self.inst_binary(f"{self.p['_ub']}/zsh", self.p['ub'])
+
+    self.inst_manpage(f"{self.p['_man1']}/zsh.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshall.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshbuiltins.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshcalsys.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshcompctl.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshcompsys.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshcompwid.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshcontrib.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshexpn.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshmisc.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshmodules.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshoptions.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshparam.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshroadmap.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshtcpsys.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshzftpsys.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/zshzle.1", self.p['man1'])
+
+    self.inst_directory(f"{self.p['_ul']}/zsh/", f"{self.p['ul']}/zsh/")
