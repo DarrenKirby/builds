@@ -1,5 +1,5 @@
 #    dev-lib/inih/inih-r58.build.py
-#    Sat Oct 26 23:19:07 UTC 2024
+#    Thu Nov 14 18:34:16 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -21,8 +21,8 @@
 def configure(self):
     os.mkdir("build")
     os.chdir("build")
-    return os.system(f"meson setup --prefix={self.seg_dir} "
-                     f"--buildtype=release ..")
+    return os.system("meson setup --prefix=/usr "
+                     "--libdir=lib --buildtype=release ..")
 
 
 def make(self):
@@ -30,14 +30,17 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("ninja install")
+    return os.system(f"DESTDIR={self.seg_dir} ninja install")
 
 
 def install(self):
-    self.inst_header(f"{self.seg_dir}/include/INIReader.h", cf.paths['ui'])
-    self.inst_header(f"{self.seg_dir}/include/ini.h", cf.paths['ui'])
+    self.inst_header(f"{self.p['_ui']}/include/INIReader.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/include/ini.h", self.p['ui'])
 
-    self.inst_library(f"{self.seg_dir}/lib64/libINIReader.so.0", cf.paths['ul'])
-    self.inst_symlink(f"{cf.paths['ul']}/libINIReader.so.0", f"{cf.paths['ul']}/libINIReader.so")
-    self.inst_library(f"{self.seg_dir}/lib64/libinih.so.0", cf.paths['ul'])
-    self.inst_symlink(f"{cf.paths['ul']}/libinih.so.0", f"{cf.paths['ul']}/libinih.so")
+    self.inst_library(f"{self.p['_ul']}/libINIReader.so.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libINIReader.so.0", f"{self.p['ul']}/libINIReader.so")
+    self.inst_library(f"{self.p['_ul']}/libinih.so.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libinih.so.0", f"{self.p['ul']}/libinih.so")
+
+    self.inst_file(f"{self.p['_ul']}/pkgconfig/INIReader.pc", f"{self.p['ul']}/pkgconfig/")
+    self.inst_file(f"{self.p['_ul']}/pkgconfig/inih.pc", f"{self.p['ul']}/pkgconfig/")

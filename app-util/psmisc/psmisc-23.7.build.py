@@ -1,5 +1,5 @@
 #    app-util/psmisc/psmisc-23.7.build.py
-#    Fri Oct 25 20:43:30 UTC 2024
+#    Thu Nov 14 19:05:59 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -18,9 +18,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system("./configure --prefix=/usr")
 
 
 def make(self):
@@ -28,39 +27,22 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/fuser", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/killall", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/peekfd", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/prtstat", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/pslog", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/pstree", cf.paths['ub'])
+    self.inst_binary(f"{self.p['ub']}/fuser", self.p['ub'])
+    self.inst_binary(f"{self.p['ub']}/killall", self.p['ub'])
+    self.inst_binary(f"{self.p['ub']}/peekfd", self.p['ub'])
+    self.inst_binary(f"{self.p['ub']}/prtstat", self.p['ub'])
+    self.inst_binary(f"{self.p['ub']}/pslog", self.p['ub'])
+    self.inst_binary(f"{self.p['ub']}/pstree", self.p['ub'])
 
-    cf.do_sym(f"{cf.paths['ub']}/pstree", f"{cf.paths['ub']}/pstree.x11")
+    self.inst_symlink(f"{self.p['ub']}/pstree", f"{self.p['ub']}/pstree.x11")
 
-    cf.do_man(f"{self.seg_dir}/share/man/man1/fuser.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/killall.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/peekfd.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/prtstat.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/pslog.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/pstree.1", cf.paths['man1'])
-
-
-"""
-/usr/bin/fuser
-/usr/bin/killall
-/usr/bin/peekfd
-/usr/bin/prtstat
-/usr/bin/pslog
-/usr/bin/pstree
-/usr/bin/pstree.x11
-/usr/share/man/man1/fuser.1
-/usr/share/man/man1/killall.1
-/usr/share/man/man1/peekfd.1
-/usr/share/man/man1/prtstat.1
-/usr/share/man/man1/pslog.1
-/usr/share/man/man1/pstree.1
-"""
+    self.inst_manpage(f"{self.p['man1']}/fuser.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['man1']}/killall.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['man1']}/peekfd.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['man1']}/prtstat.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['man1']}/pslog.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['man1']}/pstree.1", self.p['man1'])

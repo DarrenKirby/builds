@@ -1,5 +1,5 @@
 #    app-util/gawk/gawk-5.3.1.build.py
-#    Thu Oct 31 22:11:26 UTC 2024
+#    Thu Nov 14 19:59:55 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -24,7 +24,7 @@ def configure(self):
         os.system("sed -i 's/extras//' Makefile.in")
     except:
         cf.yellow("sed command failed: non fatal")
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system("./configure --prefix=/usr")
 
 
 def make(self):
@@ -32,36 +32,27 @@ def make(self):
 
 
 def make_install(self):
-    return os.system(f"make  {cf.config['makeopts']}install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    self.inst_binary(f"{self.seg_dir}/bin/gawk", cf.paths['ub'])
-    self.inst_binary(f"{self.seg_dir}/bin/gawk-5.3.1", cf.paths['ub'])
-    self.inst_script(f"{self.seg_dir}/bin/gawkbug", cf.paths['ub'])
+    self.inst_binary(f"{self.p['_ub']}/gawk", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/gawk-5.3.1", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/gawkbug", self.p['ub'])
     # link awk -> gawk
-    self.inst_symlink(f"{cf.paths['ub']}/gawk", f"{cf.paths['ub']}/awk")
+    self.inst_symlink(f"{self.p['ub']}/gawk", f"{self.p['ub']}/awk")
 
-    self.inst_header(f"{self.seg_dir}/include/gawkapi.h", cf.paths['ui'])
+    self.inst_header(f"{self.p['_ui']}/gawkapi.h", self.p['ui'])
 
-    self.inst_directory(f"{self.seg_dir}/lib/gawk/", f"{cf.paths['ul']}/gawk/")
+    self.inst_directory(f"{self.p['_ul']}/gawk/", f"{self.p['ul']}/gawk/")
 
-    self.inst_directory(f"{self.seg_dir}/libexec/awk/", f"{cf.paths['ule']}/awk/")
+    self.inst_directory(f"{self.p['_ule']}/awk/", f"{self.p['ule']}/awk/")
 
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/gawk.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/gawkbug.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/pm-gawk.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/gawk.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/gawkbug.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/pm-gawk.1", self.p['man1'])
     # link  awk.1 -> gawk1.bz2
-    self.inst_symlink(f"{cf.paths['man1']}/gawk.1.bz2", f"{cf.paths['man1']}/awk.1")
+    self.inst_symlink(f"{self.p['man1']}/gawk.1.bz2", f"{self.p['man1']}/awk.1")
 
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/filefuncs.3am", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/fnmatch.3am", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/fork.3am", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/inplace.3am", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/ordchr.3am", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/readdir.3am", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/readfile.3am", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/revoutput.3am", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/revtwoway.3am", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/rwarray.3am", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/time.3am", cf.paths['man3'])
+    for file in os.listdir(self.p['_man3']):
+        self.inst_manpage(f"{self.p['_man3']}/{file}", self.p['man3'])

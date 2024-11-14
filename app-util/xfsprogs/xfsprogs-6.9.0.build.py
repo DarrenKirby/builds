@@ -22,37 +22,32 @@ depend="dev-lib/inih,lib-util/liburcu"
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir} --enable-static=no")
+    return os.system("./configure --prefix=/usr --libdir=/usr/lib --enable-static=no")
 
 
 def make(self):
-    # BUG: This hack will likely break on systemd systems,
-    # or to be sure, it won't fix the underlying issue.
-    # Prevent install script from installing xfs.rules to
-    # /usr/lib/udev/rules.d/
-    os.system("sed -i -e 's/install-udev//' scrub/Makefile")
-    return os.system("make DEBUG=-DNDEBUG")
+    return os.system(f"make DEBUG=-DNDEBUG {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    self.inst_library(f"{self.seg_dir}/lib64/libhandle.so.1.0.3", cf.paths['ul'])
-    self.inst_symlink(f"{cf.paths['ul']}/libhandle.so.1.0.3", f"{cf.paths['ul']}/libhandle.so.1")
+    self.inst_library(f"{self.p['_ul']}/libhandle.so.1.0.3", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libhandle.so.1.0.3", f"{self.p['ul']}/libhandle.so.1")
 
-    for file in os.listdir(f"{cf.config['builds_root']}/app-util/xfsprogs/work/seg/sbin"):
-        self.inst_binary(f"{self.seg_dir}/sbin/{file}", cf.paths['us'])
+    for file in os.listdir(self.p['_us']):
+        self.inst_binary(f"{self.p['_us']}/{file}", self.p['us'])
 
-    self.inst_manpage(f"{self.seg_dir}/share/man/man5/projects.5", cf.paths['man5'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man5/projid.5", cf.paths['man5'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man5/xfs.5", cf.paths['man5'])
+    self.inst_manpage(f"{self.p['_man5']}/projects.5", self.p['man5'])
+    self.inst_manpage(f"{self.p['_man5']}/projid.5", self.p['man5'])
+    self.inst_manpage(f"{self.p['_man5']}/xfs.5", self.p['man5'])
 
-    for file in os.listdir(f"{cf.config['builds_root']}/app-util/xfsprogs/work/seg/share/man/man8"):
-        self.inst_manpage(f"{self.seg_dir}/share/man/man8/{file}", cf.paths['man8'])
+    for file in os.listdir(self.p['_man8']):
+        self.inst_manpage(f"{self.p['_man8']}/{file}", self.p['man8'])
 
-    self.inst_directory(f"{self.seg_dir}/share/xfsprogs/", f"{cf.paths['ush']}/xfsprogs/")
+    self.inst_directory(f"{self.p['_ush']}/xfsprogs/", f"{self.p['ush']}/xfsprogs/")
 
     # Install xfs.rules to /usr/lib/udev/rules.d
-    self.inst_file("./scrub/xfs.rules", f"{cf.paths['ul']}/udev/rules.d/64-xfs.rules")
+    self.inst_file("./scrub/xfs.rules", f"{self.p['ul']}/udev/rules.d/64-xfs.rules")

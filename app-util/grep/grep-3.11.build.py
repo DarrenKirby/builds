@@ -1,5 +1,5 @@
 #    app-util/grep/grep-3.11.build.py
-#    Fri Oct 25 20:43:30 UTC 2024
+#    Thu Nov 14 19:16:36 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -18,9 +18,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system("./configure --prefix=/usr")
 
 
 def make(self):
@@ -28,20 +27,12 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/grep", cf.paths['ub'])
-    cf.do_scr(f"{self.seg_dir}/bin/egrep", cf.paths['ub'])
-    cf.do_scr(f"{self.seg_dir}/bin/fgrep", cf.paths['ub'])
+    self.inst_binary(f"{self.p['_ub']}/grep", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/egrep", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/fgrep", self.p['ub'])
 
-    cf.do_man(f"{self.seg_dir}/share/man/man1/grep.1", cf.paths['man1'])
-
-
-"""
-/usr/bin/grep
-/usr/bin/egrep
-/usr/bin/fgrep
-/usr/share/man/man1/grep.1.bz2
-"""
+    self.inst_manpage(f"{self.p['_man1']}/grep.1", self.p['man1'])

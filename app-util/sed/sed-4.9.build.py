@@ -1,7 +1,7 @@
 #    app-util/sed/sed-4.9.build.py
-#    Mon Oct 21 23:05:39 UTC 2024
+#    Thu Nov 14 18:37:43 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system("./configure --prefix=/usr")
 
 
 def make(self):
@@ -27,15 +27,9 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/sed", cf.paths['ub'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/sed.1", cf.paths['man1'])
-
-
-"""
-/usr/bin/sed
-/usr/share/man/man1/sed.1.bz2
-"""
+    self.inst_binary(f"{self.p['_ub']}/sed", self.p['ub'])
+    self.inst_manpage(f"{self.p['_man1']}/sed.1", self.p['man1'])

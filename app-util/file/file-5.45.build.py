@@ -1,7 +1,7 @@
 #    app-util/file/file-5.45.build.py
-#    Tue Oct 22 21:19:20 UTC 2024
+#    Thu Nov 14 21:19:00 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -31,19 +31,18 @@ def make_install(self):
 
 
 def install(self):
-    cf.do_lib(f"{self.seg_dir}/lib/libmagic.so.1.0.0", cf.paths['ul'])
-    cf.do_sym(f"{cf.paths['ul']}/libmagic.so.1.0.0", f"{cf.paths['ul']}/libmagic.so")
-    cf.do_sym(f"{cf.paths['ul']}/libmagic.so.1.0.0", f"{cf.paths['ul']}/libmagic.so.1")
+    self.inst_library(f"{self.p['_ul']}/libmagic.so.1.0.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libmagic.so.1.0.0", f"{self.p['ul']}/libmagic.so")
+    self.inst_symlink(f"{self.p['ul']}/libmagic.so.1.0.0", f"{self.p['ul']}/libmagic.so.1")
 
-    cf.do_hdr(f"{self.seg_dir}/include/magic.h", cf.paths['ui'])
+    self.inst_header(f"{self.p['_ui']}/magic.h", self.p['ui'])
 
-    cf.do_bin(f"{self.seg_dir}/bin/file", f"{cf.paths['ub']}")
+    self.inst_binary(f"{self.p['_ub']}/file", f"{self.p['ub']}")
 
-    cf.do_man(f"{self.seg_dir}/share/man/man1/file.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man3/libmagic.3", cf.paths['man3'])
-    cf.do_man(f"{self.seg_dir}/share/man/man4/magic.4", cf.paths['man4'])
+    self.inst_manpage(f"{self.p['_man1']}/file.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man3']}/libmagic.3", self.p['man3'])
+    self.inst_manpage(f"{self.p['_man4']}/magic.4", self.p['man4'])
 
-    os.system("mkdir -p /usr/share/misc")
-    cf.do_bin(f"{self.seg_dir}/share/misc/magic.mgc", "/usrshare/misc/magic.mgc")
-
+    self.inst_file(f"{self.p['_ush']}/misc/magic.mgc", f"{self.p['ush']}/misc/magic.mgc")
+    self.inst_file(f"{self.p['_ul']}/pkgconfig/libmagic.pc", f"{self.p['ul']}/pkgconfig/")
 

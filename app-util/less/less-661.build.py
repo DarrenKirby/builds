@@ -1,7 +1,7 @@
 #    app-util/less/less-661.build.py
-#    Mon Oct 21 22:52:42 UTC 2024
+#    Thu Nov 14 19:10:05 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system("./configure --prefix=/usr")
 
 
 def make(self):
@@ -27,24 +27,14 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
-
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/less", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/lessecho", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/lesskey", cf.paths['ub'])
+    self.inst_binary(f"{self.p['_ub']}/less", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/lessecho", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/lesskey", self.p['ub'])
 
-    cf.do_man(f"{self.seg_dir}/share/man/man1/less.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/lessecho.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/lesskey.1", cf.paths['man1'])
-
-"""
-/usr/bin/less
-/usr/bin/lessecho
-/usr/bin/lesskey
-/usr/share/man/man1/less.1.bz2
-/usr/share/man/man1/lessecho.1.bz2
-/usr/share/man/man1/lesskey.1.bz2
-"""
+    self.inst_manpage(f"{self.p['_man1']}/less.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/lessecho.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/lesskey.1", self.p['man1'])
