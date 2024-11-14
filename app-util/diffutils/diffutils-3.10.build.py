@@ -1,5 +1,5 @@
 #    app-util/diffutils/diffutils-3.10.build.py
-#    Thu Oct 31 21:09:52 UTC 2024
+#    Wed Nov 13 02:12:07 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system("./configure --prefix=/usr")
 
 
 def make(self):
@@ -27,16 +27,16 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    self.inst_binary(f"{self.seg_dir}/bin/cmp", cf.paths['ub'])
-    self.inst_binary(f"{self.seg_dir}/bin/diff", cf.paths['ub'])
-    self.inst_binary(f"{self.seg_dir}/bin/diff3", cf.paths['ub'])
-    self.inst_binary(f"{self.seg_dir}/bin/sdiff", cf.paths['ub'])
+    self.inst_binary(f"{self.p['_ub']}/bin/cmp", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/bin/diff", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/bin/diff3", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/bin/sdiff", self.p['ub'])
 
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/cmp.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/diff.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/diff3.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/sdiff.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/cmp.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/diff.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/diff3.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/sdiff.1", self.p['man1'])

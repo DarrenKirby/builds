@@ -24,12 +24,12 @@ def configure(self):
     os.mkdir("build")
     os.chdir("build")
 
-    return os.system(f"../configure --prefix=/usr "
-                    f"--enable-elf-shlibs "
-                    f"--disable-libblkid "
-                    f"--disable-libuuid "
-                    f"--disable-uuidd "
-                    f"--disable-fsck")
+    return os.system("../configure --prefix=/usr "
+                     "--enable-elf-shlibs "
+                     "--disable-libblkid "
+                     "--disable-libuuid "
+                     "--disable-uuidd "
+                     "--disable-fsck")
 
 
 def make(self):

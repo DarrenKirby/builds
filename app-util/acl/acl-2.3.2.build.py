@@ -1,5 +1,5 @@
 #    app-util/acl/acl-2.3.2.build.py
-#    Thu Oct 31 21:58:49 UTC 2024
+#    Wed Nov 13 00:51:21 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir} --disable-static")
+    return os.system(f"./configure --prefix=/usr --disable-static")
 
 
 def make(self):
@@ -27,26 +27,27 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    self.inst_binary(f"{self.seg_dir}/bin/", cf.paths['ub'])
-    self.inst_binary(f"{self.seg_dir}/bin/", cf.paths['ub'])
-    self.inst_binary(f"{self.seg_dir}/bin/", cf.paths['ub'])
+    self.inst_binary(f"{self.p['_ub']}/chacl", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/getfacl", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/setfacl", self.p['ub'])
 
-    self.inst_directory(f"{self.seg_dir}/include/acl/", f"{cf.paths['ui']}/acl/")
-    self.inst_header(f"{self.seg_dir}/include/sys/acl.h", f"{cf.paths['ui']}/sys")
+    self.inst_directory(f"{self.p['_ui']}/acl/", f"{self.p['ui']}/acl/")
+    self.inst_header(f"{self.p['_ui']}/sys/acl.h", f"{self.p['ui']}/sys")
 
-    self.inst_library(f"{self.seg_dir}/lib/libacl.so.1.1.2302", cf.paths['ul'])
-    self.inst_symlink(f"{cf.paths['ul']}/libacl.so.1.1.2302", f"{cf.paths['ul']}/libacl.so.1")
-    self.inst_symlink(f"{cf.paths['ul']}/libacl.so.1.1.2302", f"{cf.paths['ul']}/libacl.so")
+    self.inst_library(f"{self.p['_ul']}/libacl.so.1.1.2302", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libacl.so.1.1.2302", f"{self.p['ul']}/libacl.so.1")
+    self.inst_symlink(f"{self.p['ul']}/libacl.so.1.1.2302", f"{self.p['ul']}/libacl.so")
+    self.inst_file(f"{self.p['_ul']}/pkgconfig/libacl.pc", f"{self.p['ul']}/pkgconfig/libacl.pc")
 
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/chacl.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/getfacl.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/setfacl.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/chacl.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/getfacl.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/setfacl.1", self.p['man1'])
 
-    for manpage in glob.glob(f"{self.seg_dir}/share/man/man3/acl_*.3"):
-        self.inst_manpage(manpage, cf.paths['man3'])
+    for manpage in os.listdir(f"{self.p['_man3']}/"):
+        self.inst_manpage(f"{self.p['_man3']}/{manpage}", self.p['man3'])
 
-    self.inst_manpage(f"{self.seg_dir}/share/man/man5/acl.5", cf.paths['man5'])
+    self.inst_manpage(f"{self.p['_man5']}/acl.5", self.p['man5'])

@@ -1,7 +1,7 @@
 #    app-util/coreutils/coreutils-9.5.build
-#    Thu Oct 31 21:14:16 UTC 2024
+#    Wed Nov 13 02:07:51 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -38,9 +38,9 @@ def install_source_posthook(self):
 
 def configure(self):
     es1 = os.system("autoreconf -fiv")
-    es2 = os.system(f"FORCE_UNSAFE_CONFIGURE=1 "
-                    f"./configure --prefix={self.seg_dir} "
-                    f"--enable-no-install-program=kill,uptime")
+    es2 = os.system("FORCE_UNSAFE_CONFIGURE=1 "
+                    "./configure --prefix=/usr "
+                    "--enable-no-install-program=kill,uptime")
 
     if es1 == 0 and es2 == 0:
         return 0
@@ -52,21 +52,21 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
     # FHS says chroot should be in sbin
-    self.inst_binary(f"{self.seg_dir}/bin/chroot", cf.paths['us'])
-    os.remove(f"{self.seg_dir}/bin/chroot")
+    self.inst_binary(f"{self.p['_ub']}/chroot", self.p['us'])
+    os.remove(f"{self.p['_ub']}/chroot")
 
-    os.rename(f"{self.seg_dir}/share/man/man1/chroot.1", f"{self.seg_dir}/share/man/man1/chroot.8")
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/chroot.8", cf.paths['man8'])
+    os.rename(f"{self.p['_man1']}/chroot.1", f"{self.p['_man1']}/chroot.8")
+    self.inst_manpage(f"{self.p['_man1']}/chroot.8", self.p['man8'])
 
-    for app in glob.glob(f"{self.seg_dir}/bin/*"):
-        self.inst_binary(f"{self.seg_dir}/bin/{app}", cf.paths['ub'])
+    for file in os.listdir(self.p['_ub']):
+        self.inst_binary(f"{self.p['_ub']}/{file}", self.p['ub'])
 
-    for manpage in glob.glob(f"{self.seg_dir}/share/man/man1/*.1"):
-        self.inst_manpage(f"{self.seg_dir}/share/man/man1/{manpage}", cf.paths['man1'])
+    for file in os.listdir(self.p['_man1']):
+        self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
 
-    self.inst_directory(f"{self.seg_dir}/libexec/coreutils/", f"{cf.paths['ul']}exec/coreutils/")
+    self.inst_directory(f"{self.p['_ule']}/coreutils/", f"{self.p['ule']}/coreutils/")

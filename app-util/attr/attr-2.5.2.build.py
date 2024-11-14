@@ -1,7 +1,7 @@
 #    app-util/attr/attr-2.5.2.build.py
-#    Thu Oct 31 21:52:45 UTC 2024
+#    Wed Nov 13 01:29:24 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir} --disable-static")
+    return os.system(f"./configure --prefix=/usr --disable-static")
 
 
 def make(self):
@@ -27,32 +27,32 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    self.inst_binary(f"{self.seg_dir}/bin/attr", cf.paths['ub'])
-    self.inst_binary(f"{self.seg_dir}/bin/getfattr", cf.paths['ub'])
-    self.inst_binary(f"{self.seg_dir}/bin/setfattr", cf.paths['ub'])
+    self.inst_binary(f"{self.p['_ub']}/attr", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/getfattr", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/setfattr", self.p['ub'])
 
-    self.inst_config(f"{self.seg_dir}/etc/xattr.conf", cf.paths['e'])
+    self.inst_config(f"{self.seg_dir}/usr/etc/xattr.conf", self.p['e'])
 
-    self.inst_library(f"{self.seg_dir}/lib/libattr.so.1.1.2502", cf.paths['ul'])
-    self.inst_symlink(f"{cf.paths['ul']}/libattr.so.1.1.2502", f"{cf.paths['ul']}/libattr.so")
-    self.inst_symlink(f"{cf.paths['ul']}/libattr.so.1.1.2502", f"{cf.paths['ul']}/libattr.so.1")
+    self.inst_library(f"{self.p['_ul']}/libattr.so.1.1.2502", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libattr.so.1.1.2502", f"{self.p['ul']}/libattr.so")
+    self.inst_symlink(f"{self.p['ul']}/libattr.so.1.1.2502", f"{self.p['ul']}/libattr.so.1")
 
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/attr.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/getfattr.1", cf.paths['man1'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man1/setfattr.1", cf.paths['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/attr.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/getfattr.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/setfattr.1", self.p['man1'])
 
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/attr_get.3", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/attr_list.3", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/attr_multi.3", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/attr_remove.3", cf.paths['man3'])
-    self.inst_manpage(f"{self.seg_dir}/share/man/man3/attr_set.3", cf.paths['man3'])
+    self.inst_manpage(f"{self.p['_man3']}/attr_get.3", self.p['man3'])
+    self.inst_manpage(f"{self.p['_man3']}/attr_list.3", self.p['man3'])
+    self.inst_manpage(f"{self.p['_man3']}/attr_multi.3", self.p['man3'])
+    self.inst_manpage(f"{self.p['_man3']}/attr_remove.3", self.p['man3'])
+    self.inst_manpage(f"{self.p['_man3']}/attr_set.3", self.p['man3'])
 
-    self.inst_symlink(f"{cf.paths['man3']}/attr_get.3", f"{cf.paths['man3']}/attr_getf.3")
-    self.inst_symlink(f"{cf.paths['man3']}/attr_list.3", f"{cf.paths['man3']}/attr_listf.3")
-    self.inst_symlink(f"{cf.paths['man3']}/attr_multi.3", f"{cf.paths['man3']}/attr_multif.3")
-    self.inst_symlink(f"{cf.paths['man3']}/attr_remove.3", f"{cf.paths['man3']}/attr_removef.3")
-    self.inst_symlink(f"{cf.paths['man3']}/attr_set.3", f"{cf.paths['man3']}/attr_setf.3")
+    self.inst_symlink(f"{self.p['man3']}/attr_get.3", f"{self.p['man3']}/attr_getf.3")
+    self.inst_symlink(f"{self.p['man3']}/attr_list.3", f"{self.p['man3']}/attr_listf.3")
+    self.inst_symlink(f"{self.p['man3']}/attr_multi.3", f"{self.p['man3']}/attr_multif.3")
+    self.inst_symlink(f"{self.p['man3']}/attr_remove.3", f"{self.p['man3']}/attr_removef.3")
+    self.inst_symlink(f"{self.p['man3']}/attr_set.3", f"{self.p['man3']}/attr_setf.3")

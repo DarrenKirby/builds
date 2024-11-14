@@ -19,15 +19,15 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system("./configure --prefix=/usr")
 
 
 def make(self):
-    return os.system("make")
+    return os.system(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
@@ -47,14 +47,3 @@ def install(self):
     cf.do_bin(f"{self.seg_dir}/share/misc/magic.mgc", "/usrshare/misc/magic.mgc")
 
 
-"""
-/usr/bin/file
-/usr/include/magic.h
-/usr/lib/libmagic.so
-/usr/lib/libmagic.so.1
-/usr/lib/libmagic.so.1.0.0
-/usr/share/man/man1/file.1.bz2
-/usr/share/man/man3/libmagic.3.bz2
-/usr/share/man/man4/magic.4.bz2
-/usr/share/misc/magic.mgc
-"""

@@ -32,7 +32,7 @@ def make(self):
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make  {cf.config['makeopts']}install")
 
 
 def install(self):
