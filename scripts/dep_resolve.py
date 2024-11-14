@@ -97,7 +97,7 @@ def resolve_dependencies(args: argparse.Namespace) -> list:
             db_list = db_string.split(',')
             atoms.append((db_list[0], db_list[1]))
 
-    # This is a _REALLY_ naive implementation of a dependency tree
+    # This is a _REALLY_ naive implementation of dependency resolution
     # This will have to be refactored and improved when the rest
     # of the scaffolding is up...
     for atom in atoms:
