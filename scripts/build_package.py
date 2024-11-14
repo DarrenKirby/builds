@@ -241,14 +241,14 @@ class FileInstaller:
         abspath = f"{to}/{frm.split('/')[-1]}"
         self.manifest.append(abspath)
 
-    def inst_file(self, frm: str, to: str) -> None:
+    def inst_file(self, frm: str, to: str, mode: int = 644) -> None:
         """
         Install a generic file to the live filesystem
         with 644 permisions
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm} {to}"), check=True)
+                sp.run(shlex.split(f"install -S -v -o root -g root -m {mode} {frm} {to}"), check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
@@ -419,7 +419,7 @@ class BuildPackage(FileInstaller):
 
     def inst(self) -> None:
         """
-        Install the program and files into the live filesystem.
+        Install the program files into the live filesystem.
 
         make_install() MUST be defined in the package.build.py file.
         """
