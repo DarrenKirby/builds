@@ -292,6 +292,7 @@ class BuildPackage(FileInstaller):
          version     = '1.28'
          sha256sum   = '9599b22ecd1d5787ad7d3b7bf0c59f312b3396d1e281175dd1f8a4014da621ff'
          src_url     = 'http://ftp.gnu.org/gnu/tar/tar-1.28.tar.xz'
+         builds_root = '/var/builds'
          build_dir   = '/var/builds/app-arch/tar'
          build_file  = '/var/builds/app-arch/tar/tar-1.28.build.py'
          work_dir    = '/var/builds/app-arch/tar/work'
@@ -319,13 +320,13 @@ class BuildPackage(FileInstaller):
         """
         Fetch the package source and check sha256sum
         """
+        os.chdir(config['distfiles'])
 
         if hasattr(self, 'fetch_prehook'):
             self.fetch_prehook()
 
         cf.bold(f"Fetching {self.package}...")
 
-        os.chdir(config['distfiles'])
         if exists(self.package):
             cf.bold(f"...{self.package} already downloaded.")
         else:
@@ -486,6 +487,7 @@ class BuildPackage(FileInstaller):
         Resolve pathnames and create useful instance attributes.
         """
         self.build_dir = f"{config['builds_root']}/{self.build}"
+        self.builds_root = config['builds_root']
         self.build_file = f"{self.build_dir}/{self.name}-{self.version}.build.py"
         self.work_dir = f"{config['builds_root']}/{self.build}/work"
         self.seg_dir = f"{self.work_dir}/seg"
