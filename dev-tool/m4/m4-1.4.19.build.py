@@ -1,7 +1,7 @@
 #    dev-tool/m4/m4-1.4.19.build.py
-#    Tue Oct  8 23:59:38 UTC 2024
+#    Sat Nov 16 22:06:52 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -19,19 +19,17 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system("./configure --prefix=/usr")
+
 
 def make(self):
     return os.system("make")
 
+
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
+
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/m4", f"{cf.paths['ub']}")
-    cf.do_man(f"{self.seg_dir}/share/man/man1/m4.1", cf.paths['man1'])
-
-"""
-/usr/bin/m4
-/usr/share/man/man1/m4.1.bz2
-"""
+    self.inst_binary(f"{self.p['_ub']}/m4", self.p['ub'])
+    self.inst_manpage(f"{self.p['_man1']}/m4.1", self.p['man1'])

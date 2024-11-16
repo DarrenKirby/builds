@@ -19,104 +19,32 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system("./configure --prefix=/usr")
 
 
 def make(self):
-    return os.system("make")
+    return os.system(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/", cf.paths['ub'])
+    self.inst_binary(f"{self.p['_ub']}/autoconf", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/autoheader", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/autom4te", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/autoreconf", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/autoscan", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/autoupdate", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/ifnames", self.p['ub'])
 
-    cf.do_dir(f"{self.seg_dir}/share/autoconf/", f"{cf.paths['ush']}/autoconf")
+    self.inst_directory(f"{self.p['_ush']}/autoconf/", f"{self.p['ush']}/autoconf")
 
-    cf.do_man(f"{self.seg_dir}/share/man/man1/autoconf.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/autoheader.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/autom4te.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/autoreconf.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/autoscan.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/autoupdate.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/ifnames.1", cf.paths['man1'])
-
-
-"""
-/usr/bin/autoconf
-/usr/bin/autoheader
-/usr/bin/autom4te
-/usr/bin/autoreconf
-/usr/bin/autoscan
-/usr/bin/autoupdate
-/usr/bin/ifnames
-/usr/share/autoconf/
-/usr/share/autoconf/INSTALL
-/usr/share/autoconf/autom4te.cfg
-/usr/share/autoconf/version.m4
-/usr/share/autoconf/Autom4te/
-/usr/share/autoconf/Autom4te/C4che.pm
-/usr/share/autoconf/Autom4te/ChannelDefs.pm
-/usr/share/autoconf/Autom4te/Channels.pm
-/usr/share/autoconf/Autom4te/Config.pm
-/usr/share/autoconf/Autom4te/Configure_ac.pm
-/usr/share/autoconf/Autom4te/FileUtils.pm
-/usr/share/autoconf/Autom4te/General.pm
-/usr/share/autoconf/Autom4te/Getopt.pm
-/usr/share/autoconf/Autom4te/Request.pm
-/usr/share/autoconf/Autom4te/XFile.pm
-/usr/share/autoconf/autoconf/
-/usr/share/autoconf/autoconf/autoconf.m4
-/usr/share/autoconf/autoconf/autoconf.m4f
-/usr/share/autoconf/autoconf/autoheader.m4
-/usr/share/autoconf/autoconf/autoscan.m4
-/usr/share/autoconf/autoconf/autotest.m4
-/usr/share/autoconf/autoconf/autoupdate.m4
-/usr/share/autoconf/autoconf/c.m4
-/usr/share/autoconf/autoconf/erlang.m4
-/usr/share/autoconf/autoconf/fortran.m4
-/usr/share/autoconf/autoconf/functions.m4
-/usr/share/autoconf/autoconf/general.m4
-/usr/share/autoconf/autoconf/go.m4
-/usr/share/autoconf/autoconf/headers.m4
-/usr/share/autoconf/autoconf/lang.m4
-/usr/share/autoconf/autoconf/libs.m4
-/usr/share/autoconf/autoconf/oldnames.m4
-/usr/share/autoconf/autoconf/programs.m4
-/usr/share/autoconf/autoconf/specific.m4
-/usr/share/autoconf/autoconf/status.m4
-/usr/share/autoconf/autoconf/trailer.m4
-/usr/share/autoconf/autoconf/types.m4
-/usr/share/autoconf/autoscan/
-/usr/share/autoconf/autoscan/autoscan.list
-/usr/share/autoconf/autotest/
-/usr/share/autoconf/autotest/autotest.m4
-/usr/share/autoconf/autotest/autotest.m4f
-/usr/share/autoconf/autotest/general.m4
-/usr/share/autoconf/autotest/specific.m4
-/usr/share/autoconf/build-aux/
-/usr/share/autoconf/build-aux/config.guess
-/usr/share/autoconf/build-aux/config.sub
-/usr/share/autoconf/build-aux/install-sh
-/usr/share/autoconf/m4sugar/
-/usr/share/autoconf/m4sugar/foreach.m4
-/usr/share/autoconf/m4sugar/m4sh.m4
-/usr/share/autoconf/m4sugar/m4sh.m4f
-/usr/share/autoconf/m4sugar/m4sugar.m4
-/usr/share/autoconf/m4sugar/m4sugar.m4f
-/usr/share/man/man1/autoconf.1.bz2
-/usr/share/man/man1/autoheader.1.bz2
-/usr/share/man/man1/autom4te.1.bz2
-/usr/share/man/man1/autoreconf.1.bz2
-/usr/share/man/man1/autoscan.1.bz2
-/usr/share/man/man1/autoupdate.1.bz2
-/usr/share/man/man1/ifnames.1.bz2
-"""
+    self.inst_binary(f"{self.p['_man1']}/autoconf.1", self.p['man1'])
+    self.inst_binary(f"{self.p['_man1']}/autoheader.1", self.p['man1'])
+    self.inst_binary(f"{self.p['_man1']}/autom4te.1", self.p['man1'])
+    self.inst_binary(f"{self.p['_man1']}/autoreconf.1", self.p['man1'])
+    self.inst_binary(f"{self.p['_man1']}/autoscan.1", self.p['man1'])
+    self.inst_binary(f"{self.p['_man1']}/autoupdate.1", self.p['man1'])
+    self.inst_binary(f"{self.p['_man1']}/ifnames.1", self.p['man1'])

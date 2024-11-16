@@ -1,7 +1,7 @@
 #    lib-util/readline/readline-8.2.13.build.py
-#    Sat Oct 19 21:45:00 UTC 2024
+#    Sat Nov 16 22:25:34 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -23,46 +23,31 @@ def configure(self):
     os.system("sed -i '/{OLDSUFF}/c:' support/shlib-install")
     os.system("sed -i 's/-Wl,-rpath,[^ ]*//' support/shobj-conf")
 
-    return os.system(f"./configure --prefix={self.seg_dir} --disable-static --with-curses")
+    return os.system("./configure --prefix=/usr --disable-static --with-curses")
 
 
 def make(self):
-    return os.system('make SHLIB_LIBS="-lncursesw"')
+    return os.system(f'make SHLIB_LIBS="-lncursesw" {cf.config["makeopts"]}')
 
 
 def make_install(self):
-    return os.system('make SHLIB_LIBS="-lncursesw" install')
+    return os.system(f'make DESTDIR={self.seg_dir} SHLIB_LIBS="-lncursesw" install')
 
 
 def install(self):
-    cf.do_lib(f"{self.seg_dir}/lib/libhistory.so.8.2", cf.paths['ul'])
-    cf.do_sym(f"{cf.paths['ul']}/libhistory.so.8.2", f"{cf.paths['ul']}/libhistory.so")
-    cf.do_sym(f"{cf.paths['ul']}/libhistory.so.8.2", f"{cf.paths['ul']}/libhistory.so.8")
-    cf.do_lib(f"{self.seg_dir}/lib/libreadline.so.8.2", cf.paths['ul'])
-    cf.do_sym(f"{cf.paths['ul']}/libreadline.so.8.2", f"{cf.paths['ul']}/libreadline.so")
-    cf.do_sym(f"{cf.paths['ul']}/libreadline.so.8.2", f"{cf.paths['ul']}/libreadline.so.8")
+    self.inst_library(f"{self.p['_ul']}/libhistory.so.8.2", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libhistory.so.8.2", f"{self.p['ul']}/libhistory.so.8")
+    self.inst_symlink(f"{self.p['ul']}/libhistory.so.8", f"{self.p['ul']}/libhistory.so")
+    self.inst_library(f"{self.p['_ul']}/libreadline.so.8.2", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libreadline.so.8.2", f"{self.p['ul']}/libreadline.so.8")
+    self.inst_symlink(f"{self.p['ul']}/libreadline.so.8", f"{self.p['ul']}/libreadline.so")
 
     # Recursively copy the header directory
-    cf.do_dir(f"{self.seg_dir}/include/readline/", f"{cf.paths['ui']}/readline/")
+    self.inst_directory(f"{self.p['_ui']}/readline/", f"{self.p['ui']}/readline/")
 
-    cf.do_man(f"{self.seg_dir}/share/man/man3/history.3", cf.paths['man3'])
-    cf.do_man(f"{self.seg_dir}/share/man/man3/readlines.3", cf.paths['man3'])
+    # Copy over pkgconfig files
+    self.inst_file(f"{self.p['_ul']}/pkgconfig/history.pc", f"{self.p['ul']}/pkgconfig/")
+    self.inst_file(f"{self.p['_ul']}/pkgconfig/readline.pc", f"{self.p['ul']}/pkgconfig/")
 
-
-"""
-/usr/lib/libhistory.so
-/usr/lib/libhistory.so.8
-/usr/lib/libhistory.so.8.2
-/usr/lib/libreadline.so
-/usr/lib/libreadline.so.8
-/usr/lib/libreadline.so.8.2
-/usr/include/readline
-/usr/include/readline/chardefs.h
-/usr/include/readline/history.h
-/usr/include/readline/keymaps.h
-/usr/include/readline/readline.h
-/usr/include/readline/rlconf.h
-/usr/include/readline/rlstdc.h
-/usr/include/readline/rltypedefs.h
-/usr/include/readline/tilde.h
-"""
+    self.inst_manpage(f"{self.p['_man3']}/history.3", self.p['man3'])
+    self.inst_manpage(f"{self.p['_man3']}/readlines.3", self.p['man3'])

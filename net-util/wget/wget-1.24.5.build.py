@@ -1,7 +1,7 @@
 #    net-util/wget/wget-1.24.5.build.py
-#    Mon Oct 21 20:14:02 UTC 2024
+#    Sat Nov 16 21:11:57 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -19,25 +19,18 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir}")
+    return os.system("./configure --prefix=/usr")
 
 
 def make(self):
-    return os.system("make")
+    return os.system(f"make {cf.config['make_opts']}")
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/wget", cf.paths['ub'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/wget.1", cf.paths['man1'])
-    cf.do_con(f"{self.seg_dir}/etc/wgetrc", cf.paths['e'])
-
-
-"""
-/etc/wgetrc
-/usr/bin/wget
-/usr/share/man/man1/wget.1.bz2
-"""
+    self.inst_binary(f"{self.p['_ub']}/wget", self.p['ub'])
+    self.inst_manpage(f"{self.p['_man1']}/wget.1", self.p['man1'])
+    self.inst_config(f"{self.p['_ue']}/wgetrc", self.p['e'])

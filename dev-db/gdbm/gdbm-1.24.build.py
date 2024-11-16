@@ -1,7 +1,7 @@
 #    dev-db/gdbm/gdbm-1.24.build.py
-#    Fri Oct 18 23:27:51 UTC 2024
+#    Sat Nov 16 21:52:39 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -19,51 +19,35 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix={self.seg_dir} --disable-static --enable-libgdbm-compat")
+    return os.system("./configure --prefix=/usr --disable-static --enable-libgdbm-compat")
+
 
 def make(self):
-    return os.system("make")
+    return os.system(f"make {cf.config['makeopts']}")
+
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
+
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/gdbm_dump", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/gdbm_load", cf.paths['ub'])
-    cf.do_bin(f"{self.seg_dir}/bin/gdbmtool", cf.paths['ub'])
+    self.inst_binary(f"{self.p['_ub']}/gdbm_dump", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/gdbm_load", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/gdbmtool", self.p['ub'])
 
-    cf.do_lib(f"{self.seg_dir}/lib/libgdbm.so.6.0.0", cf.paths['ul'])
-    cf.do_sym(f"{cf.paths['ul']}/libgdbm.so.6.0.0", f"{cf.paths['ul']}/libgdbm.so.6")
-    cf.do_sym(f"{cf.paths['ul']}/libgdbm.so.6.0.0", f"{cf.paths['ul']}/libgdbm.so")
+    self.inst_library(f"{self.p['_ul']}/libgdbm.so.6.0.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libgdbm.so.6.0.0", f"{self.p['ul']}/libgdbm.so.6")
+    self.inst_symlink(f"{self.p['ul']}/libgdbm.so.6.0.0", f"{self.p['ul']}/libgdbm.so")
 
-    cf.do_lib(f"{self.seg_dir}/lib/libgdbm_compat.so.4.0.0", cf.paths['ul'])
-    cf.do_sym(f"{cf.paths['ul']}/libgdbm_compat.so.4.0.0", f"{cf.paths['ul']}/libgdbm_compat.so.4")
-    cf.do_sym(f"{cf.paths['ul']}/libgdbm_compat.so.4.0.0", f"{cf.paths['ul']}/libgdbm_compat.so")
+    self.inst_library(f"{self.p['_ul']}/libgdbm_compat.so.4.0.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libgdbm_compat.so.4.0.0", f"{self.p['ul']}/libgdbm_compat.so.4")
+    self.inst_symlink(f"{self.p['ul']}/libgdbm_compat.so.4.0.0", f"{self.p['ul']}/libgdbm_compat.so")
 
-    cf.do_hdr(f"{self.seg_dir}/include/dbm.h", cf.paths['ui'])
-    cf.do_hdr(f"{self.seg_dir}/include/gdbm.h", cf.paths['ui'])
-    cf.do_hdr(f"{self.seg_dir}/include/ndbm.h", cf.paths['ui'])
+    self.inst_header(f"{self.p['_ui']}/dbm.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/gdbm.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/ndbm.h", self.p['ui'])
 
-    cf.do_man(f"{self.seg_dir}/share/man/man3/gdbm.3", cf.paths['man3'])
-    cf.do_man(f"{self.seg_dir}/share/man/man3/gdbm_dump.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man3/gdbm_load.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man3/gdbmtool.1", cf.paths['man1'])
-
-"""
-/usr/bin/gdbm_dump
-/usr/bin/gdbm_load
-/usr/bin/gdbmtool
-/usr/include/dbm.h
-/usr/include/gdbm.h
-/usr/include/ndbm.h
-/usr/lib/libgdbm.so.6.0.0
-/usr/lib/libgdbm.so.6
-/usr/lib/libgdbm.so
-/usr/lib/libgdbm_compat.so.4.0.0
-/usr/lib/libgdbm_compat.so.4
-/usr/lib/libgdbm_compat.so
-/usr/share/man/man3/gdbm.3.bz2
-/usr/share/man/man1/gdbm_dump.1.bz2
-/usr/share/man/man1/gdbm_load.1.bz2
-/usr/share/man/man1/gdbmtool.1.bz2
-"""
+    self.inst_manpage(f"{self.p['_man3']}/gdbm.3", self.p['man3'])
+    self.inst_manpage(f"{self.p['_man1']}/gdbm_dump.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/gdbm_load.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/gdbmtool.1", self.p['man1'])

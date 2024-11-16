@@ -1,7 +1,7 @@
 #    sci-math/bc/bc-6.7.6.build.py
-#    Tue Oct 22 23:29:21 UTC 2024
+#    Sat Nov 16 21:33:14 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c)
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -20,28 +20,20 @@
 
 def configure(self):
     # -N: --disable-nls, as --prefix is not honoured for locale installation
-    return os.system(f"CC=gcc ./configure --prefix={self.seg_dir} -G -N -O3 -r")
+    return os.system("CC=gcc ./configure --prefix=/usr -G -N -O3 -r")
 
 
 def make(self):
-    return os.system("make")
+    return os.system(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system("make install")
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    cf.do_bin(f"{self.seg_dir}/bin/bc", cf.paths['ub'])
-    cf.do_sym(f"{cf.paths['ub']}/bc", f"{cf.paths['ub']}/dc")
+    self.inst_binary(f"{self.p['_ub']}/bc", self.p['ub'])
+    self.inst_symlink(f"{self.p['ub']}/bc", f"{self.p['ub']}/dc")
 
-    cf.do_man(f"{self.seg_dir}/share/man/man1/bc.1", cf.paths['man1'])
-    cf.do_man(f"{self.seg_dir}/share/man/man1/dc.1", cf.paths['man1'])
-
-
-"""
-/usr/bin/bc
-/usr/bin/dc
-/usr/share/man/man1/bc.1.bz2
-/usr/share/man/man1/dc.1.bz2
-"""
+    self.inst_manpage(f"{self.p['_man1']}/share/man/man1/bc.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/share/man/man1/dc.1", self.p['man1'])
