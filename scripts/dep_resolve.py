@@ -1,30 +1,30 @@
 """
-#    /var/builds/scripts/dep_resolve.py
-#    Thu Oct 24 02:23:33 UTC 2024
+    /var/builds/scripts/dep_resolve.py
+    Sat Nov 16 05:26:26 UTC 2024
 
-#    Naïve dependency resolver
-#
-#    Copyright:: (c) 2024
-#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
+    Naïve dependency resolver
 
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+    Copyright:: (c) 2024
+    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-#    You should have received a copy of the GNU General Public License
-#    along with this program. If not, see <http://www.gnu.org/licenses/>.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import dbm
 import sys
-import glob
 import argparse
+import logging as log
 
 import common_functions as cf
 from config import config
@@ -112,42 +112,49 @@ def get_version(package: str) -> tuple[str, str]:
 
 def topological_sort(graph: dict) -> list:
     """
-    Perform topological sorting on a dependency graph.
-    Ensures that dependencies are built before the packages that depend on them.
+    Perform topological sorting on the dependency graph using DFS.
+    Detect and report circular dependencies.
     """
-    from collections import defaultdict, deque
+    visited = set()
+    stack = []
+    cycle = []
 
-    # Calculate in-degrees for each node
-    in_degree = defaultdict(int)
-    for node in graph:
-        for dep in graph[node]:
-            in_degree[dep] += 1
+    def dfs(node, path):
+        """
+        Performs a depth-first search (DFS) to detect cycles and build
+        the topological order.
+        """
+        nonlocal visited, stack, cycle
+        if node in path:  # Cycle detected!
+            # Include the starting node to complete the cycle
+            cycle.extend(path[path.index(node):] + [node])
+            return
 
-    # Initialize the queue with nodes that have no incoming edges
-    queue = deque([node for node in graph if in_degree[node] == 0])
-    sorted_order = []
+        if node not in visited:
+            visited.add(node)
+            path.append(node)
+            for neighbor in graph[node]:
+                dfs(neighbor, path)
+            path.pop()
+            stack.append(node)
 
-    while queue:
-        current = queue.popleft()
-        sorted_order.append(current)
+    for outer_node in graph:
+        if outer_node not in visited:
+            dfs(outer_node, [])
 
-        for dep in graph[current]:
-            in_degree[dep] -= 1
-            if in_degree[dep] == 0:
-                queue.append(dep)
+    if cycle:
+        log.critical("Circular dependency detected: %s", ' -> '.join(cycle))
+        cf.yellow(f"Circular dependency detected: {' -> '.join(cycle)}")
+        cf.red("Aborting build")
+        sys.exit(100)
 
-    # Check for cycles
-    if len(sorted_order) != len(graph):
-        raise ValueError("Circular dependency detected in dependency graph")
-
-    sorted_order.reverse()
-    return sorted_order
+    return stack
 
 
-def resolve_dependencies(args: argparse.Namespace) -> list:
+def resolve_dependencies(args: argparse.Namespace) -> list[tuple]:
     """
     Resolve package dependencies, perform a topological sort, and
-    return a list of (expanded_name, version) tuples in build order.
+    return a list of (name, version) tuples in correct build order.
     """
     pkg_atoms = process_packages(args)  # Initial packages from the command line
     version_dict = {}
@@ -164,7 +171,7 @@ def resolve_dependencies(args: argparse.Namespace) -> list:
     while to_process:
         current = to_process.pop(0)
         for dep in dep_graph[current]:
-            if dep not in dep_graph:  # If dependency hasn't been processed yet
+            if dep not in dep_graph:
                 dep_name, dep_version = get_version(dep)
                 version_dict[dep_name] = dep_version
                 dep_graph[dep_name] = get_deps(
@@ -175,5 +182,5 @@ def resolve_dependencies(args: argparse.Namespace) -> list:
     # Perform topological sort
     build_order = topological_sort(dep_graph)
 
-    # Construct the final list of (name, version) tuples
+    # do_main(), the caller, expects (name, version) tuples
     return [(name, version_dict[name]) for name in build_order]
