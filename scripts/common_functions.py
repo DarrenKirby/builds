@@ -24,8 +24,6 @@
 import argparse
 import hashlib
 import sys
-import subprocess as sp
-import shlex
 import os
 import csv
 import dbm
@@ -38,36 +36,6 @@ import tqdm
 
 from config import config
 
-# These paths are deprecated, and will be removed once
-# I've updated the existing build scripts. Please use
-# The path variables in the FileInstaller class instead.
-paths = {
-    'b': "/bin",
-    's': "/sbin",
-    'l': "/lib",
-    'e': "/etc",
-    'ub': "/usr/bin",
-    'us': "/usr/sbin",
-    'ui': "/usr/include",
-    'ul': "/usr/lib",
-    'ule': "/usr/libexec",
-    'ulb': "/usr/local/bin",
-    'uls': "/usr/local/sbin",
-    'uli': "/usr/local/include",
-    'ull': "/usr/local/lib",
-    'ush': "/usr/share",
-
-    # Man paths
-    'man1': "/usr/share/man/man1",
-    'man2': "/usr/share/man/man2",
-    'man3': "/usr/share/man/man3",
-    'man4': "/usr/share/man/man4",
-    'man5': "/usr/share/man/man5",
-    'man6': "/usr/share/man/man6",
-    'man7': "/usr/share/man/man7",
-    'man8': "/usr/share/man/man8"
-}
-
 clr = {
     'green': '\033[1;32m',
     'yellow': '\033[1;33m',
@@ -79,7 +47,6 @@ clr = {
 
 # Coloured output. For the following functions, the `print_x`
 # version does not include a newline.
-
 def colorize(color: str, msg: str) -> str:
     """
     Returns a message string in colour or
@@ -138,116 +105,6 @@ def print_red(msg: str) -> None:
     """Print red text with no newline """
     msg = colorize("red", msg)
     print(msg, end='')
-
-
-# These helper functions are intended to be used in the
-# 'install()' function in the package.build file.
-def do_bin(frm: str, to: str) -> None:
-    """
-    Install a binary to the live filesystem
-    """
-    try:
-        sp.run(shlex.split(f"install -S -v -o root -g root -m 755 -s {frm} {to}"), check=True)
-    except sp.CalledProcessError as e:
-        red(f"Install of {frm} failed: ")
-        print(e)
-        log.error("install of %s failed.", frm)
-        sys.exit(-1)
-
-
-def do_scr(frm: str, to: str) -> None:
-    """
-    Install a script to the live filesystem
-    """
-    try:
-        sp.run(shlex.split(f"install -S -v -o root -g root -m 755 {frm} {to}"), check=True)
-    except sp.CalledProcessError as e:
-        red(f"Install of {frm} failed: ")
-        print(e)
-        log.error("install of %s failed.", frm)
-        sys.exit(-1)
-
-
-def do_lib(frm: str, to: str) -> None:
-    """
-    Install a library to the live filesystem
-    """
-    try:
-        sp.run(shlex.split(f"install -S -v -o root -g root -m 755 {frm} {to}"), check=True)
-    except sp.CalledProcessError as e:
-        red(f"Install of {frm} failed: ")
-        print(e)
-        log.error("install of %s failed.", frm)
-        sys.exit(-1)
-
-
-def do_hdr(frm: str, to: str) -> None:
-    """
-    Install a header file to the live filesystem
-    """
-    try:
-        sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm} {to}"), check=True)
-    except sp.CalledProcessError as e:
-        red(f"Install of {frm} failed: ")
-        print(e)
-        log.error("install of %s failed.", frm)
-        sys.exit(-1)
-
-
-def do_man(frm: str, to: str) -> None:
-    """
-    Compress and install a manpage to the live filesystem
-    """
-    try:
-        sp.run(shlex.split(f"bzip2 {frm}"), check=True)
-        sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm}.bz2 {to}"), check=True)
-    except sp.CalledProcessError as e:
-        red(f"Install of {frm} failed: ")
-        print(e)
-        log.error("install of %s failed: %s.", frm, e)
-        sys.exit(-1)
-
-
-def do_sym(target: str, name: str) -> None:
-    """
-    Make a symbolic link in the live filesystem
-    """
-    try:
-        sp.run(shlex.split(f"ln -svf {target} {name}"), check=True)
-    except sp.CalledProcessError as e:
-        red(f"Install of {name} failed: ")
-        print(e)
-        log.error("symbolic link of %s failed: %s.", name, e)
-        sys.exit(-1)
-
-
-def do_dir(src: str, dst: str) -> None:
-    """
-    Recursively install a directory of files
-
-    This is intended to be used with packages that create
-    deep nested directories of library files
-    """
-    try:
-        os.rename(src, dst)
-    except OSError as e:
-        red("Call to do_dir failed: ")
-        print(e)
-        log.error("call to do_dir failed. Aborting install")
-        sys.exit(-1)
-
-
-def do_con(frm: str, to: str) -> None:
-    """
-    Install a configuration file to the live filesystem.
-    """
-    try:
-        sp.run(shlex.split(f"install -b -v -o root -g root -m 644 {frm} {to}"), check=True)
-    except sp.CalledProcessError as e:
-        red(f"Install of {frm} failed: ")
-        print(e)
-        log.error("install of %s failed.", frm)
-        sys.exit(-1)
 
 
 def download(url: str, filename: str) -> None:
@@ -396,7 +253,7 @@ def get_db_info(package: str) -> list:
         try:
             string = db[package].decode()
         except KeyError:
-            yellow(f"'{package}' not found in builds db.")
+            yellow(f"'{package}' was not found in builds db.")
             sys.exit(10)
 
     lst = string.split(',')
