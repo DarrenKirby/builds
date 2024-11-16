@@ -430,7 +430,7 @@ class BuildPackage(FileInstaller):
             cf.red(f"{self.build_file} has no 'install()' method defined")
             cf.yellow("All build files must define `install()`")
             cf.log.critical(f"{self.build_file} has no install() method defined - aborting")
-            self.cleanup()
+            # self.cleanup()
             sys.exit(5)
 
         if self.args.verbose:
