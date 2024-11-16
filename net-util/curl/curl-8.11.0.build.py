@@ -1,5 +1,5 @@
 #    net-util/curl/curl-8.11.0.build.py
-#    `date --utc`
+#    Fri Nov 15 23:58:41 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -18,66 +18,40 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment or delete this line
-# out, otherwise, add all dependencies to this variable as strings ie:
-# depend="dev-lang/ruby,app-editor/nano"
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are (presumably) already installed.
-# depend = ""
+depend = "dev-lib/libpsl"
+
+def configure(self):
+    return os.system("./configure --prefix=/usr "
+                     "--disable-static "
+                     "--with-openssl "
+                     "--enable-threaded-resolver "
+                     # "--with-libssh2 "
+                     "--with-ca-path=/etc/ssl/certs")
 
 
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook(self):
-#     pass
-#
-# def fetch_posthook(self):
-#     pass
+def make(self):
+    return os.system(f"make {cf.config['makeopts']}")
 
 
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook(self):
-#     pass
-#
-# def install_source_posthook(self):
-#     pass
+def make_install(self):
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
-# Use configure() to run configure scripts
-# def configure(self):
-#     return os.system("./configure --prefix=/usr")
+def install(self):
+    self.inst_binary(f"{self.p['_ub']}/curl", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/curl-config", self.p['ub'])
 
+    self.inst_directory(f"{self.p['_ui']}/curl/", f"{self.p['ui']}/curl/")
 
-# Use make() to make the package
-# def make(self):
-#     return os.system("make")
+    self.inst_library(f"{self.p['_ul']}/libcurl.so.4.8.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libcurl.so.4.8.0", f"{self.p['ul']}/libcurl.so")
+    self.inst_symlink(f"{self.p['ul']}/libcurl.so.4.8.0", f"{self.p['ul']}/libcurl.so.4")
 
+    self.inst_file(f"{self.p['_ul']}/pkgconfig/libcurl.pc", f"{self.p['ul']}/pkgconfig/")
+    self.inst_file(f"{self.p['_ush']}/aclocal/libcurl.m4", f"{self.p['ush']}/aclocal/")
 
-# Use make_install() to install the built files into a segregated directory
-# def make_install(self):
-#     return os.system(f"make DESTDIR={self.seg_dir} install")
+    self.inst_manpage(f"{self.p['_man1']}/curl-config.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/curl.1", self.p['man1'])
 
-# The above three functions need to return 0 to the caller
-# so bld knows the commands ran without error, and can continue.
-
-
-# install() MUST be defined in the build file.
-# Use the helper functions in build_package.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
-
-# You can also install whole directories, or individual
-# files that don't fit the above categories.
-# def install(self):
-#     self.inst_binary(f"{self.p['_ub']}/fooapp", self.p['ub'])
-#     self.inst_library(f"{self.p['_ul']}/libfooapp.so", self.p['ul'])
-#     self.inst_header(f"{self.p['_ui']}/libfooapp.h", self.p['ui'])
-#     self.inst_manpage(f"{self.p['_man1']}/fooapp.1", self.p['man1'])
-#     self.inst_manpage(f"{self.p['_man3']}/libfooapp.3", self.p['man3'])
-
-
-# Use these two as pre/post hooks into the cleanup process
-# def cleanup_prehook(self):
-#     pass
-#
-# def cleanup_posthook(self):
-#     pass
+    for file in os.listdir(self.p['_man3']):
+        self.inst_manpage(f"{self.p['_man3']}/{file}", self.p['man3'])
