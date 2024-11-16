@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>-<version>.build.py
-#    `date --utc`
+#    dev-lib/libpsl/libpsl-0.21.5.build.py
+#    Sat Nov 16 00:36:21 UTC 2024
 
 #    Copyright:: (c) 2024
-#    Author:: <name> (mailto:<email>)
+#    Author:: Darren Kirby (mailto:Darren Kirby)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -17,67 +17,35 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-# If there are no dependencies then comment or delete this line
-# out, otherwise, add all dependencies to this variable as strings ie:
-# depend="dev-lang/ruby,app-editor/nano"
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are (presumably) already installed.
-# depend = ""
+depend = "dev-lib/libunistring,dev-lib/libidn2"
 
 
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook(self):
-#     pass
-#
-# def fetch_posthook(self):
-#     pass
+
+def configure(self):
+    os.mkdir("build")
+    os.chdir("build")
+    return os.system("meson setup --prefix=/usr --libdir=/usr/lib --buildtype=release")
 
 
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook(self):
-#     pass
-#
-# def install_source_posthook(self):
-#     pass
+def make(self):
+    return os.system("ninja")
 
 
-# Use configure() to run configure scripts
-# def configure(self):
-#     return os.system("./configure --prefix=/usr")
+def make_install(self):
+    return os.system(f"DESTDIR={self.seg_dir} ninja install")
 
 
-# Use make() to make the package
-# def make(self):
-#     return os.system("make")
+def install(self):
+    self.inst_binary(f"{self.p['_ub']}/psl", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/psl-make-dafsa", self.p['ub'])
 
+    self.inst_header(f"{self.p['_ui']}/libpsl.h", self.p['ui'])
 
-# Use make_install() to install the built files into a segregated directory
-# def make_install(self):
-#     return os.system(f"make DESTDIR={self.seg_dir} install")
+    self.inst_library(f"{self.p['_ul']}/libpsl.so.5.3.5", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libpsl.so.5.3.5", f"{self.p['ul']}/libpsl.so.5")
+    self.inst_symlink(f"{self.p['ul']}/libpsl.so.5", f"{self.p['ul']}/libpsl.so")
 
-# The above three functions need to return 0 to the caller
-# so bld knows the commands ran without error, and can continue.
+    self.inst_file(f"{self.p['_ul']}/pkgconfig/libpsl.pc", f"{self.p['ul']}/pkgconfig/")
 
-
-# install() MUST be defined in the build file.
-# Use the helper functions in build_package.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
-
-# You can also install whole directories, or individual
-# files that don't fit the above categories.
-# def install(self):
-#     self.inst_binary(f"{self.p['_ub']}/fooapp", self.p['ub'])
-#     self.inst_library(f"{self.p['_ul']}/libfooapp.so", self.p['ul'])
-#     self.inst_header(f"{self.p['_ui']}/libfooapp.h", self.p['ui'])
-#     self.inst_manpage(f"{self.p['_man1']}/fooapp.1", self.p['man1'])
-#     self.inst_manpage(f"{self.p['_man3']}/libfooapp.3", self.p['man3'])
-
-
-# Use these two as pre/post hooks into the cleanup process
-# def cleanup_prehook(self):
-#     pass
-#
-# def cleanup_posthook(self):
-#     pass
+    self.inst_manpage(f"{self.p['_man1']}/psl.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/psl-make-dafsa.1", self.p['man1'])
