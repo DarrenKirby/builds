@@ -30,7 +30,7 @@ import common_functions as cf
 from config import config
 
 
-def already_installed(p):
+def already_installed(p: str) -> bool:
     """
     Check to see if dependency is already installed
     """
