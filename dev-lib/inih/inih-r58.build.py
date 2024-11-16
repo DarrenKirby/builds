@@ -34,8 +34,8 @@ def make_install(self):
 
 
 def install(self):
-    self.inst_header(f"{self.p['_ui']}/include/INIReader.h", self.p['ui'])
-    self.inst_header(f"{self.p['_ui']}/include/ini.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/INIReader.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/ini.h", self.p['ui'])
 
     self.inst_library(f"{self.p['_ul']}/libINIReader.so.0", self.p['ul'])
     self.inst_symlink(f"{self.p['ul']}/libINIReader.so.0", f"{self.p['ul']}/libINIReader.so")
