@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>-<version>.build.py
-#    `date --utc`
+#    dev-lib/libunistring/libunistring-1.3.build.py
+#    Sat Nov 16 01:02:22 UTC 2024
 
 #    Copyright:: (c) 2024
-#    Author:: <name> (mailto:<email>)
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,66 +18,25 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment or delete this line
-# out, otherwise, add all dependencies to this variable as strings ie:
-# depend="dev-lang/ruby,app-editor/nano"
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are (presumably) already installed.
-# depend = ""
+def configure(self):
+    return os.system("./configure --prefix=/usr "
+                     "--disable-static")
 
 
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook(self):
-#     pass
-#
-# def fetch_posthook(self):
-#     pass
+def make(self):
+    return os.system(f"make {cf.config['makeopts']}")
 
 
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook(self):
-#     pass
-#
-# def install_source_posthook(self):
-#     pass
+def make_install(self):
+    return os.system(f"make DESTDIR={self.seg_dir} install")
 
 
-# Use configure() to run configure scripts
-# def configure(self):
-#     return os.system("./configure --prefix=/usr")
+def install(self):
+    for file in glob.glob(f"{self.p['_ui']}/*.h"):
+        self.inst_header(f"{self.p['_ui']}/{file}", self.p['ui'])
 
+    self.inst_directory(f"{self.p['_ui']}/unistring/", f"{self.p['ui']}/unistring/")
 
-# Use make() to make the package
-# def make(self):
-#     return os.system("make")
-
-
-# Use make_install() to install the built files into a segregated directory
-# def make_install(self):
-#     return os.system(f"make DESTDIR={self.seg_dir} install")
-
-# The above three functions need to return 0 to the caller
-# so bld knows the commands ran without error, and can continue.
-
-
-# install() MUST be defined in the build file.
-# Use the helper functions in build_package.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
-
-# You can also install whole directories, or individual
-# files that don't fit the above categories.
-# def install(self):
-#     self.inst_binary(f"{self.p['_ub']}/fooapp", self.p['ub'])
-#     self.inst_library(f"{self.p['_ul']}/libfooapp.so", self.p['ul'])
-#     self.inst_header(f"{self.p['_ui']}/libfooapp.h", self.p['ui'])
-#     self.inst_manpage(f"{self.p['_man1']}/fooapp.1", self.p['man1'])
-#     self.inst_manpage(f"{self.p['_man3']}/libfooapp.3", self.p['man3'])
-
-
-# Use these two as pre/post hooks into the cleanup process
-# def cleanup_prehook(self):
-#     pass
-#
-# def cleanup_posthook(self):
-#     pass
+    self.inst_library(f"{self.p['_ul']}/libunistring.so.5.2.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libunistring.so.5.2.0", f"{self.p['ul']}/libunistring.so.5")
+    self.inst_symlink(f"{self.p['ul']}/libunistring.so.5.2.0", f"{self.p['ul']}/libunistring.so.5.2.0")
