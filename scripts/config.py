@@ -21,7 +21,6 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import os
 import sys
 import logging as log
@@ -52,7 +51,7 @@ def get_config() -> dict:
     if os.environ.get("NO_COLOR"):
         _config['color'] = False
 
-    if not 'makeopts' in _config:
+    if 'makeopts' not in _config:
         _config['makeopts'] = '-j1'
 
     return _config
