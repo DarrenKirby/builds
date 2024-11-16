@@ -113,7 +113,7 @@ class FileInstaller:
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
-                log.error("install of %s failed.", frm)
+                log.error("build failure: install of %s failed.", frm)
                 sys.exit(-1)
 
         abspath = f"{to}/{frm.split('/')[-1]}"
@@ -129,7 +129,7 @@ class FileInstaller:
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
-                log.error("install of %s failed.", frm)
+                log.error("build failure: install of %s failed.", frm)
                 sys.exit(-1)
 
         abspath = f"{to}/{frm.split('/')[-1]}"
@@ -145,7 +145,7 @@ class FileInstaller:
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
-                log.error("install of %s failed.", frm)
+                log.error("build failure: install of %s failed.", frm)
                 sys.exit(-1)
 
         abspath = f"{to}/{frm.split('/')[-1]}"
@@ -161,7 +161,7 @@ class FileInstaller:
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
-                log.error("install of %s failed.", frm)
+                log.error("build failure: install of %s failed.", frm)
                 sys.exit(-1)
 
         abspath = f"{to}/{frm.split('/')[-1]}"
@@ -178,7 +178,7 @@ class FileInstaller:
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
-                log.error("install of %s failed: %s.", frm, e)
+                log.error("build failure: install of %s failed: %s.", frm, e)
                 sys.exit(-1)
 
         abspath = f"{to}/{frm.split('/')[-1]}.bz2"
@@ -194,7 +194,7 @@ class FileInstaller:
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {name} failed: ")
                 print(e)
-                log.error("symbolic link of %s failed: %s.", name, e)
+                log.error("build failure: symbolic link of %s failed: %s.", name, e)
                 sys.exit(-1)
 
         abspath = name
@@ -211,9 +211,9 @@ class FileInstaller:
             try:
                 os.rename(src, dst)
             except OSError as e:
-                cf.red("Call to do_dir failed: ")
+                cf.red("Call to inst_directory() failed: ")
                 print(e)
-                log.error("call to do_dir failed. Aborting install")
+                log.error("build failure: call to inst_directory() failed. Aborting install")
                 sys.exit(-1)
 
         # FIXME: This is not ideal, but how else to generate a manifest
@@ -235,7 +235,7 @@ class FileInstaller:
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
-                log.error("install of %s failed.", frm)
+                log.error("build failure: install of %s failed.", frm)
                 sys.exit(-1)
 
         abspath = f"{to}/{frm.split('/')[-1]}"
@@ -252,7 +252,7 @@ class FileInstaller:
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
-                log.error("install of %s failed.", frm)
+                log.error("build failure: install of %s failed.", frm)
                 sys.exit(-1)
 
         if to[-1] == '/':
@@ -339,6 +339,7 @@ class BuildPackage(FileInstaller):
             cf.green("sha256sum matches ;-)")
         else:
             cf.red(f"sha256sum of download {self.package} does not match!")
+            log.critical(f"build failure: sha256sum  of {self.package} does not match")
             sys.exit(-1)
 
         if hasattr(self, 'fetch_posthook'):
@@ -348,7 +349,6 @@ class BuildPackage(FileInstaller):
         """
         Extract the source into the work directory
         """
-
         if hasattr(self, 'install_source_prehook'):
             self.install_source_prehook()
 
@@ -358,6 +358,7 @@ class BuildPackage(FileInstaller):
             cf.yellow(f"{self.work_dir} already exists!")
             if input("Overwrite (y/n) ") in ['n', 'N', 'no', 'No']:
                 cf.red("Aborting...")
+                log.warning(f"build failure: build of {self.package} aborted due to existing work directory")
                 sys.exit(5)
             else:
                 rmtree(self.work_dir)
@@ -383,7 +384,7 @@ class BuildPackage(FileInstaller):
                 cf.green("Package successfully configured.")
             else:
                 cf.red("Configure failed")
-                cf.log.critical(f"configure of {self.name} {self.version} failed")
+                cf.log.critical(f"build failure: configure of {self.name} {self.version} failed")
                 sys.exit(12)
         else:
             cf.bold("Nothing to configure.")
@@ -401,7 +402,7 @@ class BuildPackage(FileInstaller):
                 cf.green("`make` successful.")
             else:
                 cf.red("`make` failed")
-                cf.log.critical(f"make of {self.name} {self.version} failed")
+                cf.log.critical(f"build failure: make of {self.name} {self.version} failed")
                 sys.exit(13)
         else:
             cf.bold("Nothing to make.")
@@ -415,7 +416,7 @@ class BuildPackage(FileInstaller):
             print()
             if self.make_install() != 0:
                 cf.red("`make install` failed")
-                cf.log.critical(f"make of {self.name}  {self.version} failed")
+                cf.log.critical(f"build failure: make of {self.name}  {self.version} failed")
                 sys.exit(13)
 
     def inst(self) -> None:
@@ -429,8 +430,7 @@ class BuildPackage(FileInstaller):
         else:
             cf.red(f"{self.build_file} has no 'install()' method defined")
             cf.yellow("All build files must define `install()`")
-            cf.log.critical(f"{self.build_file} has no install() method defined - aborting")
-            # self.cleanup()
+            cf.log.critical(f"build failure: {self.build_file.split('/')[-1]} has no install() method defined")
             sys.exit(5)
 
         if self.args.verbose:
@@ -528,7 +528,7 @@ class BuildPackage(FileInstaller):
 
         if spec is None:
             cf.red(f"Cannot find build file at {path}")
-            cf.log.critical(f"{self.build_file} not found - aborting")
+            cf.log.critical(f"build failure: {self.build_file.split('/')[-1]} not found - aborting")
             sys.exit(25)
 
         module = importlib.util.module_from_spec(spec)
