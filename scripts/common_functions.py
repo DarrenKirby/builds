@@ -294,6 +294,11 @@ def download(url: str, filename: str) -> None:
             # which we need to clean up if the download fails
             os.remove(filename)
             sys.exit(12)
+        # other, unknown exception
+        except requests.exceptions.RequestException as e:
+            red(f"Download of {filename} failed: ")
+            print(e)
+            log.error("build failure: Download of %s failed", filename)
 
 
 class DownloadProgressBar(tqdm.tqdm):
@@ -320,10 +325,7 @@ def download_ftp(url: str, filename: str) -> None:
                                  miniters=1,
                                  desc=url.split('/')[-1]) as t:
             request.urlretrieve(url, filename=filename, reporthook=t.update_to)
-    # try:
-    #     with closing(request.urlopen(url)) as r:
-    #         with open(filename, 'wb') as f:
-    #             shutil.copyfileobj(r, f)
+
     except URLError as e:
         if e.reason.find('No such file or directory') >= 0:
             red(f"File: {filename.split('/')[-1]} not found on server")
@@ -336,11 +338,6 @@ def get_sha256sum(file_name: str) -> str:
     """
     Produce checksum of downloaded file
     """
-    # with open(file_name, "rb") as f:
-    #    digest = hashlib.file_digest(f, "sha256")
-    #    return digest.hexdigest()
-    # file_digest only available on Python 3.11+
-    #
     sha256_hash = hashlib.sha256()
     with open(file_name, "rb") as f:
         # Read the file in chunks to avoid memory issues with large files
@@ -396,7 +393,11 @@ def get_db_info(package: str) -> list:
         package = package.split('/')[0]
 
     with dbm.open(config['db_file']) as db:
-        string = db[package].decode()
+        try:
+            string = db[package].decode()
+        except KeyError:
+            yellow(f"'{package}' not found in builds db.")
+            sys.exit(10)
 
     lst = string.split(',')
     lst.insert(0, package)
