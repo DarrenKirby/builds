@@ -9,21 +9,21 @@ scripts or packages. While I have created a modest library of scripts which are 
 should be thought of as a collection of recipes for building software of interest to a particular user. If a particular
 build script does not yet exist, it is relatively easy for anyone to create their own, even without knowledge of Python.
 
-Although it is theroretically possible, I have not designed *builds* to take the place of a proper package management
-system. At this point, it is probably too simple to handle this task without frustration. In its current form, *builds*
-does not have a robust, reliable dependancy resolver. It is certainly in the works to improve this, but I am working on
-getting some usable scaffolding up first and foremost.
-
 I originally created *builds* to take care of updating and installing software in a
 new [Linux From Scratch](https://www.linuxfromscratch.org/) system installation of my own. That said, I have designed
 *builds* to be portable, and the front-end should work just fine on any unixish system that supports Python 3.6 or
 better. It is only the per-package build scripts that would need to be customized for each system, and for personal
 preferences.
 
-Rather than managing all software for a particular system, *builds* is best suited to managing a specific subset of
+Although it is theroretically possible, I have not designed *builds* to take the place of a proper, operating
+system-wide
+package management
+system. Rather than managing all software for a particular system, *builds* is best suited to managing a specific subset
+of
 packages, collected for a specific purpose. For example, collectively managing all the packages required for a Python
 data-science ecosystem. Or perhaps for managing a development/testing environment for some custom software and its
-dependancies.
+dependancies. Maybe you like having the bleeding-edge versions of a few packages and your OS delivers stable packages
+from a few versions back.
 
 There are two different, and (presently) incompatible methods for installing *builds*:
 
