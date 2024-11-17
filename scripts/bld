@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    /usr/sbin/bld
+#    /usr/(s)bin/bld
 #    Sun Oct 19 03:34:12 UTC 2014
 
 #    The front end to the builds source building tree
@@ -25,10 +25,49 @@
 import sys
 import os
 
-if os.path.isdir("/var/builds/scripts"):
-    sys.path.insert(0, '/var/builds/scripts')
-elif os.path.isdir(os.path.expanduser("~/builds/scripts")):
-    sys.path.insert(0, os.path.expanduser("~/builds/scripts"))
+
+def get_builds_path():
+    # System-wide configuration
+    system_config = "/etc/builds.conf"
+    # User-specific configuration
+    user_config = os.path.expanduser("~/.config/builds/builds.conf")
+    config_file = None
+
+    # Check if the configuration file exists
+    if os.path.isfile(system_config):
+        config_file = system_config
+    elif os.path.isfile(user_config):
+        config_file = user_config
+
+    if config_file:
+        with open(config_file, "r") as f:
+            config = {}
+            for line in f:
+                if "=" in line:
+                    key, value = line.strip().split("=", 1)
+                    config[key.strip()] = value.strip()
+
+            # Get builds_root and construct scripts path
+            builds_root = config.get("builds_root")
+            if builds_root:
+                return os.path.join(builds_root, "scripts")
+
+    # Fallbacks in case configuration is not found or invalid
+    if os.path.isdir("/var/builds/scripts"):
+        return "/var/builds/scripts"
+    elif os.path.isdir(os.path.expanduser("~/builds/scripts")):
+        return os.path.expanduser("~/builds/scripts")
+
+    return None
+
+
+# Determine the builds scripts path
+builds_path = get_builds_path()
+if builds_path and os.path.isdir(builds_path):
+    sys.path.insert(0, builds_path)
+else:
+    print("Error: Could not locate builds scripts path.")
+    sys.exit(1)
 
 import builds
 import common_functions as cf
