@@ -26,6 +26,8 @@ import dbm
 import sys
 import os
 import datetime
+import pwd
+import grp
 
 BUILDS_ROOT = os.path.abspath(os.pardir)
 
@@ -34,19 +36,25 @@ if os.geteuid() != 0:
     print("Not root!")
     print("Can only install builds in user directory!")
     print(f"installing build root as {BUILDS_ROOT}")
-    CONF_PATH = f"{os.environ['HOME']}/.builds.conf"
+    CONF_PATH = f"{os.environ['HOME']}/.config/builds/builds.conf"
     LOG_PATH = BUILDS_ROOT + "/builds.log"
-    DB_PATH = BUILDS_ROOT + "/scripts/builds"
+    DB_PATH = BUILDS_ROOT + "/scripts/builds-stable"
     print(f"!!! It is imperative to edit {CONF_PATH} and")
     print("set 'install_root=' to where you want packages")
     print("to be installed into the live filesystem!")
     print("Use an absolute path without trailing directory slash.")
+    print("ie: /home/<username>/system")
+    USER = pwd.getpwuid(os.getuid()).pw_name
+    GRP = grp.getgrgid(os.getgid()).gr_name
+
 else:
     print("Installing builds systemwide as root")
     print(f"configuring build root as {BUILDS_ROOT}")
     CONF_PATH = "/etc/builds.conf"
     LOG_PATH = "/var/log/builds.log"
     DB_PATH = BUILDS_ROOT + "/scripts/builds-stable"
+    USER = "root"
+    GRP = "root"
 
 print(f"Writing configuration file at '{CONF_PATH}'")
 current_time = datetime.datetime.now(datetime.UTC)
@@ -92,15 +100,42 @@ with open(CONF_PATH, 'w', encoding="utf-8") as conf_file:
     conf_file.write(f"log_file={LOG_PATH}\n")
     conf_file.write(f"db_file={BUILDS_ROOT}/scripts/builds-stable\n")
     conf_file.write("color=True")
+    conf_file.write(f"user={USER}")
+    conf_file.write(f"group={GRP}")
 
 if not os.path.exists(f"{BUILDS_ROOT}/distfiles"):
     os.mkdir(f"{BUILDS_ROOT}/distfiles")
 
-print(f"Writing log file at {LOG_PATH}...")
-print(f"Initializing database at {BUILDS_ROOT}/scripts/builds-stable...")
+print(f"Writing log file at {LOG_PATH}")
+print(f"Initializing database at {BUILDS_ROOT}/scripts/builds-stable")
 
 with dbm.open(f'{BUILDS_ROOT}/scripts/builds-stable', 'c') as db:
     with open(f'{BUILDS_ROOT}/scripts/builds-stable.csv', newline='', encoding='UTF8') as f:
         reader = csv.reader(f)
         for row in reader:
             db[row[0]] = ','.join(row[1:])
+
+print("...Done")
+
+try:
+    import requests
+
+    print("'requests' is installed! Good!")
+except ImportError:
+    print("'requests' HTTP library is not installed.")
+    print("This library is needed to download packages.")
+    print("Please run 'pip3 install requests' to install it...")
+try:
+    import tqdm
+
+    print("'tqdm' is installed! Good!")
+except ImportError:
+    print("'tqdm' library is not installed.")
+    print("This library is needed for a download progress bar.")
+    print("Please run 'pip3 install tqdm' to install it...")
+
+print("builds is now installed.")
+print(f"please do not forget to review and edit {CONF_PATH}")
+print("as necessary before the first run.")
+print(f"You should also move (or copy) '{BUILDS_ROOT}/scripts/bld' to an")
+print("appropriate location within a system or user PATH")
