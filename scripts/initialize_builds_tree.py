@@ -1,6 +1,6 @@
 """
     /var/builds/scripts/initialize_builds_tree.py
-    Wed Sep 25 23:30:16 UTC 2024
+    Sun Nov 17 20:41:14 UTC 2024
 
     A script which installs the bld app, and initializes the db file
 
@@ -28,37 +28,123 @@ import os
 import datetime
 import pwd
 import grp
+from pathlib import Path
+
+import common_functions as cf
+
+banner_text = """
+                                                                                           
+bbbbbbbb                                                          dddddddd                 
+b::::::b                                iiii  lllllll             d::::::d                 
+b::::::b                               i::::i l:::::l             d::::::d                 
+b::::::b                                iiii  l:::::l             d::::::d                 
+ b:::::b                                      l:::::l             d:::::d                  
+ b:::::bbbbbbbbb    uuuuuu    uuuuuu  iiiiiii  l::::l     ddddddddd:::::d     ssssssssss   
+ b::::::::::::::bb  u::::u    u::::u  i:::::i  l::::l   dd::::::::::::::d   ss::::::::::s  
+ b::::::::::::::::b u::::u    u::::u   i::::i  l::::l  d::::::::::::::::d ss:::::::::::::s 
+ b:::::bbbbb:::::::bu::::u    u::::u   i::::i  l::::l d:::::::ddddd:::::d s::::::ssss:::::s
+ b:::::b    b::::::bu::::u    u::::u   i::::i  l::::l d::::::d    d:::::d  s:::::s  ssssss 
+ b:::::b     b:::::bu::::u    u::::u   i::::i  l::::l d:::::d     d:::::d    s::::::s      
+ b:::::b     b:::::bu::::u    u::::u   i::::i  l::::l d:::::d     d:::::d       s::::::s   
+ b:::::b     b:::::bu:::::uuuu:::::u   i::::i  l::::l d:::::d     d:::::d ssssss   s:::::s 
+ b:::::bbbbbb::::::bu:::::::::::::::uui::::::il::::::ld::::::ddddd::::::dds:::::ssss::::::s
+ b::::::::::::::::b  u:::::::::::::::ui::::::il::::::l d:::::::::::::::::ds::::::::::::::s 
+ b:::::::::::::::b    uu::::::::uu:::ui::::::il::::::l  d:::::::::ddd::::d s:::::::::::ss  
+ bbbbbbbbbbbbbbbb       uuuuuuuu  uuuuiiiiiiiillllllll   ddddddddd   ddddd  sssssssssss    
+                                                                                           
+                                                                                 
+"""
+
+print(banner_text)
 
 BUILDS_ROOT = os.path.abspath(os.pardir)
 
-# check if root, else print message about non-privileged install
 if os.geteuid() != 0:
-    print("Not root!")
-    print("Can only install builds in user directory!")
-    print()
-    print(f"installing build root as {BUILDS_ROOT}")
-    print()
+    print("Hi there. I see you are not root, and therefore would like to ")
+    print("install builds in your user directory. Is that correct?")
+    if input(">>> ") in ['n', 'N', 'no', 'No']:
+        sys.exit(1)
+
+    print("OK.")
+    print(f"So you want to keep build root as ", end="")
+    cf.print_bold(f"{BUILDS_ROOT}?")
+    if input(">>> ") in ['n', 'N', 'no', 'No']:
+        sys.exit(1)
+
     CONF_PATH = f"{os.environ['HOME']}/.config/builds/builds.conf"
     CONF_DIR = f"{os.environ['HOME']}/.config/builds/"
+
+    print("OK. So we will write a configuration file to: ")
+    cf.bold(CONF_PATH)
+
     os.makedirs(CONF_DIR, exist_ok=True)
     LOG_PATH = BUILDS_ROOT + "/builds.log"
     DB_PATH = BUILDS_ROOT + "/scripts/builds-stable"
-    print(f"!!! It is imperative to edit {CONF_PATH} and")
-    print("set 'install_root=' to where you want packages")
-    print("to be installed into the live filesystem!")
-    print("Use an absolute path without trailing directory slash.")
-    print("ie: /home/<username>/system")
+
+    print()
+    print("Now, we have to decide where to install the live files.")
+    print("The default, provided build scripts install files using ")
+    print("'--prefix=/usr', so if we use your home directory all files ")
+    print("will be installed in ~/usr/bin, ~/usr/include, ~/usr/lib ")
+    print("and so on. Is this satisfactory?")
+    if input(">>> ") in ['n', 'N', 'no', 'No']:
+        print("OK. Then tell me where to put them. Please use an ABSOLUTE path ")
+        print("with no trailing slash. It needs to be either under your home ")
+        print("directory, or somewhere else you have write permissions...")
+        INSTALL_ROOT = input("(type install root) >>> ")
+    else:
+        INSTALL_ROOT = str(Path.home())
+
+    print("Cool. ", end="")
+    cf.print_bold(INSTALL_ROOT)
+    print(" it is then.")
+    print("We need to initialize a filesystem structure now. I will create ")
+    print(f"some empty directories under {INSTALL_ROOT} to install files to.")
+
+    try:
+        for directory in ["/usr/bin",
+                          "/usr/sbin",
+                          "/usr/etc",
+                          "/usr/include",
+                          "/usr/libexec",
+                          "/usr/lib",
+                          "/usr/share/man/man1",
+                          "/usr/share/man/man2",
+                          "/usr/share/man/man3",
+                          "/usr/share/man/man4",
+                          "/usr/share/man/man5",
+                          "/usr/share/man/man6",
+                          "/usr/share/man/man7",
+                          "/usr/share/man/man8",
+                          "/usr/local"
+                          ]:
+            os.makedirs(f"{INSTALL_ROOT}{directory}", exist_ok=True)
+            print(f"Created: {INSTALL_ROOT}{directory}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        sys.exit()
+
     USER = pwd.getpwuid(os.getuid()).pw_name
     GRP = grp.getgrgid(os.getgid()).gr_name
 
 else:
-    print("Installing builds systemwide as root")
-    print(f"configuring build root as {BUILDS_ROOT}")
+    print("Hi there. I see you are root, and therefore would like to ")
+    print("install builds system wide. Is that correct?")
+    if input(">>> ") in ['n', 'N', 'no', 'No']:
+        sys.exit(1)
+
+    print("OK.")
+    print(f"So you want to keep build root as ", end="")
+    cf.print_bold(f"{BUILDS_ROOT}?")
+    if input(">>> ") in ['n', 'N', 'no', 'No']:
+        sys.exit(1)
+
     CONF_PATH = "/etc/builds.conf"
     LOG_PATH = "/var/log/builds.log"
     DB_PATH = BUILDS_ROOT + "/scripts/builds-stable"
     USER = "root"
     GRP = "root"
+    INSTALL_ROOT = ""
 
 
 current_time = datetime.datetime.now(datetime.UTC)
@@ -94,13 +180,13 @@ if os.path.isfile(CONF_PATH):
         sys.exit(1)
 
 print(f"Writing {CONF_PATH}...")
-print("...please check default values, and edit as necessary")
-print("leave 'install_root=' for systemwide installs.")
+print("Please check default values, and edit as necessary")
+print("Leave 'install_root=' for system-wide installs.")
 print()
 with open(CONF_PATH, 'w', encoding="utf-8") as conf_file:
     conf_file.write(HEADER)
     conf_file.write(f"builds_root={BUILDS_ROOT}\n")
-    conf_file.write(f'install_root=""\n')
+    conf_file.write(f'install_root={INSTALL_ROOT}\n')
     conf_file.write(f"distfiles={BUILDS_ROOT}/distfiles\n")
     conf_file.write(f"log_file={LOG_PATH}\n")
     conf_file.write(f"db_file={BUILDS_ROOT}/scripts/builds-stable\n")
@@ -146,7 +232,8 @@ with open(install_file, 'a'):
     os.utime(install_file, None)
 
 print("builds is now installed.")
-print(f"please do not forget to review and edit {CONF_PATH}")
+print(f"Please do not forget to review and edit {CONF_PATH}")
 print("as necessary before the first run.")
-print(f"You should also move (or copy) '{BUILDS_ROOT}/scripts/bld' to an")
+print()
+print(f"You should also copy (or move) '{BUILDS_ROOT}/scripts/bld' to an")
 print("appropriate location within a system or user PATH")
