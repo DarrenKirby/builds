@@ -1,7 +1,7 @@
 #    app-arch/bzip2/bzip2-1.0.8.build.py
 #    Tue Nov  5 23:04:26 UTC 2024
 
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ def install(self):
     self.inst_symlink(f"{self.p['ul']}/libbz2.so.1.0.8", f"{self.p['ul']}/libbz2.so")
     self.inst_symlink(f"{self.p['ul']}/libbz2.so.1.0.8", f"{self.p['ul']}/libbz2.so.1.0")
 
-    self.inst_header(f"{self.seg_dir}/include/bzlib.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/bzlib.h", self.p['ui'])
 
     os.rename("bzip2-shared", f"{self.p['_ub']}/bzip2")
     self.inst_binary(f"{self.p['_ub']}/bzip2", f"{self.p['ub']}")

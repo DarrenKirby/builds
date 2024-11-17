@@ -33,11 +33,3 @@ def make_install(self):
 def install(self):
     self.inst_binary(f"{self.p['_ub']}/dash", self.p['b'])
     self.inst_manpage(f"{self.p['_man1']}/dash.1", self.p['man1'])
-
-
-def cleanup_prehook(self):
-    print()
-    cf.yellow("Make /bin/sh link to /usr/bin/dash ? (y/n)")
-    if input(">>> ") not in ['n', 'N', 'No', 'no']:
-        self.inst_symlink("/usr/bin/dash", "/bin/sh")
-    print()

@@ -41,7 +41,7 @@ def make_install(self):
 
 def install(self):
     self.inst_binary(f"{self.p['_ub']}/vim", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/vimtutor", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/vimtutor", self.p['ub'])
     self.inst_binary(f"{self.p['_ub']}/xxf", self.p['ub'])
 
     self.inst_symlink(f"{self.p['ub']}/vim", f"{self.p['ub']}/ex")

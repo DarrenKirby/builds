@@ -31,8 +31,8 @@ def make_install(self):
 
 
 def install(self):
-    self.inst_binary(f"{self.p.['_ub']}/nano", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/nano", self.p['ub'])
     self.inst_symlink(f"{self.p['ub']}/nano", f"{self.p['ub']}/rnano")
-    self.inst_manpage(f"{self.p.['_man1']}/nano.1", self.p['man1'])
-    self.inst_manpage(f"{self.p.['_man1']}/rnano.1", self.p['man1'])
-    self.inst_manpage(f"{self.p.['_man5']}/nanorc.5", self.p['man8'])
+    self.inst_manpage(f"{self.p['_man1']}/nano.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/rnano.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man5']}/nanorc.5", self.p['man8'])

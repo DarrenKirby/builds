@@ -35,5 +35,5 @@ def install(self):
     self.inst_binary(f"{self.p['_ub']}/bc", self.p['ub'])
     self.inst_symlink(f"{self.p['ub']}/bc", f"{self.p['ub']}/dc")
 
-    self.inst_manpage(f"{self.p['_man1']}/share/man/man1/bc.1", self.p['man1'])
-    self.inst_manpage(f"{self.p['_man1']}/share/man/man1/dc.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/bc.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/dc.1", self.p['man1'])
