@@ -111,7 +111,9 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"install -S -v -o root -g root -m 755 -s {frm} {to}"), check=True)
+                sp.run(
+                    shlex.split(f"install -S -v -o {cf.config['user']} -g {cf.config['group']} -m 755 -s {frm} {to}"),
+                    check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
@@ -127,7 +129,8 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"install -S -v -o root -g root -m 755 {frm} {to}"), check=True)
+                sp.run(shlex.split(f"install -S -v -o {cf.config['user']} -g {cf.config['group']} -m 755 {frm} {to}"),
+                       check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
@@ -143,7 +146,8 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"install -S -v -o root -g root -m 755 {frm} {to}"), check=True)
+                sp.run(shlex.split(f"install -S -v -o {cf.config['user']} -g {cf.config['group']} -m 755 {frm} {to}"),
+                       check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
@@ -159,7 +163,8 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm} {to}"), check=True)
+                sp.run(shlex.split(f"install -S -v -o {cf.config['user']} -g {cf.config['group']} -m 644 {frm} {to}"),
+                       check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
@@ -176,7 +181,9 @@ class FileInstaller:
         if not self.args.test:
             try:
                 sp.run(shlex.split(f"bzip2 {frm}"), check=True)
-                sp.run(shlex.split(f"install -S -v -o root -g root -m 644 {frm}.bz2 {to}"), check=True)
+                sp.run(
+                    shlex.split(f"install -S -v -o {cf.config['user']} -g {cf.config['group']} -m 644 {frm}.bz2 {to}"),
+                    check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
@@ -233,7 +240,8 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"install -b -v -o root -g root -m 644 {frm} {to}"), check=True)
+                sp.run(shlex.split(f"install -b -v -o {cf.config['user']} -g {cf.config['group']} -m 644 {frm} {to}"),
+                       check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
@@ -250,7 +258,9 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"install -S -v -o root -g root -m {mode} {frm} {to}"), check=True)
+                sp.run(
+                    shlex.split(f"install -S -v -o {cf.config['user']} -g {cf.config['group']} -m {mode} {frm} {to}"),
+                    check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
