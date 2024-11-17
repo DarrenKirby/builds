@@ -35,8 +35,12 @@ BUILDS_ROOT = os.path.abspath(os.pardir)
 if os.geteuid() != 0:
     print("Not root!")
     print("Can only install builds in user directory!")
+    print()
     print(f"installing build root as {BUILDS_ROOT}")
+    print()
     CONF_PATH = f"{os.environ['HOME']}/.config/builds/builds.conf"
+    CONF_DIR = f"{os.environ['HOME']}/.config/builds/"
+    os.makedirs(CONF_DIR, exist_ok=True)
     LOG_PATH = BUILDS_ROOT + "/builds.log"
     DB_PATH = BUILDS_ROOT + "/scripts/builds-stable"
     print(f"!!! It is imperative to edit {CONF_PATH} and")
@@ -56,7 +60,7 @@ else:
     USER = "root"
     GRP = "root"
 
-print(f"Writing configuration file at '{CONF_PATH}'")
+
 current_time = datetime.datetime.now(datetime.UTC)
 
 HEADER = f"""
@@ -92,6 +96,7 @@ if os.path.isfile(CONF_PATH):
 print(f"Writing {CONF_PATH}...")
 print("...please check default values, and edit as necessary")
 print("leave 'install_root=' for systemwide installs.")
+print()
 with open(CONF_PATH, 'w', encoding="utf-8") as conf_file:
     conf_file.write(HEADER)
     conf_file.write(f"builds_root={BUILDS_ROOT}\n")
@@ -99,9 +104,9 @@ with open(CONF_PATH, 'w', encoding="utf-8") as conf_file:
     conf_file.write(f"distfiles={BUILDS_ROOT}/distfiles\n")
     conf_file.write(f"log_file={LOG_PATH}\n")
     conf_file.write(f"db_file={BUILDS_ROOT}/scripts/builds-stable\n")
-    conf_file.write("color=True")
-    conf_file.write(f"user={USER}")
-    conf_file.write(f"group={GRP}")
+    conf_file.write("color=True\n")
+    conf_file.write(f"user={USER}\n")
+    conf_file.write(f"group={GRP}\n")
 
 if not os.path.exists(f"{BUILDS_ROOT}/distfiles"):
     os.mkdir(f"{BUILDS_ROOT}/distfiles")
@@ -125,6 +130,7 @@ except ImportError:
     print("'requests' HTTP library is not installed.")
     print("This library is needed to download packages.")
     print("Please run 'pip3 install requests' to install it...")
+    print()
 try:
     import tqdm
 
@@ -133,6 +139,11 @@ except ImportError:
     print("'tqdm' library is not installed.")
     print("This library is needed for a download progress bar.")
     print("Please run 'pip3 install tqdm' to install it...")
+    print()
+
+install_file = "../sets/installed"
+with open(install_file, 'a'):
+    os.utime(install_file, None)
 
 print("builds is now installed.")
 print(f"please do not forget to review and edit {CONF_PATH}")
