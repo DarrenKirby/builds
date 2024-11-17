@@ -29,8 +29,8 @@ import logging as log
 def get_config() -> dict:
     """Read the builds.conf configuration file """
 
-    if os.path.isfile(f'{os.path.expanduser("~")}/.builds.conf'):
-        conf_file = f'{os.path.expanduser("~")}/.builds.conf'
+    if os.path.isfile(f'{os.path.expanduser("~")}/.config/builds/builds.conf'):
+        conf_file = f'{os.path.expanduser("~")}/.config/builds/builds.conf'
     elif os.path.isfile('/etc/builds.conf'):
         conf_file = '/etc/builds.conf'
     else:
