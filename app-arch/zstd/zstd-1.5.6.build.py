@@ -43,9 +43,9 @@ def install(self):
     self.inst_symlink(f"{self.p['ub']}/zstd", f"{self.p['ub']}/zstdcat")
     self.inst_symlink(f"{self.p['ub']}/zstd", f"{self.p['ub']}/zstdmt")
 
-    self.inst_manpage(f"{self.p['_man1']}/zstd.1", self.p['man1'])
-    self.inst_manpage(f"{self.p['_man1']}/zstdgrep.1", self.p['man1'])
-    self.inst_manpage(f"{self.p['_man1']}/zstdless.1", self.p['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zstd.1", self.p['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zstdgrep.1", self.p['man1'])
+    self.inst_manpage(f"{self.seg_dir}/share/man/man1/zstdless.1", self.p['man1'])
 
     self.inst_symlink(f"{self.p['man1']}/zstd.1.bz2", f"{self.p['man1']}/unzstd.1")
     self.inst_symlink(f"{self.p['man1']}/zstd.1.bz2", f"{self.p['man1']}/zstdcat.1")
