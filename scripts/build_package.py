@@ -262,8 +262,16 @@ class FileInstaller:
         Install a generic file to the live filesystem
         with 644 permisions
         """
+        if to[-1] == '/':
+            absdir = to
+            absfile = f"{to}{frm.split('/')[-1]}"
+        else:
+            absdir = to.rsplit("/", 1)[0]
+            absfile = to
+
         if not self.args.test:
             try:
+                os.makedirs(absdir, exist_ok=True)
                 sp.run(
                     shlex.split(f"install -S -v -o {cf.config['user']} -g {cf.config['group']} -m {mode} {frm} {to}"),
                     check=True)
@@ -273,11 +281,7 @@ class FileInstaller:
                 log.error("build failure: install of %s failed.", frm)
                 sys.exit(-1)
 
-        if to[-1] == '/':
-            abspath = f"{to}{frm.split('/')[-1]}"
-        else:
-            abspath = to
-        self.manifest.append(abspath)
+        self.manifest.append(absfile)
 
     @staticmethod
     def _list_all_paths(directory_path):
