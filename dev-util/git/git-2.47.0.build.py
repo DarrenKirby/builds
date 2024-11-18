@@ -65,7 +65,7 @@ def install(self):
         self.inst_manpage(f"{self.work_dir}/man1/{file}", self.p['man1'])
 
     for file in os.listdir(f"{self.work_dir}/man5/"):
-        self.inst_manpage(f"{self.work_dir}/man1/{file}", self.p['man1'])
+        self.inst_manpage(f"{self.work_dir}/man5/{file}", self.p['man5'])
 
     for file in os.listdir(f"{self.work_dir}/man7/"):
-        self.inst_manpage(f"{self.work_dir}/man1/{file}", self.p['man1'])
+        self.inst_manpage(f"{self.work_dir}/man7/{file}", self.p['man7'])

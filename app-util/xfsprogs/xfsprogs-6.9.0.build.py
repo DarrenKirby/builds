@@ -1,5 +1,5 @@
 #    app-util/xfsprogs/xfsprogs-6.9.0.build.py
-#    Tue Oct 29 21:39:35 UTC 2024
+#    Mon Nov 18 20:33:19 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -34,11 +34,12 @@ def make_install(self):
 
 
 def install(self):
-    self.inst_library(f"{self.p['_ul']}/libhandle.so.1.0.3", self.p['ul'])
+    # xfsprogs is not honouring --prefix=/usr and --libdir=/usr/lib
+    self.inst_library(f"{self.seg_dir}/lib64/libhandle.so.1.0.3", self.p['ul'])
     self.inst_symlink(f"{self.p['ul']}/libhandle.so.1.0.3", f"{self.p['ul']}/libhandle.so.1")
 
-    for file in os.listdir(self.p['_us']):
-        self.inst_binary(f"{self.p['_us']}/{file}", self.p['us'])
+    for file in os.listdir(self.p['_s']):
+        self.inst_binary(f"{self.p['_s']}/{file}", self.p['us'])
 
     self.inst_manpage(f"{self.p['_man5']}/projects.5", self.p['man5'])
     self.inst_manpage(f"{self.p['_man5']}/projid.5", self.p['man5'])
@@ -50,4 +51,4 @@ def install(self):
     self.inst_directory(f"{self.p['_ush']}/xfsprogs/", f"{self.p['ush']}/xfsprogs/")
 
     # Install xfs.rules to /usr/lib/udev/rules.d
-    self.inst_file("./scrub/xfs.rules", f"{self.p['ul']}/udev/rules.d/64-xfs.rules")
+    self.inst_file(f"{self.p['_ul']}/udev/rules.d/64-xfs.rules", f"{self.p['ul']}/udev/rules.d/64-xfs.rules")

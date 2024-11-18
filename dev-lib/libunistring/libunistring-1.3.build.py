@@ -39,4 +39,4 @@ def install(self):
 
     self.inst_library(f"{self.p['_ul']}/libunistring.so.5.2.0", self.p['ul'])
     self.inst_symlink(f"{self.p['ul']}/libunistring.so.5.2.0", f"{self.p['ul']}/libunistring.so.5")
-    self.inst_symlink(f"{self.p['ul']}/libunistring.so.5.2.0", f"{self.p['ul']}/libunistring.so.5.2.0")
+    self.inst_symlink(f"{self.p['ul']}/libunistring.so.5.2.0", f"{self.p['ul']}/libunistring.so")
