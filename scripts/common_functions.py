@@ -107,6 +107,31 @@ def print_red(msg: str) -> None:
     print(msg, end='')
 
 
+def uniq_list(input_list: list) -> list:
+    """
+    `uniq`, but for Python lists
+    """
+    seen = set()
+    return [x for x in input_list if not (x in seen or seen.add(x))]
+
+
+def basic_download(url: str, filename: str) -> None:
+    """
+    Try a basic download with no progress bar.
+    """
+    try:
+        with requests.get(url, stream=True) as response:
+            response.raise_for_status()  # Check for HTTP errors
+            with open(filename, 'wb') as file:
+                for chunk in response.iter_content(chunk_size=8192):
+                    file.write(chunk)
+    except requests.exceptions.RequestException as e:
+        red(f"Download of {filename} failed: ")
+        print(e)
+        log.error("build failure: Download of %s failed", filename)
+        sys.exit(12)
+
+
 def download(url: str, filename: str) -> None:
     """
     Download package with nice progress bar
@@ -151,11 +176,21 @@ def download(url: str, filename: str) -> None:
             # which we need to clean up if the download fails
             os.remove(filename)
             sys.exit(12)
+        # Some servers cannot/will not return a content-length header
+        # resulting in a 406 error
+        except requests.exceptions.HTTPError as e:
+            yellow(e)
+            print("Attempting basic download")
+            # remove the zero-length file written by requests
+            os.remove(filename)
+            basic_download(url, filename)
+            return
         # other, unknown exception
         except requests.exceptions.RequestException as e:
             red(f"Download of {filename} failed: ")
             print(e)
             log.error("build failure: Download of %s failed", filename)
+            sys.exit(12)
 
 
 class DownloadProgressBar(tqdm.tqdm):
