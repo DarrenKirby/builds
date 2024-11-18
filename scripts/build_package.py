@@ -220,6 +220,7 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
+                os.makedirs(dst, exist_ok=True)
                 os.rename(src, dst)
             except OSError as e:
                 cf.red("Call to inst_directory() failed: ")
