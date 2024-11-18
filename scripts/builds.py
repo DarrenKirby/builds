@@ -91,6 +91,10 @@ def process_args():
     initdb_parser = subparsers.add_parser("initdb")
     initdb_parser.add_argument("db_file", action="extend", nargs="+", type=str)
 
+    # 'cleantree' command options
+    cleantree_parser = subparsers.add_parser("cleantree")
+    cleantree_parser.add_argument("category", action="extend", nargs="*", type=str)
+
     args = global_parser.parse_args()
     return args
 
@@ -134,6 +138,17 @@ def do_main() -> None:
         sys.exit(0)
     elif args.command == 'initdb':
         cf.do_initdb(args)
+        sys.exit(0)
+    elif args.command == 'cleantree':
+        num_cleaned = 0
+        if len(args.category) == 0:
+            num_cleaned = cf.clean_tree(f"{config['builds_root']}", args)
+        else:
+            for cat in args.category:
+                num_cleaned = cf.clean_tree(f"{config['builds_root']}/{cat}", args)
+        cf.print_bold("cleaned ")
+        cf.print_green(str(num_cleaned))
+        cf.print_bold(" directory\n" if num_cleaned == 1 else " directories\n")
         sys.exit(0)
     else:
         builds_to_build = dep_resolve.resolve_dependencies(args)
@@ -253,6 +268,7 @@ Usage: {APPNAME} [general options] command [command options] arg [arg2...]
         'search'    string                  search the package db for package names matching string
         'info'      pkg_atom [pkg_atom...]  print info on packages if installed
         'initdb'    csv_file [csv_file...]  initialze a build db with data from csv_file
+        'cleantree' [category...]           delete all 'work' directories, or just under [categories]
 
     General Options:
         '-h'   or '--help'                  show these usage details
