@@ -114,12 +114,12 @@ class FileInstaller:
         if not self.args.test:
             try:
                 sp.run(
-                    shlex.split(f"install -S -v -o {cf.config['user']} -g {cf.config['group']} -m 755 -s {frm} {to}"),
+                    shlex.split(f"install -v -o {cf.config['user']} -g {cf.config['group']} -m 755 -s {frm} {to}"),
                     check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
-                log.error("build failure: install of %s failed.", frm)
+                log.error("build failure: install of %s failed: %s", frm, e)
                 sys.exit(-1)
 
         abspath = f"{to}/{frm.split('/')[-1]}"
@@ -131,12 +131,12 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"install -S -v -o {cf.config['user']} -g {cf.config['group']} -m 755 {frm} {to}"),
+                sp.run(shlex.split(f"install -v -o {cf.config['user']} -g {cf.config['group']} -m 755 {frm} {to}"),
                        check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
-                log.error("build failure: install of %s failed.", frm)
+                log.error("build failure: install of %s failed: %s", frm, e)
                 sys.exit(-1)
 
         abspath = f"{to}/{frm.split('/')[-1]}"
@@ -148,12 +148,12 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"install -S -v -o {cf.config['user']} -g {cf.config['group']} -m 755 {frm} {to}"),
+                sp.run(shlex.split(f"install -v -o {cf.config['user']} -g {cf.config['group']} -m 755 {frm} {to}"),
                        check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
-                log.error("build failure: install of %s failed.", frm)
+                log.error("build failure: install of %s failed: %s", frm, e)
                 sys.exit(-1)
 
         abspath = f"{to}/{frm.split('/')[-1]}"
@@ -165,26 +165,28 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"install -S -v -o {cf.config['user']} -g {cf.config['group']} -m 644 {frm} {to}"),
+                sp.run(shlex.split(f"install -v -o {cf.config['user']} -g {cf.config['group']} -m 644 {frm} {to}"),
                        check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
-                log.error("build failure: install of %s failed.", frm)
+                log.error("build failure: install of %s failed: %s", frm, e)
                 sys.exit(-1)
 
         abspath = f"{to}/{frm.split('/')[-1]}"
         self.manifest.append(abspath)
 
-    def inst_manpage(self, frm: str, to: str) -> None:
+    def inst_manpage(self, frm: str, to: str, compress: bool = True) -> None:
         """
         Compress and install a manpage to the live filesystem
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"bzip2 {frm}"), check=True)
+                if compress:
+                    sp.run(shlex.split(f"bzip2 {frm}"), check=True)
+                    frm += ".bz2"
                 sp.run(
-                    shlex.split(f"install -S -v -o {cf.config['user']} -g {cf.config['group']} -m 644 {frm}.bz2 {to}"),
+                    shlex.split(f"install -Dv -o {cf.config['user']} -g {cf.config['group']} -m 644 {frm} {to}"),
                     check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
@@ -192,7 +194,7 @@ class FileInstaller:
                 log.error("build failure: install of %s failed: %s.", frm, e)
                 sys.exit(-1)
 
-        abspath = f"{to}/{frm.split('/')[-1]}.bz2"
+        abspath = f"{to}/{frm.split('/')[-1]}"
         self.manifest.append(abspath)
 
     def inst_symlink(self, target: str, name: str) -> None:
@@ -220,12 +222,13 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
+                # os.rename fails if intermediate directories do not exist.
                 os.makedirs(dst, exist_ok=True)
                 os.rename(src, dst)
             except OSError as e:
                 cf.red("Call to inst_directory() failed: ")
                 print(e)
-                log.error("build failure: call to inst_directory() failed. Aborting install")
+                log.error("build failure: call to inst_directory() failed: %s", e)
                 sys.exit(-1)
 
         # If we are using --test and the files are not actually installed
@@ -246,12 +249,12 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"install -b -v -o {cf.config['user']} -g {cf.config['group']} -m 644 {frm} {to}"),
+                sp.run(shlex.split(f"install -bv -o {cf.config['user']} -g {cf.config['group']} -m 644 {frm} {to}"),
                        check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
-                log.error("build failure: install of %s failed.", frm)
+                log.error("build failure: install of %s failed: %s", frm, e)
                 sys.exit(-1)
 
         abspath = f"{to}/{frm.split('/')[-1]}"
@@ -263,22 +266,21 @@ class FileInstaller:
         with 644 permisions
         """
         if to[-1] == '/':
-            absdir = to
             absfile = f"{to}{frm.split('/')[-1]}"
+            to = absfile
         else:
-            absdir = to.rsplit("/", 1)[0]
             absfile = to
 
         if not self.args.test:
             try:
-                os.makedirs(absdir, exist_ok=True)
+                # os.makedirs(absdir, exist_ok=True)
                 sp.run(
-                    shlex.split(f"install -S -v -o {cf.config['user']} -g {cf.config['group']} -m {mode} {frm} {to}"),
+                    shlex.split(f"install -Dv -o {cf.config['user']} -g {cf.config['group']} -m {mode} {frm} {to}"),
                     check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
                 print(e)
-                log.error("build failure: install of %s failed.", frm)
+                log.error("build failure: install of %s failed: %s", frm, e)
                 sys.exit(-1)
 
         self.manifest.append(absfile)
@@ -323,7 +325,6 @@ class BuildPackage(FileInstaller):
          package_dir = 'tar-1.28'
 
         """
-        # self.args = args
         self.build = build
         self.name = build.split('/')[1]
         with dbm.open(config['db_file']) as db:
