@@ -1,5 +1,5 @@
 #    app-util/e2fsprogs/e2fsprogs-1.47.1.build.py
-#    Thu Oct 31 22:20:22 UTC 2024
+#    Mon Nov 18 17:45:21 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -48,6 +48,7 @@ def install(self):
     self.inst_script(f"{self.p['_ub']}/mk_cmds", self.p['ub'])
 
     # Rather than pick through them, we'll skip stripping and do it after
+    # Must consider using python-magic to sort bins from scripts
     for file in os.listdir(self.p['_us']):
         self.inst_script(f"{self.p['_us']}/{file}", self.p['us'])
 
@@ -77,14 +78,15 @@ def install(self):
     self.inst_config(f"{self.p['_ue']}/mke2fs.conf", self.p['ue'])
     self.inst_config(f"{self.p['_ue']}/e2scrub.conf", self.p['ue'])
 
+    # Compressing manpages is problematic for this package
     for file in os.listdir(self.p['_man1']):
-        self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
+        self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'], compress=False)
 
     for file in os.listdir(self.p['_man5']):
-        self.inst_manpage(f"{self.p['_man5']}/{file}", self.p['man5'])
+        self.inst_manpage(f"{self.p['_man5']}/{file}", self.p['man5'], compress=False)
 
     for file in os.listdir(self.p['_man8']):
-        self.inst_manpage(f"{self.p['_man8']}/{file}", self.p['man8'])
+        self.inst_manpage(f"{self.p['_man8']}/{file}", self.p['man8'], compress=False)
 
     for file in ["badblocks",
                  "debugfs",

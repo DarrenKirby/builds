@@ -48,7 +48,10 @@ def make_install(self):
 
 def install(self):
     for file in os.listdir(self.p['_ub']):
-        self.inst_binary(f"{self.p['_ub']}/{file}", self.p['ub'])
+        if file in ["git-cvsserver", "gitk"]:
+            self.inst_script(f"{self.p['_ub']}/{file}", self.p['ub'])
+        else:
+            self.inst_binary(f"{self.p['_ub']}/{file}", self.p['ub'])
 
     self.inst_directory(f"{self.p['_ule']}/git-core/", f"{self.p['ule']}/git-core/")
     self.inst_directory(f"{self.p['_ush']}/git-core/", f"{self.p['ush']}/git-core/")
