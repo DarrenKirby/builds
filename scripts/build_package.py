@@ -60,6 +60,7 @@ class FileInstaller:
             's': f"{ir}/sbin",
             'l': f"{ir}/lib",
             'e': f"{ir}/etc",
+            'i': f"{ir}/include",
             'ub': f"{ir}/usr/bin",
             'ue': f"{ir}/usr/etc",
             'us': f"{ir}/usr/sbin",
@@ -84,6 +85,7 @@ class FileInstaller:
             '_s': self.seg + "/sbin",
             '_l': self.seg + "/lib",
             '_e': self.seg + "/etc",
+            '_i': self.seg + "/include",
             '_ub': self.seg + "/usr/bin",
             '_ue': self.seg + "/usr/etc",
             '_us': self.seg + "/usr/sbin",
@@ -199,7 +201,7 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"ln -svf {target} {name}"), check=True)
+                sp.run(shlex.split(f"ln -srvf {target} {name}"), check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {name} failed: ")
                 print(e)
@@ -225,13 +227,16 @@ class FileInstaller:
                 log.error("build failure: call to inst_directory() failed. Aborting install")
                 sys.exit(-1)
 
-        # FIXME: This is not ideal, but how else to generate a manifest
-        # without actually installing the files to the live filesystem?
-        seg_files = self._list_all_paths(src)
-        real_paths = []
-        for file in seg_files:
-            file = file.replace(self.seg, config['install_root'])
-            real_paths.append(file)
+        # If we are using --test and the files are not actually installed
+        # we still need to generate a manifest
+        if self.args.test:
+            seg_files = self._list_all_paths(src)
+            real_paths = []
+            for file in seg_files:
+                file = file.replace(self.seg, config['install_root'])
+                real_paths.append(file)
+        else:
+            real_paths = self._list_all_paths(dst)
         self.manifest += real_paths
 
     def inst_config(self, frm: str, to: str) -> None:
@@ -282,8 +287,8 @@ class FileInstaller:
                 all_paths.append(os.path.join(root, dir_name) + '/')
             for file_name in files:
                 all_paths.append(os.path.join(root, file_name))
-            # all_paths.append(root)
-        return all_paths
+            all_paths.append(root)
+        return cf.uniq_list(all_paths)
 
 
 # pylint: disable=too-many-instance-attributes
