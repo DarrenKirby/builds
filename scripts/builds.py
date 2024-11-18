@@ -251,7 +251,7 @@ Usage: {APPNAME} [general options] command [command options] arg [arg2...]
         'install'   pkg_atom [pkg_atom...]  install one or more packages and dependancies
         'uninstall' pkg_atom                uninstall package
         'search'    string                  search the package db for package names matching string
-        'info'      pkg_atom                print info on packages if installed
+        'info'      pkg_atom [pkg_atom...]  print info on packages if installed
         'initdb'    csv_file [csv_file...]  initialze a build db with data from csv_file
 
     General Options:
