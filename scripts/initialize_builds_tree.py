@@ -74,8 +74,9 @@ if os.geteuid() != 0:
     CONF_PATH = f"{os.environ['HOME']}/.config/builds/builds.conf"
     CONF_DIR = f"{os.environ['HOME']}/.config/builds/"
 
-    print("OK. So we will write a configuration file to: ")
-    cf.bold(CONF_PATH)
+    print("OK.")
+    print("We're going to write a configuration file to: ")
+    cf.print_bold(CONF_PATH + "\n")
 
     os.makedirs(CONF_DIR, exist_ok=True)
     LOG_PATH = BUILDS_ROOT + "/builds.log"
@@ -106,6 +107,7 @@ if os.geteuid() != 0:
                           "/usr/sbin",
                           "/usr/etc",
                           "/usr/include",
+                          "/usr/lib",
                           "/usr/libexec",
                           "/usr/share/misc",
                           "/usr/share/man/man1",
