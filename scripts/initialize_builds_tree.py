@@ -108,6 +108,7 @@ if os.geteuid() != 0:
                           "/usr/include/sys",
                           "/usr/libexec",
                           "/usr/lib/pkgconfig",
+                          "/usr/lib/udev/rules.d/",
                           "/usr/share/misc",
                           "/usr/share/man/man1",
                           "/usr/share/man/man2",
