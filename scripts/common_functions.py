@@ -180,7 +180,7 @@ def download(url: str, filename: str) -> None:
         # Some servers cannot/will not return a content-length header
         # resulting in a 406 error
         except requests.exceptions.HTTPError as e:
-            yellow(e)
+            yellow(str(e))
             print("Attempting basic download")
             # remove the zero-length file written by requests
             os.remove(filename)
@@ -339,7 +339,7 @@ def clean_tree(directory_path: str, args: argparse.Namespace) -> int:
                 shutil.rmtree(work_path)  # Delete the 'work' directory and its contents
                 if args.verbose:
                     print(f"Deleted: {work_path}")
-                    num_cleaned += 1
+                num_cleaned += 1
             except Exception as e:
                 print(f"Error deleting {work_path}: {e}")
     return num_cleaned
