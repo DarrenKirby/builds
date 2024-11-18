@@ -67,7 +67,7 @@ if os.geteuid() != 0:
 
     print("OK.")
     print(f"So you want to keep build root as ", end="")
-    cf.print_bold(f"{BUILDS_ROOT}?")
+    cf.print_bold(f"{BUILDS_ROOT}?\n")
     if input(">>> ") in ['n', 'N', 'no', 'No']:
         sys.exit(1)
 
@@ -108,6 +108,8 @@ if os.geteuid() != 0:
                           "/usr/include",
                           "/usr/libexec",
                           "/usr/lib",
+                          "/usr/lib/pkgconfig",
+                          "/usr/share/misc",
                           "/usr/share/man/man1",
                           "/usr/share/man/man2",
                           "/usr/share/man/man3",
