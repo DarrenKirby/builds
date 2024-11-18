@@ -37,7 +37,7 @@ def install(self):
 
     self.inst_binary(f"{self.p['_b']}/zstd", f"{self.p['ub']}")
     self.inst_script(f"{self.p['_b']}/zstdgrep", f"{self.p['ub']}")
-    self.inst_script(f"{self.p['_b']}/zsrdless", f"{self.p['ub']}")
+    self.inst_script(f"{self.p['_b']}/zstdless", f"{self.p['ub']}")
 
     self.inst_symlink(f"{self.p['ub']}/zstd", f"{self.p['ub']}/unzstd")
     self.inst_symlink(f"{self.p['ub']}/zstd", f"{self.p['ub']}/zstdcat")

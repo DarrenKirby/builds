@@ -39,7 +39,7 @@ def install(self):
     self.inst_symlink(f"{self.p['ul']}/libhandle.so.1.0.3", f"{self.p['ul']}/libhandle.so.1")
 
     for file in os.listdir(self.p['_s']):
-        self.inst_binary(f"{self.p['_s']}/{file}", self.p['us'])
+        self.inst_script(f"{self.p['_s']}/{file}", self.p['us'])
 
     self.inst_manpage(f"{self.p['_man5']}/projects.5", self.p['man5'])
     self.inst_manpage(f"{self.p['_man5']}/projid.5", self.p['man5'])
@@ -52,3 +52,7 @@ def install(self):
 
     # Install xfs.rules to /usr/lib/udev/rules.d
     self.inst_file(f"{self.p['_ul']}/udev/rules.d/64-xfs.rules", f"{self.p['ul']}/udev/rules.d/64-xfs.rules")
+
+    # Strip the binaries
+    for file in ["mkfs.xfs", "xfs_repair"]:
+        os.system(f"strip -v {self.p['us']}/{file}")
