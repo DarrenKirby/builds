@@ -27,6 +27,7 @@ import sys
 import os
 import csv
 import dbm
+import shutil
 import logging as log
 import urllib.request as request
 from urllib.error import URLError
@@ -324,3 +325,21 @@ def add_to_install_file(name: str, version: str) -> int:
             return 0
     except IOError:
         return 1
+
+
+def clean_tree(directory_path: str, args: argparse.Namespace) -> int:
+    """
+    Recursively search for and delete subdirectories named 'work' in the given directory path.
+    """
+    num_cleaned = 0
+    for root, dirs, files in os.walk(directory_path, topdown=False):
+        if 'work' in dirs:
+            work_path = os.path.join(root, 'work')
+            try:
+                shutil.rmtree(work_path)  # Delete the 'work' directory and its contents
+                if args.verbose:
+                    print(f"Deleted: {work_path}")
+                    num_cleaned += 1
+            except Exception as e:
+                print(f"Error deleting {work_path}: {e}")
+    return num_cleaned
