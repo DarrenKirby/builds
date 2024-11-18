@@ -105,9 +105,8 @@ if os.geteuid() != 0:
         for directory in ["/usr/bin",
                           "/usr/sbin",
                           "/usr/etc",
-                          "/usr/include",
+                          "/usr/include/sys",
                           "/usr/libexec",
-                          "/usr/lib",
                           "/usr/lib/pkgconfig",
                           "/usr/share/misc",
                           "/usr/share/man/man1",
@@ -176,25 +175,27 @@ HEADER = f"""
 
 """
 
+clobber = True
 if os.path.isfile(CONF_PATH):
     print(f"{CONF_PATH} exists...")
     if input(">>> overwrite? (y/n) ") in ['n', 'N', 'no', 'No']:
-        sys.exit(1)
+        clobber = False
 
-print(f"Writing {CONF_PATH}...")
-print("Please check default values, and edit as necessary")
-print("Leave 'install_root=' for system-wide installs.")
-print()
-with open(CONF_PATH, 'w', encoding="utf-8") as conf_file:
-    conf_file.write(HEADER)
-    conf_file.write(f"builds_root={BUILDS_ROOT}\n")
-    conf_file.write(f'install_root={INSTALL_ROOT}\n')
-    conf_file.write(f"distfiles={BUILDS_ROOT}/distfiles\n")
-    conf_file.write(f"log_file={LOG_PATH}\n")
-    conf_file.write(f"db_file={BUILDS_ROOT}/scripts/builds-stable\n")
-    conf_file.write("color=True\n")
-    conf_file.write(f"user={USER}\n")
-    conf_file.write(f"group={GRP}\n")
+if clobber:
+    print(f"Writing {CONF_PATH}...")
+    print("Please check default values, and edit as necessary")
+    print("Leave 'install_root=' for system-wide installs.")
+    print()
+    with open(CONF_PATH, 'w', encoding="utf-8") as conf_file:
+        conf_file.write(HEADER)
+        conf_file.write(f"builds_root={BUILDS_ROOT}\n")
+        conf_file.write(f'install_root={INSTALL_ROOT}\n')
+        conf_file.write(f"distfiles={BUILDS_ROOT}/distfiles\n")
+        conf_file.write(f"log_file={LOG_PATH}\n")
+        conf_file.write(f"db_file={BUILDS_ROOT}/scripts/builds-stable\n")
+        conf_file.write("color=True\n")
+        conf_file.write(f"user={USER}\n")
+        conf_file.write(f"group={GRP}\n")
 
 if not os.path.exists(f"{BUILDS_ROOT}/distfiles"):
     os.mkdir(f"{BUILDS_ROOT}/distfiles")
