@@ -62,6 +62,9 @@ def install(self):
 
     os.rename(f"{self.p['_man1']}/chroot.1", f"{self.p['_man1']}/chroot.8")
     self.inst_manpage(f"{self.p['_man1']}/chroot.8", self.p['man8'])
+    # We need to remove chroot.8.bz2 or bzip2 will fail
+    # trying to compress it again in the second inst_manpage() call
+    os.remove(f"{self.p['_man1']}/chroot.8.bz2")
 
     for file in os.listdir(self.p['_ub']):
         self.inst_binary(f"{self.p['_ub']}/{file}", self.p['ub'])

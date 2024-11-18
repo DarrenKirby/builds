@@ -36,7 +36,8 @@ def make_install(self):
 def install(self):
     self.inst_binary(f"{self.p['_ub']}/find", self.p['ub'])
     self.inst_binary(f"{self.p['_ub']}/locate", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/updatedb", self.p['ub'])
+    # strip fails on updatedb
+    self.inst_script(f"{self.p['_ub']}/updatedb", self.p['ub'])
     self.inst_binary(f"{self.p['_ub']}/xargs", self.p['ub'])
 
     self.inst_binary(f"{self.p['_ule']}/frcode", self.p['ule'])

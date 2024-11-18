@@ -43,7 +43,7 @@ def install(self):
     self.inst_header(f"{self.p['_ui']}/urcu-pointer.h", self.p['ui'])
     self.inst_header(f"{self.p['_ui']}/urcu-qsbr.h", self.p['ui'])
     self.inst_header(f"{self.p['_ui']}/urcu.h", self.p['ui'])
-    self.inst_directory(f"{self.p['_ui']}/include/urcu/", f"{self.p['ui']}/urcu/")
+    self.inst_directory(f"{self.p['_ui']}/urcu/", f"{self.p['ui']}/urcu/")
 
     self.inst_library(f"{self.p['_ul']}/liburcu-bp.so.8.1.0", self.p['ul'])
     self.inst_symlink(f"{self.p['ul']}/liburcu-bp.so.8.1.0", f"{self.p['ul']}/liburcu-bp.so")

@@ -50,4 +50,4 @@ def install(self):
     self.inst_file(f"{self.p['_ul']}/pkgconfig/readline.pc", f"{self.p['ul']}/pkgconfig/")
 
     self.inst_manpage(f"{self.p['_man3']}/history.3", self.p['man3'])
-    self.inst_manpage(f"{self.p['_man3']}/readlines.3", self.p['man3'])
+    self.inst_manpage(f"{self.p['_man3']}/readline.3", self.p['man3'])

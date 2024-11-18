@@ -33,7 +33,7 @@ def make_install(self):
 
 def install(self):
     for file in glob.glob(f"{self.p['_ui']}/*.h"):
-        self.inst_header(f"{self.p['_ui']}/{file}", self.p['ui'])
+        self.inst_header(file, self.p['ui'])
 
     self.inst_directory(f"{self.p['_ui']}/unistring/", f"{self.p['ui']}/unistring/")
 

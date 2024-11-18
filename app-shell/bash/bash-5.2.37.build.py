@@ -42,15 +42,5 @@ def install(self):
     # builtins
     self.inst_directory(f"{self.p['_ul']}/bash/", f"{self.p['ul']}/bash/")
 
-    self.inst_manpage(f"{self.p['_man1']}/share/man/man1/bash.1", self.p['man1'])
-    self.inst_manpage(f"{self.p['_man1']}/share/man/man1/bashbug.1", self.p['man1'])
-
-
-def cleanup_posthook(self):
-    print()
-    cf.yellow("Make /bin/sh link to /usr/bin/bash ? (y/n)")
-    if input(">>> ") not in ['n', 'N', 'No', 'no']:
-        self.inst_symlink("/usr/bin/bash", "/bin/sh")
-    cf.bold("Run...")
-    print("\texec /usr/bin/bash --login")
-    cf.bold("...to load new bash shell immediatly")
+    self.inst_manpage(f"{self.p['_man1']}/bash.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/bashbug.1", self.p['man1'])

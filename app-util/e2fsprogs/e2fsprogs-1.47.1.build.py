@@ -44,8 +44,8 @@ def install(self):
     self.inst_binary(f"{self.p['_ub']}/chattr", self.p['ub'])
     self.inst_binary(f"{self.p['_ub']}/fuse2fs", self.p['ub'])
     self.inst_binary(f"{self.p['_ub']}/lsattr", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/compile_et", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/mk_cmds", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/compile_et", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/mk_cmds", self.p['ub'])
 
     for file in os.listdir(self.p['_us']):
         self.inst_binary(f"{self.p['_us']}/{file}", self.p['us'])

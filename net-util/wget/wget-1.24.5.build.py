@@ -23,7 +23,7 @@ def configure(self):
 
 
 def make(self):
-    return os.system(f"make {cf.config['make_opts']}")
+    return os.system(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):

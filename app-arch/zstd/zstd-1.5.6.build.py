@@ -28,7 +28,7 @@ def make_install(self):
 
 def install(self):
     self.inst_library(f"{self.p['_l']}/libzstd.so.1.5.6", self.p['ul'])
-    self.inst_symlink(f"{self.p['_l']}/libzstd.so.1.5.6", f"{self.p['ul']}/libzstd.so")
+    self.inst_symlink(f"{self.p['l']}/libzstd.so.1.5.6", f"{self.p['ul']}/libzstd.so")
     self.inst_symlink(f"{self.p['l']}/libzstd.so.1.5.6", f"{self.p['ul']}/libzstd.so.1")
 
     self.inst_header(f"{self.p['_i']}/zdict.h", self.p['ui'])

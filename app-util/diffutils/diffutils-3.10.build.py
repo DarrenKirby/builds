@@ -31,10 +31,10 @@ def make_install(self):
 
 
 def install(self):
-    self.inst_binary(f"{self.p['_ub']}/bin/cmp", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/bin/diff", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/bin/diff3", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/bin/sdiff", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/cmp", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/diff", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/diff3", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/sdiff", self.p['ub'])
 
     self.inst_manpage(f"{self.p['_man1']}/cmp.1", self.p['man1'])
     self.inst_manpage(f"{self.p['_man1']}/diff.1", self.p['man1'])
