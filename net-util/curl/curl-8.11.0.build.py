@@ -39,7 +39,7 @@ def make_install(self):
 
 def install(self):
     self.inst_binary(f"{self.p['_ub']}/curl", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/curl-config", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/curl-config", self.p['ub'])
 
     self.inst_directory(f"{self.p['_ui']}/curl/", f"{self.p['ui']}/curl/")
 

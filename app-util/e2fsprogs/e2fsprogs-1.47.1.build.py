@@ -74,7 +74,8 @@ def install(self):
     self.inst_symlink(f"{self.p['ul']}/libss.so.2.0", f"{self.p['ul']}/libss.so.2")
     self.inst_symlink(f"{self.p['ul']}/libss.so.2", f"{self.p['ul']}/libss.so")
 
-    self.inst_config(f"{self.seg_dir}/etc/mke2fs.conf", self.p['e'])
+    self.inst_config(f"{self.p['_ue']}/mke2fs.conf", self.p['ue'])
+    self.inst_config(f"{self.p['_ue']}/e2scrub.conf", self.p['ue'])
 
     for file in os.listdir(self.p['_man1']):
         self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
