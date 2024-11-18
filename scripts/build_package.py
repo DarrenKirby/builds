@@ -441,6 +441,7 @@ class BuildPackage(FileInstaller):
                 cf.red("`make install` failed")
                 cf.log.critical(f"build failure: make of {self.name}  {self.version} failed")
                 sys.exit(13)
+            print()
 
     def inst(self) -> None:
         """
@@ -449,6 +450,7 @@ class BuildPackage(FileInstaller):
         make_install() MUST be defined in the package.build.py file.
         """
         if hasattr(self, 'install'):
+            cf.green("Installing components into live filesystem...")
             self.install()
         else:
             cf.red(f"{self.build_file} has no 'install()' method defined")
