@@ -47,8 +47,9 @@ def install(self):
     self.inst_script(f"{self.p['_ub']}/compile_et", self.p['ub'])
     self.inst_script(f"{self.p['_ub']}/mk_cmds", self.p['ub'])
 
+    # Rather than pick through them, we'll skip stripping and do it after
     for file in os.listdir(self.p['_us']):
-        self.inst_binary(f"{self.p['_us']}/{file}", self.p['us'])
+        self.inst_script(f"{self.p['_us']}/{file}", self.p['us'])
 
     for file in os.listdir(f"{self.p['_ul']}/udev/rules.d/"):
         self.inst_file(f"{self.p['_ul']}/udev/rules.d/{file}", f"{self.p['ul']}/udev/rules.d/")
@@ -83,3 +84,21 @@ def install(self):
 
     for file in os.listdir(self.p['_man8']):
         self.inst_manpage(f"{self.p['_man8']}/{file}", self.p['man8'])
+
+    for file in ["badblocks",
+                 "debugfs",
+                 "dumpe2fs",
+                 "e2freefrag",
+                 "e2fsck",
+                 "e2image",
+                 "e2undo",
+                 "e4crypt",
+                 "e4defrag",
+                 "filefrag",
+                 "logsave",
+                 "mke2fs",
+                 "mklost+found",
+                 "resize2fs",
+                 "tune2fs"]:
+        os.system(f"strip {self.p['us']}/{file}")
+        print(f"stripping {self.p['us']}/{file}")

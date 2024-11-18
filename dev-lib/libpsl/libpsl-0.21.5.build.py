@@ -37,7 +37,7 @@ def make_install(self):
 
 def install(self):
     self.inst_binary(f"{self.p['_ub']}/psl", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/psl-make-dafsa", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/psl-make-dafsa", self.p['ub'])
 
     self.inst_header(f"{self.p['_ui']}/libpsl.h", self.p['ui'])
 

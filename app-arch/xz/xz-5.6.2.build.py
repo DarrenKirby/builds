@@ -64,5 +64,24 @@ def install(self):
     self.inst_symlink(f"{self.p['ub']}/xzless", f"{self.p['ub']}/lzless")
     self.inst_symlink(f"{self.p['ub']}/xzmore", f"{self.p['ub']}/lzmore")
 
-    for file in os.listdir(self.p['_man1']):
-        self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
+    # ignore the symlinks.
+    for file in glob.glob(f"{self.p['_man1']}.1"):
+        if os.path.isfile(file) and not os.path.islink(file):
+            self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
+    # now make the symlinks
+    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/.1")
+    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/.1")
+    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/.1")
+    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/.1")
+    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/.1")
+    self.inst_symlink(f"{self.p['man1']}/xzdec.1.bz2", f"{self.p['man1']}/lzmadec.1")
+    self.inst_symlink(f"{self.p['man1']}/xzdiff.1.bz2", f"{self.p['man1']}/lzcmp.1")
+    self.inst_symlink(f"{self.p['man1']}/xzdiff.1.bz2", f"{self.p['man1']}/lzdiff.1")
+    self.inst_symlink(f"{self.p['man1']}/xzdiff.1.bz2", f"{self.p['man1']}/xzcmp.1")
+    self.inst_symlink(f"{self.p['man1']}/xzgrep.1.bz2", f"{self.p['man1']}/lzegrep.1")
+    self.inst_symlink(f"{self.p['man1']}/xzgrep.1.bz2", f"{self.p['man1']}/lzfgrep.1")
+    self.inst_symlink(f"{self.p['man1']}/xzgrep.1.bz2", f"{self.p['man1']}/lzgrep.1")
+    self.inst_symlink(f"{self.p['man1']}/xzgrep.1.bz2", f"{self.p['man1']}/xzegrep.1")
+    self.inst_symlink(f"{self.p['man1']}/xzgrep.1.bz2", f"{self.p['man1']}/xzfgrep.1")
+    self.inst_symlink(f"{self.p['man1']}/xzless.1.bz2", f"{self.p['man1']}/lzless.1")
+    self.inst_symlink(f"{self.p['man1']}/xzmore.1.bz2", f"{self.p['man1']}/lzmore.1")

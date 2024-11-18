@@ -65,4 +65,4 @@ def install(self):
     self.inst_symlink(f"{self.p['man1']}/vim.1.bz2", f"{self.p['man1']}/view.1")
     self.inst_symlink(f"{self.p['man1']}/vim.1.bz2", f"{self.p['man1']}/vi.1")
 
-    self.inst_directory(f"{self.seg_dir}/share/vim/", f"{self.p['ush']}/vim/")
+    self.inst_directory(f"{self.p['_ush']}/vim/", f"{self.p['ush']}/vim/")
