@@ -6,3 +6,6 @@ builds.log
 scripts/builds-stable
 .idea
 *.manifest
+sets/*
+*.csv
+!scripts/builds-stable.csv
