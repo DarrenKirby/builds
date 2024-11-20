@@ -91,7 +91,7 @@ def yellow(msg: str) -> None:
 
 
 def print_yellow(msg: str) -> None:
-    """Print yellow text with no newline """
+    """Print yellow text with no newline """  # Delete the file or symbolic link
     msg = colorize("yellow", msg)
     print(msg, end='')
 
@@ -139,6 +139,11 @@ def download(url: str, filename: str) -> None:
 
     This requires requests and tqdm
     """
+    bold(f"Fetching {filename}...")
+
+    if os.path.exists(filename):
+        bold(f"...{filename} already downloaded.")
+        return
 
     # requests doesn't do FTP
     if url[0:4] == "ftp:":
@@ -268,7 +273,7 @@ def do_initdb(args: argparse.Namespace) -> None:
 
 def get_manifest(manifest_file: str) -> list:
     """
-    Open the build file and retrieve file manifest
+    READ the MANIFEST file and return a list of installed files
     """
     manifest = []
     with open(manifest_file, 'r', encoding='utf-8') as f:
@@ -315,7 +320,7 @@ def get_installed_version(package: str) -> list:
     return [None]
 
 
-def add_to_install_file(name: str, version: str) -> int:
+def add_to_installed(name: str, version: str) -> int:
     """
     Add a newly installed package to the 'installed' file
     """
@@ -325,6 +330,21 @@ def add_to_install_file(name: str, version: str) -> int:
             return 0
     except IOError:
         return 1
+
+
+def delete_from_installed(pkg: str):
+    """
+    Deletes a package from the 'installed' file.
+    """
+    file_path = f"{config['builds_root']}/sets/installed"
+
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    updated_lines = [line for line in lines if not line.startswith(pkg)]
+
+    with open(file_path, 'w') as file:
+        file.writelines(updated_lines)
 
 
 def clean_tree(directory_path: str, args: argparse.Namespace) -> int:
