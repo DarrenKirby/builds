@@ -25,8 +25,8 @@ def configure(self):
                      "-D archlib=/usr/lib/perl5/5.40/core_perl "
                      "-D sitelib=/usr/lib/perl5/5.40/site_perl "
                      "-D sitearch=/usr/lib/perl5/5.40/site_perl "
-                     "-D vendorlib=/usr/lib/perl5/5.40/vendor_perl "
-                     "-D vendorarch=/usr/lib/perl5/5.40/vendor_perl "
+                     "-D vendorlib=/usr/lib/perl5/vendor_perl "
+                     "-D vendorarch=/usr/lib/perl5/vendor_perl "
                      "-D man1dir=/usr/share/man/man1 "
                      "-D man3dir=/usr/share/man/man3 "
                      "-D pager='/usr/bin/less -isR' "
@@ -51,7 +51,10 @@ def install(self):
     self.inst_directory(f"{self.p['_ul']}/perl5/", f"{self.p['ul']}/perl5/")
 
     for file in os.listdir(self.p['_man1']):
-        self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
+        # hardlink to perlthanks.1
+        if file not in ['perlbug.1']:
+            self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
+    self.inst_symlink(f"{self.p['man1']}/perlthanks.1.bz2", f"{self.p['man1']}/perlbug.1")
 
     for file in os.listdir(self.p['_man3']):
         self.inst_manpage(f"{self.p['_man3']}/{file}", self.p['man3'])
