@@ -222,8 +222,19 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
-                # os.rename fails if intermediate directories do not exist.
-                os.makedirs(dst, exist_ok=True)
+                # os.rename fails if destdir is not empty
+                if os.path.exists(dst):
+                    # Check if the directory is populated with files or subdirectories
+                    if any(os.scandir(dst)):  # True if directory is not empty
+                        for item in os.scandir(dst):
+                            item_path = os.path.join(dst, item.name)
+                            if item.is_file() or item.is_symlink():
+                                os.unlink(item_path)
+                            elif item.is_dir():
+                                rmtree(item_path)
+                else:
+                    # os.rename fails if intermediate directories do not exist.
+                    os.makedirs(dst, exist_ok=True)
                 os.rename(src, dst)
             except OSError as e:
                 cf.red("Call to inst_directory() failed: ")
@@ -348,13 +359,13 @@ class BuildPackage(FileInstaller):
         if hasattr(self, 'fetch_prehook'):
             self.fetch_prehook()
 
-        cf.bold(f"Fetching {self.package}...")
+        #cf.bold(f"Fetching {self.package}...")
 
-        if exists(self.package):
-            cf.bold(f"...{self.package} already downloaded.")
-        else:
-            cf.bold(f"Fetching {self.package}")
-            cf.download(self.src_url, self.package)
+        #if exists(self.package):
+        #    cf.bold(f"...{self.package} already downloaded.")
+        #else:
+        #    cf.bold(f"Fetching {self.package}")
+        cf.download(self.src_url, self.package)
 
         cf.bold("Checking sha256sum...")
 
