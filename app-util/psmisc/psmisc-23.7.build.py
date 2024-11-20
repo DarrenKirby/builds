@@ -38,7 +38,7 @@ def install(self):
     self.inst_binary(f"{self.p['_ub']}/pslog", self.p['ub'])
     self.inst_binary(f"{self.p['_ub']}/pstree", self.p['ub'])
 
-    self.inst_symlink(f"{self.p['_ub']}/pstree", f"{self.p['ub']}/pstree.x11")
+    self.inst_symlink(f"{self.p['ub']}/pstree", f"{self.p['ub']}/pstree.x11")
 
     self.inst_manpage(f"{self.p['_man1']}/fuser.1", self.p['man1'])
     self.inst_manpage(f"{self.p['_man1']}/killall.1", self.p['man1'])

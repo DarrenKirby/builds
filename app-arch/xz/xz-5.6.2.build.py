@@ -65,7 +65,7 @@ def install(self):
     self.inst_symlink(f"{self.p['ub']}/xzmore", f"{self.p['ub']}/lzmore")
 
     # ignore the symlinks.
-    for file in glob.glob(f"{self.p['_man1']}.1"):
+    for file in glob.glob(f"{self.p['_man1']}/*.1"):
         if os.path.isfile(file) and not os.path.islink(file):
             self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
     # now make the symlinks
