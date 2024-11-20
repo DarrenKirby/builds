@@ -172,8 +172,10 @@ def do_main() -> None:
             sys.exit(1)
 
     for build in builds_to_build:
+        already_installed = False
         check = cf.get_installed_version(build[0])
         if check != [None] and build[1] == check[1]:
+            already_installed = True
             cf.yellow(f"{build[0]} version {build[1]} already installed!")
             print("Install again? ")
             if input(">>> ") in ['n', 'N']:
@@ -207,8 +209,9 @@ def do_main() -> None:
 
         print()
         cf.green(f"Recording {build[0]} {build[1]} in 'sets/installed'...")
-        if cf.add_to_install_file(build[0], build[1]) == 0:
-            print(">>> ...done!")
+        if not already_installed:
+            cf.add_to_installed(build[0], build[1])
+        print(">>> ...done!")
 
         finish_time = datetime.datetime.now()
         elapsed = finish_time - start_time
@@ -234,9 +237,9 @@ def do_uninstall(args: argparse.Namespace) -> None:
     for pkg in args.pkg_atom:
         pkg_info = cf.get_installed_version(pkg)
         c, n = pkg_info[0].split('/')
-        build_file = f"{config['builds_root']}/{c}/{n}/{n}-{pkg_info[1]}.manifest"
+        manifest_file = f"{config['builds_root']}/{c}/{n}/{n}-{pkg_info[1]}.manifest"
 
-        files_to_uninstall = cf.get_manifest(build_file)
+        files_to_uninstall = cf.get_manifest(manifest_file)
         files_to_uninstall.sort()
         if files_to_uninstall == [None]:
             continue
@@ -248,11 +251,16 @@ def do_uninstall(args: argparse.Namespace) -> None:
             print()
 
         if args.ask:
-            print(f"Uninstall package {pkg}? (y/n)")
-            if input() in ['n', 'N', 'no', 'No']:
+            print(f"Uninstall package {pkg}? (y/n/quit) ")
+            choice = input(">>> ")
+            if choice in ['n', 'N', 'no', 'No']:
                 cf.yellow(f"skipping uninstall of {pkg}")
-                # or should this be 'sys.exit()'?
                 continue
+            elif choice in ['q', 'quit', 'Quit']:
+                sys.exit(1)
+
+        # Looks like we really want to delete it...
+
 
 
 def show_usage() -> None:
@@ -276,12 +284,13 @@ Usage: {APPNAME} [general options] command [command options] arg [arg2...]
         '-n'   or '--nocolor'               disable color output
         '-V'   or '--version'               print version information and exit
 
-    install/uninstall Options:
+    install/uninstall/update Options:
         '-f'   or '--fetch'                 download packages but do not install
-        '-p'   or '--pretend'               show which packages would be built then exit
+        '-p'   or '--pretend'               show which packages would be built/deleted then exit
         '-a'   or '--ask'                   prompt before installing/uninstalling package(s)
-        '-d'   or '--dontclean'             don't delete the package source tree after installation
+        '-d'   or '--dontclean'             don't delete the package 'work' tree after installation
         '-t'   or '--test'                  build source but do not install to live filesystem
+        '-b'   or '--backup'                backup installed files to '<cat>/<pkg>/backup' before uninstalling
         
     search Options:
         '-n'   or '--nameonly'              only search package names for match, skip descriptions
