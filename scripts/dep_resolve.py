@@ -167,7 +167,6 @@ def resolve_dependencies(args: argparse.Namespace) -> list[tuple]:
         except KeyError:
             cf.red(f"{pkg} is not a valid package atom.")
             print(f"Try 'bld search {pkg}'")
-            log.error(f"build failure: {pkg} is not a valid package atom")
             sys.exit(2)
         version_dict[name] = version
         dep_graph[name] = get_deps(f"{config['builds_root']}/{name}/{name.split('/')[-1]}-{version}.build.py")
