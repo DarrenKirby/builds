@@ -1,31 +1,31 @@
 ## *builds*
 
 *builds* is a lightweight and simple package management tool for installing, managing, and updating software, typically,
-but not neccessarily, from source code. It is superficially similar to *ports* from FreeBSD, and *portage* from Gentoo.
-Similarily to both, *builds* uses backend scripts which specify how to build and install packages. Unlike *ports*,
-builds has a unified front-end which accepts various commands to build and install the software. Unlike *portage*,
-*builds* uses pure-python for its scripts, rather than shell scripting. Unlike both, there is no central repository of
+from source code. It is superficially similar to *ports* from FreeBSD, and *portage* from Gentoo.
+Similarily to both, *builds* uses backend scripts which specify how to build and install packages. Unlike both,
+there is no central 'official' repository of
 scripts or packages. While I have created a modest library of scripts which are distributed with the platform, *builds*
-should be thought of as a collection of recipes for building software of interest to a particular user. If a particular
-build script does not yet exist, it is relatively easy for anyone to create their own, even without knowledge of Python.
+should be thought of as a kitchen, in which you create and test your own recipes. If a particular
+build script does not yet exist, it is relatively easy for anyone to create their own, even with a minimum of Python
+knowledge.
 
 I originally created *builds* to take care of updating and installing software in a
 new [Linux From Scratch](https://www.linuxfromscratch.org/) system installation of my own. That said, I have designed
 *builds* to be portable, and the front-end should work just fine on any unixish system that supports Python 3.6 or
 better. It is only the per-package build scripts that would need to be customized for each system, and for personal
-preferences.
+preferences. *builds* is pure-Python, and uses only two non-standard library
+modules: [requests](https://pypi.org/project/requests/)
+to download packages, and [tqdm](https://pypi.org/project/tqdm/) for a nice download progress bar.
 
 Although it is theroretically possible, I have not designed *builds* to take the place of a proper, operating
-system-wide
-package management
-system. Rather than managing all software for a particular system, *builds* is best suited to managing a specific subset
-of
+system-wide package management system. Rather than managing all software for a particular system, *builds* is best
+suited to managing a specific subset of
 packages, collected for a specific purpose. For example, collectively managing all the packages required for a Python
 data-science ecosystem. Or perhaps for managing a development/testing environment for some custom software and its
 dependancies. Maybe you like having the bleeding-edge versions of a few packages and your OS delivers stable packages
 from a few versions back.
 
-There are two different, and (presently) incompatible methods for installing *builds*:
+There are two different methods for installing *builds*:
 
 The first is a system-wide install, which will install all software to the usual locations in the live filesystem. This
 type of install will therefore require root, or otherwise priveliged access to the system.
@@ -34,6 +34,9 @@ The second method is a segregated user install. This method will install the sof
 directory of the user's choosing, presumably, somewhere within their home directory. This does not require priveliged
 access.
 
+While it should be possible to have a single system-wide and multiple user installations of *builds* on the same
+system, I have not yet tested this.
+
 The foremost feature of *builds* is customization ability. While I have tried to stay close to best practices (POSIX,
 LSB, FHS etc..) in the build scripts provided, it is up to the user to modify and create their own scripts to build the
 software how they want, and install it where they want. I have tried as much as I can to not have *builds* force
@@ -41,7 +44,7 @@ unnecessary constraints on, well, anything really.
 
 ## How it works
 
-All available software is centrally managed in a DBM database file, which is generally created from a CSV file. This db
+All available software is centrally managed in a DBM database file, which is created from a CSV file. This db
 collects the package names, versions, categories, websites, download sites, and a short description of the package. The
 frontend is a collection of Python scripts, functions, and classes which use this db to determine which software, and
 which version(s) of said software are available to install.
@@ -101,22 +104,47 @@ You can search the available package database using `search`, and it will match 
 	  Description >>> C shell with file name completion and command line editing
 	     Homepage >>> https://www.tcsh.org/
 
+You can use `info` to get information about installed packages:
+
+    # bld info coreutils
+    bld version 0.4.0 (By far the best software available for turtle stacking)
+    
+    Current installed version of app-util/coreutils is 9.5
+    
+    Current database information:
+    Category/Name >>> app-util/coreutils
+          Version >>> 9.5
+      Description >>> These are the core utilities which are expected to exist on every operating system
+         Homepage >>> https://www.gnu.org/software/coreutils/
+    
+    Local builds information:
+    Build of coreutils 9.5 started on Mon, Nov 18, 2024 at 11:45AM
+    Build of coreutils 9.5 complete in 3 minutes, 6 seconds.
+    
+    Build of coreutils 9.5 started on Sun, Nov 17, 2024 at 05:45PM
+    Build of coreutils 9.5 complete in 3 minutes, 8 seconds.
+
 ## Installation
 
 The simplest method to install *builds* is to just `git clone` the builds tree into the location you want it to live in.
 For a system-wide install it is recommended (but not necessary) to use `/var/builds/`. For a user
 install, `/home/<user>/builds/` is appropriate. If `git` is not available on the target system, then you extract a
-tarball of the builds tree into the appropriate location.
+tarball of the builds tree into the appropriate location, then  use builds to install `git` to keep updated.
+
+    # To install...
+    # git clone https://github.com/DarrenKirby/builds.git
+
+    # To update (run from the top-level "builds" directory:
+    # git pull
 
 Once the tree is installed, you can `cd` into the `scripts` directory and run `initialize_builds_tree.py` like so:
 
 	# python initialize_builds_tree.py
 
 If you run this script as root, it will assume a system-wide installation. If you run it as a non-priveliged user, it
-will
-assume a user install. The script will write a configuration file (`/etc/builds.conf` for system-wide, `~/.builds.conf`
-for user) and initialize the database. You should take the time to inspect this file, and edit if necessary, before
-running any install commands.
+will assume a user install. The script will write a configuration file (`/etc/builds.conf` for system-wide,
+`~/.config/builds/builds.conf` for user) and initialize the database. It is important to run this script from inside
+`builds/scripts/`, as the script uses the $PWD to determine paths to write to the config file.
 
 ## Note on stability
 
