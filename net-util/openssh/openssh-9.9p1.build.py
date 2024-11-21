@@ -1,5 +1,5 @@
 #    net-util/openssh/openssh-9.9p1.build.py
-#    `date --utc`
+#    Thu Nov 21 02:50:28 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -33,5 +33,27 @@ def make(self):
 def make_install(self):
     return os.system(f"make DESTDIR={self.seg_dir} install")
 
-def install():
-    pass
+def install(self):
+    # Get all files in work/seg/usr/bin/, and install to /usr/bin/
+    for file in os.listdir(self.p['_ub']):
+        self.inst_script(f"{self.p['_ub']}/{file}", self.p['ub'])
+
+    # install sshd
+    self.inst_script(f"{self.p['_us']}/sshd", self.p['ub'])
+
+    # install helper programs to /usr/libexec
+    for file in os.listdir(self.p['_ule']):
+        self.inst_script(f"{self.p['_ule']}/{file}", self.p['ule'])
+
+    # install manpages
+    for file in os.listdir(self.p['_man1']):
+        self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
+
+    for file in os.listdir(self.p['_man5']):
+        self.inst_manpage(f"{self.p['_man5']}/{file}", self.p['man5'])
+
+    for file in os.listdir(self.p['_man8']):
+        self.inst_manpage(f"{self.p['_man8']}/{file}", self.p['man8'])
+
+    # install configuration files
+    self.inst_directory(self.p['_e'] + '/ssh/', self.p['e'] + '/ssh/')
