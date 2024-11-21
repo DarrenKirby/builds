@@ -31,9 +31,9 @@ def fetch_prehook(self):
 def install_source_posthook(self):
     os.chdir(self.package_dir)
     patchname = "coreutils-9.5-i18n-2.patch"
-    es = os.system(f"patch -Np1 -i {cf.config['builds_root']}/distfiles/{patchname}")
+    os.system(f"patch -Np1 -i {cf.config['builds_root']}/distfiles/{patchname}")
     os.chdir(self.work_dir)
-    return es
+
 
 
 def configure(self):
