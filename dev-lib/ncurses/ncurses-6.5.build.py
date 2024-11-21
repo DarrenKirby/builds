@@ -1,7 +1,5 @@
 #    dev-lib/ncurses/ncurses-6.5.build.py
 #    Thu Nov 21 16:55:06 UTC 2024
-import os
-
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -91,4 +89,22 @@ def install(self):
     for link in links_to_make:
         self.inst_symlink(f"{self.p['man1']}/{link[0]}", f"{self.p['man1']}/{link[1]}")
 
+    links_to_make = []
+    for file in glob.glob(f"{self.p['_man3']}/*"):
+        if os.path.islink(file):
+            links_to_make.append((os.readlink(file), file.split("/")[-1]))
+        else:
+            self.inst_manpage(file, self.p['man3'], compress=False)
+    for link in links_to_make:
+        self.inst_symlink(f"{self.p['man3']}/{link[0]}", f"{self.p['man3']}/{link[1]}")
 
+    for file in os.listdir(self.p['_man5']):
+        self.inst_script(f"{self.p['_man5']}/{file}", self.p['man5'])
+
+    for file in os.listdir(self.p['_man8']):
+        self.inst_script(f"{self.p['_man8']}/{file}", self.p['man8'])
+
+    # Trick some applications into linking against the wide-character libs
+    for lib in ["ncurses", "form", "panel", "menu"]:
+        self.inst_symlink(f"{self.p['ul']}/lib{lib}w.so", f"{self.p['ul']}/lib{lib}.so")
+        self.inst_symlink(f"{self.p['ul']}/pkgconfig/{lib}w.pc", f"{self.p['ul']}/pkgconfig/{lib}.pc")
