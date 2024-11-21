@@ -54,6 +54,11 @@ def get_config() -> dict:
     if 'makeopts' not in _config:
         _config['makeopts'] = '-j1'
 
+    if os.environ.get('TERM') == "xterm-256color":
+        config['xterm'] = True
+    else:
+        config['xterm'] = False
+
     return _config
 
 

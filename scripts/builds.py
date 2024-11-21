@@ -25,6 +25,7 @@ import argparse
 import datetime
 import sys
 import logging as log
+import os
 
 import common_functions as cf
 import build_package
@@ -192,6 +193,11 @@ def do_main() -> None:
         cf.print_green(str(n_builds))
         cf.print_bold(f" {build[0]}\n")
         print()
+
+        # xterm titlebar
+        if config['xterm']:
+            os.system(f'echo -e "\033]0; build {this_build} of {n_builds}: {build[0]}\a"')
+
         this_build += 1
 
         bld = build_package.BuildPackage(build[0], args)
