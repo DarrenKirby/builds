@@ -359,12 +359,6 @@ class BuildPackage(FileInstaller):
         if hasattr(self, 'fetch_prehook'):
             self.fetch_prehook()
 
-        #cf.bold(f"Fetching {self.package}...")
-
-        #if exists(self.package):
-        #    cf.bold(f"...{self.package} already downloaded.")
-        #else:
-        #    cf.bold(f"Fetching {self.package}")
         cf.download(self.src_url, self.package)
 
         cf.bold("Checking sha256sum...")
