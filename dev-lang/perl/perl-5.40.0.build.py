@@ -51,7 +51,7 @@ def install(self):
     self.inst_directory(f"{self.p['_ul']}/perl5/", f"{self.p['ul']}/perl5/")
 
     for file in os.listdir(self.p['_man1']):
-        # hardlink perlbug.1 -> perlthanks.1
+        # perlbug.1 <-hardlink-> perlthanks.1
         if file not in ['perlbug.1', "perlthanks.1"]:
             self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
     self.inst_manpage(f"{self.p['man1']}/perlthanks.1", self.p['man1'], compress=False)
