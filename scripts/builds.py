@@ -204,10 +204,8 @@ def do_main() -> None:
         bld.configure_src()
         bld.make_src()
         bld.make_inst()
-        if not args.test:
-            bld.inst()
-        if not args.dontclean:
-            bld.cleanup()
+        bld.inst()
+        bld.cleanup()
 
         print()
         if not args.test:
