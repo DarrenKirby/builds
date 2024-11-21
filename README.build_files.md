@@ -271,3 +271,247 @@ running:
 
 If this runs without error, go and inspect the files installed under `./seg/`. This will give you an idea what files
 you need to install, and where they should be installed for the next step.
+
+## install()
+
+This is the penultimate step which installs the build files into your live filesystem. This is the only function that
+is required to be defined in a build file. The class `FileInstaller`, defined in `build_package.py` creates a dictionary
+of useful file paths, and defines nine functions which install files and directories. It is very import to use these
+functions, as they keep track of which files they have installed, and where they have put them. These paths are 
+then written to a manifest file which will be located at `builds/net-util/openssh/openssh-9.9p1.manifest` for our
+example. While it is certainly possible to define any valid Python code to put any file wherever you want, within 
+this function, if the files are not wrangled through these functions they will not be placed in the manifest, and `bld`
+will not know they are installed if you later decide to uninstall or update the package. This may result in orphaned
+files, or other hard to track down breakages. If you decide to do this, you are on your own. Fair warning...
+
+### Defined file paths
+
+As mentioned, there is a dictionary instance variable available to this (and other) functions that make dealing with
+paths easier:
+
+      self.p = {
+
+            'b': f"{ir}/bin",
+            's': f"{ir}/sbin",
+            'l': f"{ir}/lib",
+            'e': f"{ir}/etc",
+            'i': f"{ir}/include",
+            'ub': f"{ir}/usr/bin",
+            'ue': f"{ir}/usr/etc",
+            'us': f"{ir}/usr/sbin",
+            'ui': f"{ir}/usr/include",
+            'ul': f"{ir}/usr/lib",
+            'ule': f"{ir}/usr/libexec",
+            'ulb': f"{ir}/usr/local/bin",
+            'uls': f"{ir}/usr/local/sbin",
+            'uli': f"{ir}/usr/local/include",
+            'ull': f"{ir}/usr/local/lib",
+            'ush': f"{ir}/usr/share",
+            'man1': f"{ir}/usr/share/man/man1",
+            'man2': f"{ir}/usr/share/man/man2",
+            'man3': f"{ir}/usr/share/man/man3",
+            'man4': f"{ir}/usr/share/man/man4",
+            'man5': f"{ir}/usr/share/man/man5",
+            'man6': f"{ir}/usr/share/man/man6",
+            'man7': f"{ir}/usr/share/man/man7",
+            'man8': f"{ir}/usr/share/man/man8",
+
+            '_b': self.seg + "/bin",
+            '_s': self.seg + "/sbin",
+            '_l': self.seg + "/lib",
+            '_e': self.seg + "/etc",
+            '_i': self.seg + "/include",
+            '_ub': self.seg + "/usr/bin",
+            '_ue': self.seg + "/usr/etc",
+            '_us': self.seg + "/usr/sbin",
+            '_ui': self.seg + "/usr/include",
+            '_ul': self.seg + "/usr/lib",
+            '_ule': self.seg + "/usr/libexec",
+            '_ulb': self.seg + "/usr/local/bin",
+            '_uls': self.seg + "/usr/local/sbin",
+            '_uli': self.seg + "/usr/local/include",
+            '_ull': self.seg + "/usr/local/lib",
+            '_ush': self.seg + "/usr/share",
+            '_man1': self.seg + "/usr/share/man/man1",
+            '_man2': self.seg + "/usr/share/man/man2",
+            '_man3': self.seg + "/usr/share/man/man3",
+            '_man4': self.seg + "/usr/share/man/man4",
+            '_man5': self.seg + "/usr/share/man/man5",
+            '_man6': self.seg + "/usr/share/man/man6",
+            '_man7': self.seg + "/usr/share/man/man7",
+            '_man8': self.seg + "/usr/share/man/man8"
+        }
+
+The first group are paths in the live filesystem, in which to install files. `{ir}` is defined as the `install_root`
+read from the configuration file, which is set up during the installation of builds. For a system-wide install it is
+simply an empty string, which means the paths resolve from the `/` (root) directory. For a default user install, this
+will be the user's home directory, thus, assuming a --prefix of /usr in the configure step, files will be installed
+under `/home/<user>/usr/`. 
+
+The second group of paths, which are identical but for the underscore, are paths which lead to files installed under
+the segregated directory. These paths may, but don't have to be, used as path arguments to the nine installation 
+functions, which are enumerated now:
+
+`self.inst_binary(frm: str, to: str)` - for installing binaries
+`self.inst_script(frm: str, to: str)` - for installing scripts and other executable text files
+`self.inst_library(frm: str, to: str)` - for installing library files
+`self.inst_header(frm: str, to: str)` - for installing header files
+`self.inst_manpage(frm: str, to: str, compress: bool = True)`- for installing manpages
+`self.inst_symlink(target: str, name: str)` - for creating symlinks
+`self.inst_config(frm: str, to: str` - for installing configuration files
+`self.inst_directory(frm: str, to: str)` - for recursively installing entire directories
+`self.inst_file(frm: str, to: str, mode: int = 644)` - for installing any file, with optional mode argument
+
+All of these functions, except for `inst_directory()`, use the `install` shell command under the hood. This ensures all 
+files are placed in the filesystem with proper ownership and permissions, and allows us to overwrite existing files
+for an upgrade. The general signiture is to call them with the 'from' location as the first arg, and the 'to' location
+as the second arg. *builds* compresses manpages using `bzip2` by default, but this can be disabled by passing an
+optional `compress=False` third arg to `inst_manpage()`
+
+So with that explanation, let's get back to our example and start by installing the binaries.
+
+Taking a peak in `./seg/usr/bin` we can see that there are several binaries here. It is important to ascertain that
+the binaries you install are actually binaries. `inst_binary()` strips them, and will raise an error if you try to
+strip a script. `inst_script()` is functionally equivelant, but for the stripping, so use that for scripts, or if you
+don't want your binaries stripped. It is a good idea to run `file` on 
+these directories, as regular `ls -l` output will not distinguish between binaries and scripts:
+
+      # for f in `ls`; do file ${f}; done
+      scp: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, stripped
+      sftp: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, stripped
+      ssh: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, stripped
+      ssh-add: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, stripped
+      ssh-agent: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, stripped
+      ssh-keygen: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, stripped
+      ssh-keyscan: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, stripped
+
+So we can see they are all in fact binaries, but they are already stripped. Not all packages do this, so it is good to 
+check. Since they are stripped, we will use `inst_script`:
+
+      def install(self):
+         # Get all files in work/seg/usr/bin/, and install to /usr/bin/
+         for file in os.listdir(self.p['_ub']):
+            self.inst_script(f"{self.p['_ub']}/{file}", self.p['ub'])
+
+Note that we only have to specify the destination directory for the second argument. 
+
+OpenSSH has placed the stripped `sshd` binary in sbin/:
+
+      # install sshd
+      self.inst_script(f"{self.p['_us']}/sshd", self.p['ub'])
+
+There are several helper binaries in `usr/libexec/`. They are all stripped:
+
+      # install helper programs
+      for file in os.listdir(self.p['_ule']):
+         self_inst_script(f"{self.p['_ule']}/{file}", self.p['ule'])
+
+There are only manpages left. They are seperated into man1, man5, and man8 directories:
+
+      # install manpages
+      for file in os.listdir(self.p['_man1']):
+         self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
+        
+      for file in os.listdir(self.p['_man5']):
+         self.inst_manpage(f"{self.p['_man5']}/{file}", self.p['man5'])
+
+      # We can use glob if finer-grained control is wanted.
+      # Note that glob returns full paths, rather than the 
+      # relative paths from os.listdir(), so we have to adapt:
+      for file in glob.glob(f"{self.p['_man8']}/s*.8"):
+         self.inst_manpage(file, self.p['man8'])
+
+There are three configuration files installed into `./seg/etc/ssh/`. Let's use `inst_directory()` to grab them:
+
+      # install configuration files
+         self.inst_directory(self.p['_e'] + '/ssh/', self.p['e'] + '/ssh/')
+
+Note that you will want to include the trailing directory slash to BOTH path with `inst_directory`!
+
+We are almost done. On to our final step...
+
+## cleanup_prehook() and cleanup_posthook()
+
+The cleanup step is automated, but we have our two hooks if needed. prehook is run from `self.package_dir` before the
+work directory and source tree are deleted, and posthook is run from `self.build_dir` after the work directory is
+deleted. This is a good place to script any needed post-installation tasks. For example, for OpenSSH, we may want to
+create a 'sshd' user and group to run the daemon under. We can do that here:
+
+      def cleanup_posthook(self):
+         try:
+            os.system("groupadd -g 50 sshd")
+            os.system("useradd -c 'sshd PrivSep' -d /var/lib/sshd -g sshd -s /bin/false -u 50 sshd")
+         except OSError as e:
+            cf.yellow(f"Adding user/group 'sshd' failed: {e}")
+
+## Big picture
+
+The OpenSSH build script is now substantially complete. Here is the entire script for the big picture view:
+
+      #    net-util/openssh/openssh-9.9p1.build.py
+      #    Thu Nov 21 02:50:28 UTC 2024
+      
+      #    Copyright:: (c) 2024
+      #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
+      
+      #    This program is free software: you can redistribute it and/or modify
+      #    it under the terms of the GNU General Public License as published by
+      #    the Free Software Foundation, either version 3 of the License, or
+      #    (at your option) any later version.
+      
+      #    This program is distributed in the hope that it will be useful,
+      #    but WITHOUT ANY WARRANTY; without even the implied warranty of
+      #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      #    GNU General Public License for more details.
+      
+      #    You should have received a copy of the GNU General Public License
+      #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+      
+      
+      def configure(self):
+          return os.system("./configure --prefix=/usr "
+                           "--sysconfdir=/etc/ssh "
+                           "--with-privsep-path=/var/lib/sshd "
+                           "--with-default-path=/usr/bin "
+                           "--with-superuser-path=/usr/sbin:/usr/bin "
+                           "--with-pid-dir=/run")
+      
+      def make(self):
+          return os.system(f"make {cf.config['makeopts']}")
+      
+      
+      def make_install(self):
+          return os.system(f"make DESTDIR={self.seg_dir} install")
+      
+      def install(self):
+          # Get all files in work/seg/usr/bin/, and install to /usr/bin/
+          for file in os.listdir(self.p['_ub']):
+              self.inst_script(f"{self.p['_ub']}/{file}", self.p['ub'])
+
+      # install sshd
+      self.inst_script(f"{self.p['_us']}/sshd", self.p['ub'])
+   
+      # install helper programs to /usr/libexec
+      for file in os.listdir(self.p['_ule']):
+         self.inst_script(f"{self.p['_ule']}/{file}", self.p['ule'])
+   
+      # install manpages
+      for file in os.listdir(self.p['_man1']):
+         self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
+   
+      for file in os.listdir(self.p['_man5']):
+         self.inst_manpage(f"{self.p['_man5']}/{file}", self.p['man5'])
+   
+      for file in os.listdir(self.p['_man8']):
+         self.inst_manpage(f"{self.p['_man8']}/{file}", self.p['man8'])
+   
+      # install configuration files
+         self.inst_directory(self.p['_e'] + '/ssh/', self.p['e'] + '/ssh/')
+   
+      def cleanup_posthook(self):
+         try:
+            os.system("groupadd -g 50 sshd")
+            os.system("useradd -c 'sshd PrivSep' -d /var/lib/sshd -g sshd -s /bin/false -u 50 sshd")
+         except OSError as e:
+            cf.yellow(f"Adding user/group 'sshd' failed: {e}")
+
