@@ -69,11 +69,11 @@ def install(self):
         if os.path.isfile(file) and not os.path.islink(file):
             self.inst_manpage(file, self.p['man1'])
     # now make the symlinks
-    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/.1")
-    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/.1")
-    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/.1")
-    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/.1")
-    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/.1")
+    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/lzcat.1")
+    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/lzma.1")
+    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/unlzma.1")
+    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/unxz.1")
+    self.inst_symlink(f"{self.p['man1']}/xz.1.bz2", f"{self.p['man1']}/xzcat.1")
     self.inst_symlink(f"{self.p['man1']}/xzdec.1.bz2", f"{self.p['man1']}/lzmadec.1")
     self.inst_symlink(f"{self.p['man1']}/xzdiff.1.bz2", f"{self.p['man1']}/lzcmp.1")
     self.inst_symlink(f"{self.p['man1']}/xzdiff.1.bz2", f"{self.p['man1']}/lzdiff.1")
