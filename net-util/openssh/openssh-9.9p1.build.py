@@ -58,4 +58,4 @@ def install(self):
 
     # install configuration files
     conf_d = 'e' if cf.config['user'] == 'root' else 'ue'
-    self.inst_directory(self.p[conf_d] + '/ssh/', self.p[conf_d] + '/ssh/')
+    self.inst_directory(self.p['_' + conf_d] + '/ssh/', self.p[conf_d] + '/ssh/')
