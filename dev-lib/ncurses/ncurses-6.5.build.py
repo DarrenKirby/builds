@@ -101,8 +101,8 @@ def install(self):
     for file in os.listdir(self.p['_man5']):
         self.inst_script(f"{self.p['_man5']}/{file}", self.p['man5'])
 
-    for file in os.listdir(self.p['_man8']):
-        self.inst_script(f"{self.p['_man8']}/{file}", self.p['man8'])
+    for file in os.listdir(self.p['_man7']):
+        self.inst_script(f"{self.p['_man7']}/{file}", self.p['man7'])
 
     # Trick some applications into linking against the wide-character libs
     for lib in ["ncurses", "form", "panel", "menu"]:
