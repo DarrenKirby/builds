@@ -18,7 +18,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-def configure(self:)
+def configure(self):
     return os.system("./configure --prefix=/usr "
                      "--sysconfdir=/etc/ssh "
                      "--with-privsep-path=/var/lib/sshd "
