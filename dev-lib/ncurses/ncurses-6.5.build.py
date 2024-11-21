@@ -1,8 +1,8 @@
-#    <category>/<name>/<name>.build
-#    `date --utc`
+#    dev-lib/ncurses/ncurses-6.5.build.py
+#    Thu Nov 21 16:55:06 UTC 2024
 
-#    Copyright:: (c) 2024 <name>
-#    Author:: <name> (mailto:<email>)
+#    Copyright:: (c) 2024
+#    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -18,52 +18,29 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# If there are no dependencies then comment this line out,
-# otherwise, add all dependencies to this list as strings ie:
-# depend=['dev-lang/ruby', 'dev-editor/nano']
-# All 'system' packages are implicit dependencies, and do not
-# need to be listed here as they are already installed.
-depend = []
+def configure(self):
+    return os.system("./configure --prefix=/usr "
+                     "--mandir=/usr/share/man "
+                     "--with-shared "
+                     "--without-debug "
+                     "--without-normal "
+                     "--with-cxx-shared "
+                     "--enable-pc-files "
+                     "--with-pkg-config-libdir=/usr/lib/pkgconfig")
 
 
-# Use these two as pre/post hooks into the fetch process
-# def fetch_prehook(self):
-#     pass
-#
-# def fetch_posthook(self):
-#     pass
+def make(self):
+    return os.system(f"make {cf.config['makeopts']}")
 
 
-# Use these two as pre/post hooks into the source-install process
-# def install_source_prehook(self):
-#     pass
-#
-# def install_source_posthook(self):
-#     pass
-
-
-# make_install MUST be defined in the build file.
-# Use the helper functions in common_functions.py
-# to install binaries, scripts, libraries, headers,
-# documentation (man pages), and to create symlinks.
 def make_install(self):
+    try:
+        os.system(f"make DESTDIR={self.seg_dir} install")
+    except OSError as e:
+        cf.yellow(f"make_install failed: {e}")
+        return 1
+    # Edit header file
+    os.system(f"sed -e 's/^#if.*XOPEN.*$/#if 1/' -i {self.p['_ui']}/curses.h")
+
+def install(self):
     pass
-
-
-# Use these two as pre/post hooks into the cleanup process
-# def fetch_prehook(self):
-#     pass
-#
-# def fetch_posthook(self):
-#     pass
-
-
-# Write each installed file one per line in the commented section below.
-# This is the list that `bld uninstall` uses to know which files to remove.
-"""
-/etc/foo.conf
-/usr/bin/foo
-/usr/lib/libfoo.so
-/usr/lib/libfoo.so.5.2
-/usr/share/man/man1/foo.1
-"""
