@@ -204,13 +204,16 @@ def do_main() -> None:
         bld.configure_src()
         bld.make_src()
         bld.make_inst()
-        bld.inst()
-        bld.cleanup()
+        if not args.test:
+            bld.inst()
+        if not args.dontclean:
+            bld.cleanup()
 
         print()
-        cf.green(f"Recording {build[0]} {build[1]} in 'sets/installed'...")
-        if not already_installed:
-            cf.add_to_installed(build[0], build[1])
+        if not args.test:
+            cf.green(f"Recording {build[0]} {build[1]} in 'sets/installed'...")
+            if not already_installed:
+                cf.add_to_installed(build[0], build[1])
         print(">>> ...done!")
 
         finish_time = datetime.datetime.now()
