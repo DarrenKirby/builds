@@ -21,10 +21,6 @@
 depend="dev-lib/inih,lib-util/liburcu"
 
 
-def configure(self):
-    return os.system("./configure --prefix=/usr --libdir=/usr/lib --enable-static=no")
-
-
 def make(self):
     return os.system(f"make DEBUG=-DNDEBUG {cf.config['makeopts']}")
 
@@ -34,12 +30,14 @@ def make_install(self):
 
 
 def install(self):
-    # xfsprogs is not honouring --prefix=/usr and --libdir=/usr/lib
     self.inst_library(f"{self.seg_dir}/lib64/libhandle.so.1.0.3", self.p['ul'])
     self.inst_symlink(f"{self.p['ul']}/libhandle.so.1.0.3", f"{self.p['ul']}/libhandle.so.1")
 
     for file in os.listdir(self.p['_s']):
         self.inst_script(f"{self.p['_s']}/{file}", self.p['us'])
+
+    for file in os.listdir(self.p['_us']):
+        self.inst_script(f"{self.p['_us']}/{file}", self.p['us'])
 
     self.inst_manpage(f"{self.p['_man5']}/projects.5", self.p['man5'])
     self.inst_manpage(f"{self.p['_man5']}/projid.5", self.p['man5'])
@@ -54,5 +52,6 @@ def install(self):
     self.inst_file(f"{self.p['_ul']}/udev/rules.d/64-xfs.rules", f"{self.p['ul']}/udev/rules.d/64-xfs.rules")
 
     # Strip the binaries
-    for file in ["mkfs.xfs", "xfs_repair"]:
+    for file in ["mkfs.xfs", "xfs_repair", "xfs_copy", "xfs_db", "xfs_estimate", "xfs_fsr", "xfs_growfs", "xfs_io",
+                 "xfs_logprint", "xfs_mdrestore", "xfs_quota", "xfs_rtcp", "xfs_scrub", "xfs_spaceman"]:
         os.system(f"strip -v {self.p['us']}/{file}")
