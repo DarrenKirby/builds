@@ -35,7 +35,7 @@ def install(self):
     self.inst_binary(f"{self.p['_ub']}/getfattr", self.p['ub'])
     self.inst_binary(f"{self.p['_ub']}/setfattr", self.p['ub'])
 
-    self.inst_config(f"{self.seg_dir}/usr/etc/xattr.conf", self.p['e'])
+    self.inst_config(f"{self.seg_dir}/usr/etc/xattr.conf", self.p['e'] if cf.config['user'] == 'root' else self.p['ue'])
 
     self.inst_library(f"{self.p['_ul']}/libattr.so.1.1.2502", self.p['ul'])
     self.inst_symlink(f"{self.p['ul']}/libattr.so.1.1.2502", f"{self.p['ul']}/libattr.so")

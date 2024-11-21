@@ -19,8 +19,9 @@
 
 
 def configure(self):
+    conf_d = '/etc/ssh' if cf.config['user'] == 'root' else '/usr/etc/ssh'
     return os.system("./configure --prefix=/usr "
-                     "--sysconfdir=/etc/ssh "
+                     f"--sysconfdir={conf_d} "
                      "--with-privsep-path=/var/lib/sshd "
                      "--with-default-path=/usr/bin "
                      "--with-superuser-path=/usr/sbin:/usr/bin "
@@ -56,4 +57,5 @@ def install(self):
         self.inst_manpage(f"{self.p['_man8']}/{file}", self.p['man8'])
 
     # install configuration files
-    self.inst_directory(self.p['_e'] + '/ssh/', self.p['e'] + '/ssh/')
+    conf_d = 'e' if cf.config['user'] == 'root' else 'ue'
+    self.inst_directory(self.p[conf_d] + '/ssh/', self.p[conf_d] + '/ssh/')

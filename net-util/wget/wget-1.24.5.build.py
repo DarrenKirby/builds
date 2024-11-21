@@ -33,4 +33,4 @@ def make_install(self):
 def install(self):
     self.inst_binary(f"{self.p['_ub']}/wget", self.p['ub'])
     self.inst_manpage(f"{self.p['_man1']}/wget.1", self.p['man1'])
-    self.inst_config(f"{self.p['_ue']}/wgetrc", self.p['e'])
+    self.inst_config(f"{self.p['_ue']}/wgetrc", self.p['e'] if cf.config['user'] == 'root' else self.p['ue'])
