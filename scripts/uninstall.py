@@ -22,20 +22,102 @@
 """
 
 import argparse
+import os
 from pathlib import Path
-#import sys
-#import os
-#import csv
-#import dbm
-#import shutil
+import shutil
+import sys
 import logging as log
 
 from config import config
+import common_functions as cf
+
 
 class Unistaller:
     """
     Core logic for uninstalling files and packages.
     """
-    def __init__(self, manifest: list, args: argparse.Namespace):
+
+    def __init__(self, manifest_file: str, args: argparse.Namespace):
+        self.manifest_file = manifest_file
+        # Get package longname and version from manifest file name
+        parts = self.manifest_file.split("/")
+        self.package = "/".join(parts[-3:-1])
+        self.version = parts[-1].split("-")[1].rsplit(".", 1)[0]
+
+        manifest = cf.get_manifest(self.manifest_file)
         self.manifest = [Path(file) for file in manifest]
         self.args = args
+
+    def delete(self):
+        """
+        Delete all files listed in the manifest
+        """
+        for path in self.manifest:
+            if path.is_symlink():
+                # Handle symbolic links
+                if self.args.verbose:
+                    cf.print_green("Deleting symbolic link: ")
+                    cf.print_bold(f"{path}\n")
+                path.unlink()  # Remove the symlink itself, not the target
+            elif path.is_dir():
+                # Handle directories
+                if self.args.verbose:
+                    cf.print_green("Deleting directory: ")
+                    cf.print_bold(f"{path}\n")
+                shutil.rmtree(path)  # Recursively delete the directory and its contents
+            elif path.is_file():
+                # Handle files
+                if self.args.verbose:
+                    cf.print_green(f"Deleting file: ")
+                    cf.print_bold(f"{path}\n")
+                path.unlink()
+            else:  # Already deleted
+                pass
+
+    def delete_manifest_file(self):
+        """
+        Delete the manifest file.
+        """
+        os.remove(self.manifest_file)
+        if self.args.verbose:
+            cf.print_green("Removed: ")
+            cf.bold(self.manifest_file + "\n")
+
+    def delete_from_installed_file(self):
+        """
+        Removes the package from sets/installed.
+        """
+        cf.delete_from_installed(self.package)
+
+
+def do_uninstall(args: argparse.Namespace) -> None:
+    """
+    Uninstall a package
+    """
+    if args.pretend:
+        print("Uninstalling:")
+        for arg in args.pkg_atom:
+            cf.yellow(f"\t{arg}")
+        sys.exit(0)
+
+    for pkg in args.pkg_atom:
+        pkg_info = cf.get_installed_version(pkg)
+        c, n = pkg_info[0].split('/')
+        manifest_file = f"{config['builds_root']}/{c}/{n}/{n}-{pkg_info[1]}.manifest"
+
+        if args.ask:
+            print(f"Uninstall package {pkg}? (y/n/quit) ")
+            choice = input(">>> ")
+            if choice in ['n', 'N', 'no', 'No']:
+                cf.yellow(f"skipping uninstall of {pkg}")
+                continue
+            elif choice in ['q', 'quit', 'Quit']:
+                sys.exit(1)
+
+        # Looks like we really want to delete it...
+        uninstaller = Unistaller(manifest_file, args)
+        uninstaller.delete()
+        uninstaller.delete_manifest_file()
+        uninstaller.delete_from_installed_file()
+
+        return
