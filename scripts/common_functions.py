@@ -255,6 +255,7 @@ def do_initdb(args: argparse.Namespace) -> None:
                 with open(csv_file, newline='', encoding='utf-8') as f:
                     reader = csv.reader(f, delimiter=";")
                     for row in reader:
+                        print(row)
                         db[row[0]] = ';'.join(row[1:])
 
         except FileNotFoundError:
@@ -297,7 +298,7 @@ def get_db_info(package: str) -> list:
             yellow(f"'{package}' was not found in builds db.")
             sys.exit(10)
 
-    lst = string.split(',')
+    lst = string.split(';')
     lst.insert(0, package)
     return lst
 
