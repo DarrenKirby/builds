@@ -18,6 +18,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+def install_source_posthook(self):
+    # non-standard source tree name
+    cf.bold(f" Renaming XML-Parser-{self.version} to {self.package_dir}")
+    os.rename(f"XML-Parser-{self.version}", self.package_dir)
+
 def configure(self):
     return os.system(f"perl Makefile.PL EXPATLIBPATH={self.p['ui']} EXPATINCPATH={self.p['ui']}")
 
