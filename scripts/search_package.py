@@ -61,7 +61,7 @@ def do_search(args: argparse.Namespace) -> None:
                     name = k.decode('UTF-8')
                 if isinstance(db[k], bytes):
                     val = db[k].decode('UTF-8')
-                a = val.split(",")
+                a = val.split(";")
 
                 if args.nameonly:
                     if name.find(search_string) != -1:
