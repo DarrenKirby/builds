@@ -90,7 +90,7 @@ def get_version(package: str) -> tuple[str, str]:
     with dbm.open(config['db_file']) as db:
         if package.find('/') != -1:
             db_string = db[package.split('/')[1]].decode()
-            pkg_name = db_string.split(',')[0]
+            pkg_name = db_string.split(';')[0]
             # atom not in db...
             if not pkg_name == package:
                 cf.red(f"{package} does not appear to be a valid package atom.")
@@ -106,7 +106,7 @@ def get_version(package: str) -> tuple[str, str]:
                 cf.yellow(f"Try: 'bld search {package}'")
                 sys.exit(2)
         # Append tuple of atom and version
-        db_list = db_string.split(',')
+        db_list = db_string.split(';')
         return db_list[0], db_list[1]
 
 
