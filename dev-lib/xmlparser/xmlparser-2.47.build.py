@@ -39,5 +39,5 @@ def install(self):
     self.inst_directory(self.p['_ull'] + "64/perl5/5.40/x86_64-linux/XML/", self.p['ul'] + "/perl5/vendor_perl/XML/")
     self.inst_directory(self.p['_ull'] + "64/perl5/5.40/x86_64-linux/auto/", self.p['ul'] + "/perl5/vendor_perl/auto/")
 
-    for file in glob.glob(f"{self.seg_dir}/usr/local/man/man3/*.3"):
+    for file in glob.glob(f"{self.seg_dir}/usr/local/man/man3/*.3pm"):
         self.inst_manpage(file, self.p['man3'])
