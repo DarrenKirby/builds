@@ -205,10 +205,10 @@ print(f"Writing log file at {LOG_PATH}")
 print(f"Initializing database at {BUILDS_ROOT}/scripts/builds-stable")
 
 with dbm.open(f'{BUILDS_ROOT}/scripts/builds-stable', 'c') as db:
-    with open(f'{BUILDS_ROOT}/scripts/builds-stable.csv', newline='', encoding='UTF8') as f:
-        reader = csv.reader(f)
+    with open(f'{BUILDS_ROOT}/scripts/builds-stable.csv', newline='', encoding='utf-8') as f:
+        reader = csv.reader(f, delimiter=";")
         for row in reader:
-            db[row[0]] = ','.join(row[1:])
+            db[row[0]] = ';'.join(row[1:])
 
 print("...Done")
 
