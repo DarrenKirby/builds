@@ -58,9 +58,9 @@ def do_search(args: argparse.Namespace) -> None:
 
             for k in db.keys():
                 if isinstance(k, bytes):
-                    name = k.decode('UTF-8')
+                    name = k.decode('utf-8')
                 if isinstance(db[k], bytes):
-                    val = db[k].decode('UTF-8')
+                    val = db[k].decode('utf-8')
                 a = val.split(";")
 
                 if args.nameonly:
@@ -82,7 +82,6 @@ def parse_log(package_name: str, log_file: str = "builds.log") -> list[dict]:
     Parse builds.log for lines matching package_name.
     """
     results = []
-    # package_pattern = re.compile(rf"\|\s\d{{4}}-\d{{2}}-\d{{2}}.*{package_name}")
     with open(log_file, "r") as log_f:
         lines = log_f.readlines()
 
