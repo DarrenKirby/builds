@@ -161,18 +161,21 @@ def do_info(args):
     to_get_info = args.pkg_atom
 
     for pkg in to_get_info:
+        inst = None
         pkg_info = cf.get_db_info(pkg)
 
         installed_version = cf.get_installed_version(pkg)
 
         if installed_version == [None]:
+            inst = False
             cf.yellow(f"{pkg} is not currently installed")
-            sys.exit()
-        cf.print_bold("Current installed version of ")
-        cf.print_green(installed_version[0])
-        cf.print_bold(" is ")
-        cf.print_green(installed_version[1])
-        print("\n")
+        else:
+            inst = True
+            cf.print_bold("Current installed version of ")
+            cf.print_green(installed_version[0])
+            cf.print_bold(" is ")
+            cf.print_green(installed_version[1])
+            print("\n")
 
         cf.print_bold("Current database information:")
         print()
@@ -186,7 +189,7 @@ def do_info(args):
         else:
             print(f"No builds found for package {pkg}.")
 
-        if args.verbose:
+        if args.verbose and inst:
             manifest_file = f"{cf.config['builds_root']}/{installed_version[0]}/"
             manifest_file += f"{pkg_info[0]}-{pkg_info[2]}.manifest"
 
