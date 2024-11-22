@@ -32,4 +32,29 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_header(self.p['_ui'] + "/sys/capability.h", self.p['ui'] + "/sys/")
+    self.inst_header(self.p['_ui'] + "/sys/psx_syscall.h", self.p['ui'] + "/sys/")
+
+    self.inst_library(f"{self.p['_ul']}/libcap.so.2.70", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libcap.so.2.70", f"{self.p['ul']}/libcap.so.2")
+    self.inst_symlink(f"{self.p['ul']}/libcap.so.2", f"{self.p['ul']}/libcap.so")
+
+    self.inst_library(f"{self.p['_ul']}/libpsx.so.2.70", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libpsx.so.2.70", f"{self.p['ul']}/libpsx.so.2")
+    self.inst_symlink(f"{self.p['ul']}/libpsx.so.2", f"{self.p['ul']}/libpsx.so")
+
+    self.inst_file(self.p['_ul'] + "/security/pam_cap.so", self.p['ul'] + "/security/pam_cap.so")
+    self.inst_file(self.p['_ul'] + "/pkgconfig/libcap.pc", self.p['ul'] + "/pkgconfig/libcap.pc")
+    self.inst_file(self.p['_ul'] + "/pkgconfig/libpsx.pc", self.p['ul'] + "/pkgconfig/libpsx.pc")
+
+    for file in os.listdir(self.p['_us']):
+        self.inst_binary(f"{self.p['_us']}/{file}", self.p['us'])
+
+    self.inst_manpage(self.p['_man1'] + "/capsh.1", self.p['man1'])
+    self.inst_manpage(self.p['_man5'] + "/capability.conf.5", self.p['man5'])
+
+    for file in os.listdir(self.p['_man3']):
+        self.inst_manpage(f"{self.p['_man3']}/{file}", self.p['man3'])
+
+    for file in os.listdir(self.p['_man8']):
+        self.inst_manpage(f"{self.p['_man8']}/{file}", self.p['man8'])
