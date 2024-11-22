@@ -56,7 +56,7 @@ class Unistaller:
             if path.is_symlink():
                 # Handle symbolic links
                 if self.args.verbose:
-                    cf.print_green("Deleting symbolic link: ")
+                    cf.print_green("Deleting link:      ")
                     cf.print_bold(f"{path}\n")
                 path.unlink()  # Remove the symlink itself, not the target
             elif path.is_dir():
@@ -68,7 +68,7 @@ class Unistaller:
             elif path.is_file():
                 # Handle files
                 if self.args.verbose:
-                    cf.print_green(f"Deleting file: ")
+                    cf.print_green(f"Deleting file:      ")
                     cf.print_bold(f"{path}\n")
                 path.unlink()
             else:  # Already deleted
@@ -80,6 +80,7 @@ class Unistaller:
         """
         os.remove(self.manifest_file)
         if self.args.verbose:
+            print()
             cf.print_green("Removed: ")
             cf.bold(self.manifest_file + "\n")
 
@@ -120,4 +121,7 @@ def do_uninstall(args: argparse.Namespace) -> None:
         uninstaller.delete_manifest_file()
         uninstaller.delete_from_installed_file()
 
+        cf.print_bold(f"Package deleted: ")
+        cf.green(f" {pkg_info[0]} - {pkg_info[1]}")
+        log.warning(f"package uninstalled: {pkg_info[0]} - {pkg_info[1]}")
         return
