@@ -32,4 +32,17 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_binary(f"{self.p['_ub']}/xmlwf", self.p['ub'])
+
+    self.inst_header(f"{self.p['_ui']}/expat.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/expat_config.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/expat_external.h", self.p['ui'])
+
+    self.inst_library(f"{self.p['_ul']}/libexpat.so.1.9.3", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libexpat.so.1.9.3", f"{self.p['ul']}/libexpat.so.1")
+    self.inst_symlink(f"{self.p['ul']}/libexpat.so.1.9.3", f"{self.p['ul']}/libexpat.so")
+
+    self.inst_file(f"{self.p['_ul']}/pkgconfig/expat.pc", self.p['ul'] + "/pkgconfig/")
+    self.inst_directory(f"{self.p['_ul']}/cmake/expat-{self.version}", f"{self.p['ul']}/cmake/expat-{self.version}")
+
+    self.inst_manpage(f"{self.p['_man1']}/xmlwf.1", self.p['man1'])

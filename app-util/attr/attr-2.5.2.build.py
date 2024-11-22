@@ -51,8 +51,8 @@ def install(self):
     self.inst_manpage(f"{self.p['_man3']}/attr_remove.3", self.p['man3'])
     self.inst_manpage(f"{self.p['_man3']}/attr_set.3", self.p['man3'])
 
-    self.inst_symlink(f"{self.p['man3']}/attr_get.3", f"{self.p['man3']}/attr_getf.3")
-    self.inst_symlink(f"{self.p['man3']}/attr_list.3", f"{self.p['man3']}/attr_listf.3")
-    self.inst_symlink(f"{self.p['man3']}/attr_multi.3", f"{self.p['man3']}/attr_multif.3")
-    self.inst_symlink(f"{self.p['man3']}/attr_remove.3", f"{self.p['man3']}/attr_removef.3")
-    self.inst_symlink(f"{self.p['man3']}/attr_set.3", f"{self.p['man3']}/attr_setf.3")
+    self.inst_symlink(f"{self.p['man3']}/attr_get.3.bz2", f"{self.p['man3']}/attr_getf.3")
+    self.inst_symlink(f"{self.p['man3']}/attr_list.3.bz2", f"{self.p['man3']}/attr_listf.3")
+    self.inst_symlink(f"{self.p['man3']}/attr_multi.3.bz2", f"{self.p['man3']}/attr_multif.3")
+    self.inst_symlink(f"{self.p['man3']}/attr_remove.3.bz2", f"{self.p['man3']}/attr_removef.3")
+    self.inst_symlink(f"{self.p['man3']}/attr_set.3.bz2", f"{self.p['man3']}/attr_setf.3")

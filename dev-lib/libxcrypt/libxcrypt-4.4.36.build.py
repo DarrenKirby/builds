@@ -35,4 +35,16 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_header(f"{self.p['_ui']}/crypt.h", self.p['ui'])
+
+    self.inst_library(f"{self.p['_ul']}/libcrypt.so.2.0.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libcrypt.so.2.0.0", f"{self.p['ul']}/libcrypt.so.2")
+    self.inst_symlink(f"{self.p['ul']}/libcrypt.so.2.0.0", f"{self.p['ul']}/libcrypt.so")
+
+    self.inst_file(f"{self.p['_ul']}/pkgconfig/libxcrypt.pc", self.p['ul'] + "/pkgconfig/")
+    self.inst_symlink(self.p['ul'] + "/pkgconfig/libxcrypt.pc", self.p['ul'] + "/pkgconfig/libcrypt.pc")
+
+    self.inst_manpage(f"{self.p['_man5']}/crypt.5", self.p['man5'])
+
+    for file in os.listdir(self.p['_man3']):
+        self.inst_manpage(f"{self.p['_man3']}/{file}", self.p['man3'])
