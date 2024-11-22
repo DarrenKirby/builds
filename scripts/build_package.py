@@ -339,7 +339,7 @@ class BuildPackage(FileInstaller):
         self.build = build
         self.name = build.split('/')[1]
         with dbm.open(config['db_file']) as db:
-            a = db[self.name].decode().split(",")
+            a = db[self.name].decode().split(";")
 
         self.version = a[1]
         self.sha256sum = a[2]
