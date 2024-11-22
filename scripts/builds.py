@@ -31,10 +31,11 @@ import common_functions as cf
 import build_package
 import search_package
 import dep_resolve
+import uninstall
 from config import config
 
 APPNAME = "bld"
-APPVERSION = "0.4.0"
+APPVERSION = "0.5.1"
 QUIP = "By far the best software available for turtle stacking"
 
 
@@ -135,7 +136,7 @@ def do_main() -> None:
         search_package.do_info(args)
         sys.exit(0)
     elif args.command == 'uninstall':
-        do_uninstall(args)
+        uninstall.do_uninstall(args)
         sys.exit(0)
     elif args.command == 'initdb':
         cf.do_initdb(args)
@@ -230,43 +231,6 @@ def do_main() -> None:
     cf.green("Finished all builds. Exiting...")
     sys.exit(0)
 
-
-def do_uninstall(args: argparse.Namespace) -> None:
-    """
-    Uninstall a package
-    """
-    if args.pretend:
-        print("Uninstalling:")
-        for arg in args.pkg_atom:
-            cf.yellow(f"\t{arg}")
-        sys.exit(0)
-
-    for pkg in args.pkg_atom:
-        pkg_info = cf.get_installed_version(pkg)
-        c, n = pkg_info[0].split('/')
-        manifest_file = f"{config['builds_root']}/{c}/{n}/{n}-{pkg_info[1]}.manifest"
-
-        files_to_uninstall = cf.get_manifest(manifest_file)
-        files_to_uninstall.sort()
-        if files_to_uninstall == [None]:
-            continue
-
-        if args.verbose:
-            cf.yellow(f"Files to be uninstalled for {pkg}: ")
-            for file in files_to_uninstall:
-                cf.bold(f"\t{file}")
-            print()
-
-        if args.ask:
-            print(f"Uninstall package {pkg}? (y/n/quit) ")
-            choice = input(">>> ")
-            if choice in ['n', 'N', 'no', 'No']:
-                cf.yellow(f"skipping uninstall of {pkg}")
-                continue
-            elif choice in ['q', 'quit', 'Quit']:
-                sys.exit(1)
-
-        # Looks like we really want to delete it...
 
 
 
