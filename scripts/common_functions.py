@@ -252,10 +252,10 @@ def do_initdb(args: argparse.Namespace) -> None:
         try:
             db_file_name = csv_file.split('/')[-1]
             with dbm.open(f'{config["builds_root"]}/scripts/{db_file_name[:-4]}', 'c') as db:
-                with open(csv_file, newline='', encoding='UTF8') as f:
-                    reader = csv.reader(f)
+                with open(csv_file, newline='', encoding='utf-8') as f:
+                    reader = csv.reader(f, delimiter=";")
                     for row in reader:
-                        db[row[0]] = ','.join(row[1:])
+                        db[row[0]] = ';'.join(row[1:])
 
         except FileNotFoundError:
             red(f"The file {csv_file} was not found.")
