@@ -22,7 +22,7 @@
 def fetch_prehook(self):
     patchname = "coreutils-9.5-i18n-2.patch"
     cf.bold(f"Downloading {patchname}...")
-    cf.download("https://www.linuxfromscratch.org/patches/lfs/12.2/coreutils-9.5-i18n-2.patch",
+    cf.download(f"https://www.linuxfromscratch.org/patches/lfs/12.2/{patchname}",
                 f"{cf.config['builds_root']}/distfiles/{patchname}")
     cf.bold("...done.")
 
