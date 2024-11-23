@@ -254,8 +254,10 @@ def do_initdb(args: argparse.Namespace) -> None:
             with dbm.open(f'{config["builds_root"]}/scripts/{db_file_name[:-4]}', 'c') as db:
                 with open(csv_file, newline='', encoding='utf-8') as f:
                     reader = csv.reader(f, delimiter=";")
+                    n_packages = 0
                     for row in reader:
                         db[row[0]] = ';'.join(row[1:])
+                        n_packages += 1
 
         except FileNotFoundError:
             red(f"The file {csv_file} was not found.")
@@ -268,7 +270,12 @@ def do_initdb(args: argparse.Namespace) -> None:
         except csv.Error as e:
             red(f"Error while reading {csv_file}: {e}")
             sys.exit(8)
-        green(f"Initialized {csv_file[:-4]}")
+        print_bold(">>> ")
+        print_green(f"Initialized '")
+        print_bold(db_file_name[:-4])
+        print_green("' database with ")
+        print_bold(str(n_packages))
+        print_green(" packages.\n")
 
 
 def get_manifest(manifest_file: str) -> list:
