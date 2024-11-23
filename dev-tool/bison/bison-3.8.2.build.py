@@ -31,4 +31,16 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_script(self.p['_ub'] + "/yacc", self.p['ub'])
+    self.inst_binary(self.p['_ub'] + "/bison", self.p['ub'])
+
+    # this library is not very useful, but POSIX requires it
+    self.inst_library(self.p['_ul'] + "/liby.a", self.p['ul'])
+
+    # Make sure usr/share/aclocal exists
+    os.makedirs(f"{self.p['ush']}/aclocal/", exist_ok=True)
+    self.inst_file(self.p['_ush'] + "/aclocal/bison-i18n.m4", self.p['ush'] + "/aclocal/")
+    self.inst_directory(f"{self.p['_ush']}/bison/", f"{self.p['ush']}/bison/")
+
+    self.inst_manpage(self.p['_man1'] + "/bison.1", self.p['man1'])
+    self.inst_manpage(self.p['_man1'] + "/yacc.1", self.p['man1'])
