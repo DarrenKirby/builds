@@ -71,15 +71,19 @@ def get_deps(build_file: str) -> list:
     Get dependancies for each package from build file.
     """
     deps = []
-    with open(build_file, 'r', encoding='utf-8') as fh:
-        lines = fh.readlines()
-        for line in lines:
-            if line.startswith('depend'):
-                pkgs = line.split('=')[-1].strip()
-                pkgs = pkgs[1:-1]  # remove quotes
-                for pkg in pkgs.split(','):
-                    if not already_installed(pkg):
-                        deps.append(pkg)
+    try:
+        with open(build_file, 'r', encoding='utf-8') as fh:
+            lines = fh.readlines()
+            for line in lines:
+                if line.startswith('depend'):
+                    pkgs = line.split('=')[-1].strip()
+                    pkgs = pkgs[1:-1]  # remove quotes
+                    for pkg in pkgs.split(','):
+                        if not already_installed(pkg):
+                            deps.append(pkg)
+    except FileNotFoundError:
+        cf.red(f"Cannot find {build_file}.")
+        sys.exit(3)
     return deps
 
 
