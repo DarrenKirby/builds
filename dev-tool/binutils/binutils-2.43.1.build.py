@@ -26,7 +26,7 @@ def configure(self):
                      "--enable-gold "
                      "--enable-ld=default "
                      "--enable-plugins "
-                     "--enable-plugins "
+                     "--enable-shared "
                      "--disable-werror "
                      "--enable-64-bit-bfd "
                      "--enable-new-dtags "
@@ -43,4 +43,19 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    for file in os.listdir(self.p['_ub']):
+        if file not in ["gp-display-html"]:
+            self.inst_binary(f"{self.p['_ub']}/{file}", self.p['ub'])
+        else:
+            self.inst_script(f"{self.p['_ub']}/{file}", self.p['ub'])
+
+    # install configuration file
+    conf_d = 'e' if cf.config['user'] == 'root' else 'ue'
+    self.inst_config(self.p['_' + conf_d] + '/gprofng.rc', self.p[conf_d])
+
+    for header in os.listdir(self.p['_ui']):
+        self.inst_header(f"{self.p['_ui']}/{header}", self.p['ui'])
+
+    for manpage in os.listdir(self.p['_man1']):
+        self.inst_manpage(f"{self.p['_man1']}/{manpage}", self.p['man1'])
+
