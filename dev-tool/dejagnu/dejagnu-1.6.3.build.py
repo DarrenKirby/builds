@@ -28,7 +28,7 @@ def configure(self):
 
 def make(self):
     os.system("makeinfo --html --no-split -o doc/dejagnu.html ../doc/dejagnu.texi")
-    return os.system("makeinfo --plaintext       -o doc/dejagnu.txt  ../doc/dejagnu.texi")
+    return os.system("makeinfo --plaintext -o doc/dejagnu.txt  ../doc/dejagnu.texi")
 
 
 def make_install(self):
