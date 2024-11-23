@@ -65,7 +65,7 @@ def make_install(self):
 
 
 def install(self):
-    self.inst_binary(self.p['_ub'] + "/sqlite3_analyzer", self.p['ub'])
+    self.inst_script(self.p['_ub'] + "/sqlite3_analyzer", self.p['ub'])
     self.inst_binary(self.p['_ub'] + "/tclsh8.6", self.p['ub'])
     self.inst_symlink(self.p['ub'] + "/tclsh8.6", self.p['ub'] + "/tclsh")
 
