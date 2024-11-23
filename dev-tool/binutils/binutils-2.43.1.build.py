@@ -58,4 +58,3 @@ def install(self):
 
     for manpage in os.listdir(self.p['_man1']):
         self.inst_manpage(f"{self.p['_man1']}/{manpage}", self.p['man1'])
-
