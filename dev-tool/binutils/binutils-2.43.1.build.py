@@ -1,5 +1,5 @@
 #    dev-tool/binutils/binutils-2.43.1.build.py
-#    Sat Nov 23 00:12:08 UTC 2024
+#    Sat Nov 23 19:37:47 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -55,6 +55,27 @@ def install(self):
 
     for header in os.listdir(self.p['_ui']):
         self.inst_header(f"{self.p['_ui']}/{header}", self.p['ui'])
+
+    # Not ideal hard coding the versions, but we can serch/replacethem when the package updates
+    for file in ["libbfd-2.43.1.so", "libctf-nobfd.so.0.0.0", "libctf.so.0.0.0", "libgprofng.so.0.0.0",
+                 "libopcodes-2.43.1.so", "libsframe.so.1.0.0"]:
+        self.inst_library(f"{self.p['_ul']}/{file}", self.p['ul'])
+
+    # links
+    self.inst_symlink(self.p['ul'] + "/libbfd-2.43.1.so", self.p['ul'] + "/libbfd.so")
+    self.inst_symlink(self.p['ul'] + "/libctf-nobfd.so.0.0.0", self.p['ul'] + "/libctf-nobfd.so")
+    self.inst_symlink(self.p['ul'] + "/libctf-nobfd.so.0.0.0", self.p['ul'] + "/libctf-nobfd.so.0")
+    self.inst_symlink(self.p['ul'] + "/libctf.so.0.0.0", self.p['ul'] + "/libctf.so")
+    self.inst_symlink(self.p['ul'] + "/libctf.so.0.0.0", self.p['ul'] + "/libctf.so.0")
+    self.inst_symlink(self.p['ul'] + "/libgprofng.so.0.0.0", self.p['ul'] + "/libgprofng.so")
+    self.inst_symlink(self.p['ul'] + "/libgprofng.so.0.0.0", self.p['ul'] + "/libgprofng.so.0")
+    self.inst_symlink(self.p['ul'] + "/libopcodes-2.43.1.so", self.p['ul'] + "/libopcodes.so")
+    self.inst_symlink(self.p['ul'] + "/libsframe.so.1.0.0", self.p['ul'] + "/libsframe.so")
+    self.inst_symlink(self.p['ul'] + "/libsframe.so.1.0.0", self.p['ul'] + "/libsframe.so.1")
+
+    # Directories
+    for directory in ["/bfd-plugins/", "/gprofng/", "/ldscripts/"]:
+        self.inst_directory(self.p['_ul'] + directory, self.p['ul'] + directory)
 
     for manpage in os.listdir(self.p['_man1']):
         self.inst_manpage(f"{self.p['_man1']}/{manpage}", self.p['man1'])
