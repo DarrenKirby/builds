@@ -93,10 +93,10 @@ def install(self):
     os.rename(self.p['_man3'] + "/Thread.3", self.p['_man3'] + "/Tcl_Thread.3")
 
     for manpage in os.listdir(self.p['_man3']):
-        self.inst_manpage(f"{self.p['_man3']}/{manpage}", self.p['man3'])
+        self.inst_manpage(f"{self.p['_man3']}/{manpage}", self.p['man3'], compress=False)
 
     # Make usr/share/man/mann if it doesn't already exist.
     os.makedirs(f"{self.p['ush']}/man/mann/", exist_ok=True)
 
     for manpage in os.listdir(self.p['_ush'] + "/man/mann"):
-        self.inst_manpage(f"{self.p['_ush']}/man/mann/{manpage}", self.p['ush'] + "/man/mann/")
+        self.inst_manpage(f"{self.p['_ush']}/man/mann/{manpage}", self.p['ush'] + "/man/mann/", compress=False)
