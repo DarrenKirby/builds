@@ -1,5 +1,5 @@
 #    sci-math/mpc/mpc-1.3.1.build.py
-#    Sat Nov 16 21:33:14 UTC 2024
+#    Sun Nov 24 00:17:36 UTC 2024
 
 #    Copyright:: (c)
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -31,8 +31,9 @@ def make_install(self):
 
 
 def install(self):
-    #self.inst_binary(f"{self.p['_ub']}/bc", self.p['ub'])
-    #self.inst_symlink(f"{self.p['ub']}/bc", f"{self.p['ub']}/dc")
+    self.inst_header(f"{self.p['_ui']}/mpc.h", self.p['ui'])
 
-    #self.inst_manpage(f"{self.p['_man1']}/bc.1", self.p['man1'])
-    #self.inst_manpage(f"{self.p['_man1']}/dc.1", self.p['man1'])
+    self.inst_library(f"{self.p['_ul']}/libmpc.so.3.3.1", self.p['ul'])
+    self.inst_symlink(self.p['ul'] + "/libmpc.so.3.3.1", self.p['ul'] + "/libmpc.so.3")
+    self.inst_symlink(self.p['ul'] + "/libmpc.so.3.3.1", self.p['ul'] + "/libmpc.so")
+

@@ -1,5 +1,5 @@
 #    sci-math/mpfr/mpfr-4.2.1.build.py
-#    Sat Nov 23 17:46:07 UTC 2024
+#    Sun Nov 24 00:21:20 UTC 2024
 
 #    Copyright:: (c)
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -31,8 +31,11 @@ def make_install(self):
 
 
 def install(self):
-    #self.inst_binary(f"{self.p['_ub']}/bc", self.p['ub'])
-    #self.inst_symlink(f"{self.p['ub']}/bc", f"{self.p['ub']}/dc")
+    self.inst_header(f"{self.p['_ui']}/mpf2mpfr.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/mpfr.h", self.p['ui'])
 
-    #self.inst_manpage(f"{self.p['_man1']}/bc.1", self.p['man1'])
-    #self.inst_manpage(f"{self.p['_man1']}/dc.1", self.p['man1'])
+    self.inst_library(f"{self.p['_ul']}/libmpfr.so.6.2.1", self.p['ul'])
+    self.inst_symlink(self.p['ul'] + "/libmpfr.so.6.2.1", self.p['ul'] + "/libmpfr.so.6")
+    self.inst_symlink(self.p['ul'] + "/libmpfr.so.6.2.1", self.p['ul'] + "/libmpfr.so")
+
+    self.inst_file(self.p['_ul'] + "/pkgconfig/mpfr.pc", self.p['ul'] + "/pkgconfig/")

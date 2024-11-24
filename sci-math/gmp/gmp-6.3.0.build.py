@@ -1,5 +1,5 @@
 #    sci-math/gmp/gmp-6.3.0.build.py
-#    Sat Nov 23 17:44:07 UTC 2024
+#    Sun Nov 24 00:15:32 UTC 2024
 
 #    Copyright:: (c)
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -31,8 +31,16 @@ def make_install(self):
 
 
 def install(self):
-    #self.inst_binary(f"{self.p['_ub']}/bc", self.p['ub'])
-    #self.inst_symlink(f"{self.p['ub']}/bc", f"{self.p['ub']}/dc")
+    self.inst_header(f"{self.p['_ui']}/gmp.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/gmpxx.h", self.p['ui'])
 
-    #self.inst_manpage(f"{self.p['_man1']}/bc.1", self.p['man1'])
-    #self.inst_manpage(f"{self.p['_man1']}/dc.1", self.p['man1'])
+    self.inst_library(f"{self.p['_ul']}/libgmp.so.10.5.0", self.p['ul'])
+    self.inst_symlink(self.p['ul'] + "/libgmp.so.10.5.0", self.p['ul'] + "/libgmp.so")
+    self.inst_symlink(self.p['ul'] + "/libgmp.so.10.5.0", self.p['ul'] + "/libgmp.so.10")
+
+    self.inst_library(f"{self.p['_ul']}/libgmpxx.so.4.7.0", self.p['ul'])
+    self.inst_symlink(self.p['ul'] + "/libgmpxx.so.4.7.0", self.p['ul'] + "/libgmpxx.so")
+    self.inst_symlink(self.p['ul'] + "/libgmpxx.so.4.7.0", self.p['ul'] + "/libgmpxx.so.4")
+
+    self.inst_file(self.p['_ul'] + "/pkgconfig/gmp.pc", self.p['ul'] + "/pkgconfig/")
+    self.inst_file(self.p['_ul'] + "/pkgconfig/gmpxx.pc", self.p['ul'] + "/pkgconfig/")
