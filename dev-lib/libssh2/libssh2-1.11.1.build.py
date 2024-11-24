@@ -1,5 +1,5 @@
 #    dev-lib/libssh2/libssh2-1.11.1.build.py
-#    Thu Nov 21 16:19:19 UTC 2024
+#    Sun Nov 24 00:38:22 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -33,4 +33,15 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_header(f"{self.p['_ui']}/libssh2.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/libssh2_publickey.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/libssh2_sftp.h", self.p['ui'])
+
+    self.inst_library(f"{self.p['_ul']}/libssh2.so.1.0.1", self.p['ul'])
+    self.inst_symlink(self.p['ul'] + "/libssh2.so.1.0.1", self.p['ul'] + "/libssh2.so.1")
+    self.inst_symlink(self.p['ul'] + "/libssh2.so.1.0.1", self.p['ul'] + "/libssh2.so")
+
+    self.inst_file(self.p['_ul'] + "/pkgconfig/libssh2.pc", self.p['ul'] + "/pkgconfig/")
+
+    for manpage in os.listdir(self.p['_man3']):
+        self.inst_manpage(f"{self.p['_man3']}/{manpage}", self.p['man3'])
