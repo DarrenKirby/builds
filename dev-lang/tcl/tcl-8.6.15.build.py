@@ -58,7 +58,7 @@ def make_install(self):
         os.system(f"make DESTDIR={self.seg_dir} install")
         os.system(f"make DESTDIR={self.seg_dir} install-private-headers")
         # Need to make this lib writable to strip
-        os.chmod(self.p['_ul'] + "/libtcl8.6.so", 755)
+        os.chmod(self.p['_ul'] + "/libtcl8.6.so", 0o755)
         return 0
     except OSError:
         return 1
