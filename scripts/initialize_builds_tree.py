@@ -30,7 +30,7 @@ import pwd
 import grp
 from pathlib import Path
 
-import common_functions as cf
+# import common_functions as cf
 
 banner_text = """
                                                                                            
@@ -66,8 +66,7 @@ if os.geteuid() != 0:
         sys.exit(1)
 
     print("OK.")
-    print(f"So you want to keep build root as ", end="")
-    cf.print_bold(f"{BUILDS_ROOT}?\n")
+    print(f"So you want to keep build root as {BUILDS_ROOT}")
     if input(">>> ") in ['n', 'N', 'no', 'No']:
         sys.exit(1)
 
@@ -76,7 +75,7 @@ if os.geteuid() != 0:
 
     print("OK.")
     print("We're going to write a configuration file to: ")
-    cf.print_bold(CONF_PATH + "\n")
+    print(CONF_PATH + "\n")
 
     os.makedirs(CONF_DIR, exist_ok=True)
     LOG_PATH = BUILDS_ROOT + "/builds.log"
@@ -96,9 +95,7 @@ if os.geteuid() != 0:
     else:
         INSTALL_ROOT = str(Path.home())
 
-    print("Cool. ", end="")
-    cf.print_bold(INSTALL_ROOT)
-    print(" it is then.")
+    print(f"Cool. {INSTALL_ROOT}it is then.")
     print("We need to initialize a filesystem structure now. I will create ")
     print(f"some empty directories under {INSTALL_ROOT} to install files to.")
 
@@ -136,8 +133,7 @@ else:
         sys.exit(1)
 
     print("OK.")
-    print(f"So you want to keep build root as ", end="")
-    cf.print_bold(f"{BUILDS_ROOT}?")
+    print(f"So you want to keep build root as {BUILDS_ROOT}?")
     if input(">>> ") in ['n', 'N', 'no', 'No']:
         sys.exit(1)
 
