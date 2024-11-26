@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return os.system(".configure --prefix=/usr --disable-static")
+    return os.system("./configure --prefix=/usr --disable-static")
 
 
 def make(self):

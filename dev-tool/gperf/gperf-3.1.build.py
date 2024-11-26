@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return os.system("../configure --prefix=/usr")
+    return os.system("./configure --prefix=/usr")
 
 
 def make(self):
