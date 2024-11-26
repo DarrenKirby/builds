@@ -1,5 +1,5 @@
 #    net-util/openssh/openssh-9.9p1.build.py
-#    Thu Nov 21 02:50:28 UTC 2024
+#    Tue Nov 26 19:14:43 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -59,3 +59,23 @@ def install(self):
     # install configuration files
     conf_d = 'e' if cf.config['user'] == 'root' else 'ue'
     self.inst_directory(self.p['_' + conf_d] + '/ssh/', self.p[conf_d] + '/ssh/')
+
+
+# This will only work on a system install.
+def cleanup_posthook(self):
+    if cf.config['user'] != 'root':
+        return
+    # Check if sshd user already exists...
+    import pwd
+    try:
+        pwd.getpwuid(50)
+        return
+    except KeyError:
+        pass
+    try:
+        cf.bold("Creating user/group 'sshd'")
+        os.system("install -v -g sys -m700 -d /var/lib/sshd")
+        os.system("groupadd -g 50 sshd")
+        os.system("useradd -c 'sshd PrivSep' -d /var/lib/sshd -g sshd -s /bin/false -u 50 sshd")
+    except OSError as e:
+        cf.yellow(f"Adding user/group 'sshd' failed: {e}")
