@@ -40,7 +40,7 @@ def install(self):
         self.inst_script(f"{self.p['_ub']}/{file}", self.p['ub'])
 
     # install sshd
-    self.inst_script(f"{self.p['_us']}/sshd", self.p['ub'])
+    self.inst_script(f"{self.p['_us']}/sshd", self.p['us'])
 
     # install helper programs to /usr/libexec
     for file in os.listdir(self.p['_ule']):
@@ -59,6 +59,10 @@ def install(self):
     # install configuration files
     conf_d = 'e' if cf.config['user'] == 'root' else 'ue'
     self.inst_directory(self.p['_' + conf_d] + '/ssh/', self.p[conf_d] + '/ssh/')
+
+    # Install ssh-copy-id and manpage
+    self.inst_script(f"{self.work_dir}/{self.package_dir}/contrib/ssh-copy-id", self.p['ub'])
+    self.inst_manpage(f"{self.work_dir}/{self.package_dir}/contrib/ssh-copy-id.1", self.p['man1'])
 
 
 # This will only work on a system install.
