@@ -19,7 +19,8 @@
 
 
 def configure(self):
-    return os.system("./configure --prefix=/usr")
+    conf = '/etc' if cf.config['user'] == 'root' else '/usr/etc'
+    return os.system(f"./configure --prefix=/usr --sysconfdir={conf} --with-ssl=openssl")
 
 
 def make(self):
