@@ -41,7 +41,7 @@ def install_source_posthook(self):
 
 def configure(self):
     return os.system("./configure --prefix=/usr "
-                     "--with-tcl=/usr/lib64 "  # change this back to /usr/lib!!!!
+                     "--with-tcl=/usr/lib64 "
                      "--enable-shared "
                      "--disable-rpath "
                      "--mandir=/usr/share/man "
