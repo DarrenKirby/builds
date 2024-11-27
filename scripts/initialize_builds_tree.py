@@ -252,7 +252,7 @@ if clobber:
 if os.geteuid() == 0:
     ug = pwd.getpwnam("builds")
     os.seteuid(ug.pw_uid)
-    os.setegid(ug.pw_gid)
+    # os.setegid(ug.pw_gid)
 
 if not os.path.exists(f"{BUILDS_ROOT}/distfiles"):
     os.mkdir(f"{BUILDS_ROOT}/distfiles")

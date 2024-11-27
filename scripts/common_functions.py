@@ -124,12 +124,12 @@ class PrivDropper:
             self.unpriv_uid = pwd.getpwnam("builds").pw_uid
             self.unpriv_gid = pwd.getpwnam("builds").pw_gid
             os.seteuid(self.unpriv_uid)
-            os.setegid(self.unpriv_gid)
+            # os.setegid(self.unpriv_gid)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.orig_uid == 0:
             os.seteuid(self.orig_uid)
-            os.setegid(self.orig_gid)
+            # os.setegid(self.orig_gid)
         return False
 
 
