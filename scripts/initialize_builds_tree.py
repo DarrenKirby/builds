@@ -28,9 +28,33 @@ import os
 import datetime
 import pwd
 import grp
+import subprocess
 from pathlib import Path
 
-# import common_functions as cf
+
+def create_system_user(username, home_dir="/var/builds"):
+    try:
+        subprocess.run(
+            ["useradd", "--system", "--user-group", "--home", home_dir, "--shell", "/usr/sbin/nologin", username],
+            check=True,
+        )
+        print(f"System user/group '{username}' created successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to create user '{username}': {e}")
+        raise
+
+def recursive_chown(path, username, groupname):
+    uid = pwd.getpwnam(username).pw_uid
+    gid = grp.getgrnam(groupname).gr_gid
+    for root, dirs, files in os.walk(path):
+        os.chown(root, uid, gid)
+        for dname in dirs:
+            os.chown(os.path.join(root, dname), uid, gid)
+        for fname in files:
+            os.chown(os.path.join(root, fname), uid, gid)
+    print(f"Ownership of '{path}' recursively set to {username}:{groupname}.")
+
+
 
 banner_text = """
                                                                                            
@@ -95,7 +119,7 @@ if os.geteuid() != 0:
     else:
         INSTALL_ROOT = str(Path.home())
 
-    print(f"Cool. {INSTALL_ROOT}it is then.")
+    print(f"Cool. {INSTALL_ROOT} it is then.")
     print("We need to initialize a filesystem structure now. I will create ")
     print(f"some empty directories under {INSTALL_ROOT} to install files to.")
 
@@ -126,6 +150,10 @@ if os.geteuid() != 0:
     USER = pwd.getpwuid(os.getuid()).pw_name
     GRP = grp.getgrgid(os.getgid()).gr_name
 
+    print(f"Creating log file at {LOG_PATH}")
+    with open(LOG_PATH, 'a'):
+        os.utime(LOG_PATH, None)
+
 else:
     print("Hi there. I see you are root, and therefore would like to ")
     print("install builds system wide. Is that correct?")
@@ -143,6 +171,26 @@ else:
     USER = "root"
     GRP = "root"
     INSTALL_ROOT = ""
+
+    print("OK. We need to create an unpriviledged user and group for builds:")
+    create_system_user("builds", BUILDS_ROOT)
+    ug = pwd.getpwnam("builds")
+    print(f"UID: {ug.pw_uid}")
+    print(f"GID: {ug.pw_gid}")
+
+    print(f"Creating log file at {LOG_PATH}")
+    with open(LOG_PATH, 'a'):
+        os.utime(LOG_PATH, None)
+
+    print(f"Chown {LOG_PATH} root:builds")
+    os.chown(LOG_PATH, 0, ug.pw_gid)
+    print(f"Chmod 774 {LOG_PATH}")
+    os.chmod(LOG_PATH, 0o774)
+
+    print("Good!")
+    print(f"Now we need to recursively chown {BUILDS_ROOT} as 'builds:builds'...")
+
+    recursive_chown(BUILDS_ROOT, "builds", "builds")
 
 
 current_time = datetime.datetime.now(datetime.UTC)
@@ -194,10 +242,15 @@ if clobber:
         conf_file.write(f"user={USER}\n")
         conf_file.write(f"group={GRP}\n")
 
+# Drop root priv here
+if os.geteuid() == 0:
+    os.seteuid(ug.pw_uid)
+    os.setegid(ug.pw_gid)
+
 if not os.path.exists(f"{BUILDS_ROOT}/distfiles"):
     os.mkdir(f"{BUILDS_ROOT}/distfiles")
 
-print(f"Writing log file at {LOG_PATH}")
+
 print(f"Initializing database at {BUILDS_ROOT}/scripts/builds-stable")
 
 with dbm.open(f'{BUILDS_ROOT}/scripts/builds-stable', 'c') as db:
