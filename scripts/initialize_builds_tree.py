@@ -190,8 +190,8 @@ else:
 
     print(f"Chown {LOG_PATH} root:builds")
     os.chown(LOG_PATH, 0, ug.pw_gid)
-    print(f"Chmod 774 {LOG_PATH}")
-    os.chmod(LOG_PATH, 0o774)
+    print(f"Chmod 664 {LOG_PATH}")
+    os.chmod(LOG_PATH, 0o664)
 
     print("Good!")
     print(f"Now we need to recursively chown {BUILDS_ROOT} as 'builds:builds'...")
@@ -250,6 +250,7 @@ if clobber:
 
 # Drop root priv here
 if os.geteuid() == 0:
+    ug = pwd.getpwnam("builds")
     os.seteuid(ug.pw_uid)
     os.setegid(ug.pw_gid)
 
