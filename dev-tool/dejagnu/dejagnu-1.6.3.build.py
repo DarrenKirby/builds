@@ -1,5 +1,5 @@
 #    dev-tool/dejagnu/dejagnu-1.6.3.build.py
-#    Sat Nov 23 00:24:10 UTC 2024
+#    Wed Nov 27 02:33:45 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -36,4 +36,14 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_script(f"{self.p['_ub']}/dejagnu", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/runtest", self.p['ub'])
+
+    self.inst_header(f"{self.p['_ui']}/dejagnu.h", self.p['ui'])
+
+    self.inst_directory(self.p['_ush'] + f"/dejagnu/", self.p['ush'] + "/dejagnu/")
+
+    self.inst_manpage(self.p['_man1'] + "/dejagnu-help.1", self.p['man1'])
+    self.inst_manpage(self.p['_man1'] + "/dejagnu-report-card.1", self.p['man1'])
+    self.inst_manpage(self.p['_man1'] + "/dejagnu.1", self.p['man1'])
+    self.inst_manpage(self.p['_man1'] + "/runtest.1", self.p['man1'])
