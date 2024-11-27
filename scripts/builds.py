@@ -109,129 +109,137 @@ def do_main() -> None:
     or builds the list of packages to install and feeds them one by one
     to the BuildPackage class.
     """
-    args = process_args()
-    if args.help:
-        show_usage()
-        sys.exit(0)
+    # Drop privs
+    with cf.PrivDropper():
+        args = process_args()
+        if args.help:
+            show_usage()
+            sys.exit(0)
 
-    if args.nocolor:
-        config['color'] = False
+        if args.nocolor:
+            config['color'] = False
 
-    # Print banner
-    cf.print_green(f"{APPNAME} ")
-    print("version ", end='')
-    cf.print_green(f"{APPVERSION} ")
-    print("(", end='')
-    cf.print_bold(f"{QUIP}")
-    print(")")
-    print()
+        # Print banner
+        cf.print_green(f"{APPNAME} ")
+        print("version ", end='')
+        cf.print_green(f"{APPVERSION} ")
+        print("(", end='')
+        cf.print_bold(f"{QUIP}")
+        print(")")
+        print()
 
-    if args.version:
-        sys.exit(0)
+        if args.version:
+            sys.exit(0)
 
-    if args.command == 'search':
-        search_package.do_search(args)
-        sys.exit(0)
-    elif args.command == 'info':
-        search_package.do_info(args)
-        sys.exit(0)
-    elif args.command == 'uninstall':
+        if args.command == 'search':
+            search_package.do_search(args)
+            sys.exit(0)
+        elif args.command == 'info':
+            search_package.do_info(args)
+            sys.exit(0)
+        elif args.command == 'initdb':
+            cf.do_initdb(args)
+            sys.exit(0)
+        elif args.command == 'cleantree':
+            num_cleaned = 0
+            if len(args.category) == 0:
+                num_cleaned = cf.clean_tree(f"{config['builds_root']}", args)
+            else:
+                for cat in args.category:
+                    num_cleaned = cf.clean_tree(f"{config['builds_root']}/{cat}", args)
+            cf.print_bold("cleaned ")
+            cf.print_green(str(num_cleaned))
+            cf.print_bold(" directory\n" if num_cleaned == 1 else " directories\n")
+            sys.exit(0)
+
+    # Need priv to uninstall
+    if args.command == 'uninstall':
         uninstall.do_uninstall(args)
         sys.exit(0)
-    elif args.command == 'initdb':
-        cf.do_initdb(args)
-        sys.exit(0)
-    elif args.command == 'cleantree':
-        num_cleaned = 0
-        if len(args.category) == 0:
-            num_cleaned = cf.clean_tree(f"{config['builds_root']}", args)
-        else:
-            for cat in args.category:
-                num_cleaned = cf.clean_tree(f"{config['builds_root']}/{cat}", args)
-        cf.print_bold("cleaned ")
-        cf.print_green(str(num_cleaned))
-        cf.print_bold(" directory\n" if num_cleaned == 1 else " directories\n")
-        sys.exit(0)
-    else:
+
+    with cf.PrivDropper():
+
         builds_to_build = dep_resolve.resolve_dependencies(args)
 
-    n_builds = len(builds_to_build)
-    this_build = 1
+        n_builds = len(builds_to_build)
+        this_build = 1
 
-    cf.green("builds to build:")
-    for name, version in builds_to_build:
-        cf.print_bold(f">>> {name} ")
-        cf.print_green(f"{version}\n")
-    print()
+        cf.green("builds to build:")
+        for name, version in builds_to_build:
+            cf.print_bold(f">>> {name} ")
+            cf.print_green(f"{version}\n")
+        print()
 
-    if args.pretend:
-        sys.exit(0)
+        if args.pretend:
+            sys.exit(0)
 
-    if args.ask:
-        cont = input("...continue with these builds? [y/n] ")
-        if cont in ['n', 'N']:
-            cf.red("aborting")
-            sys.exit(1)
-
-    for build in builds_to_build:
-        already_installed = False
-        check = cf.get_installed_version(build[0])
-        if check != [None] and build[1] == check[1]:
-            already_installed = True
-            cf.yellow(f"{build[0]} version {build[1]} already installed!")
-            print("Install again? ")
-            if input(">>> ") in ['n', 'N']:
+        if args.ask:
+            cont = input("...continue with these builds? [y/n] ")
+            if cont in ['n', 'N']:
                 cf.red("aborting")
                 sys.exit(1)
 
-        print()
-        start_time = datetime.datetime.now()
-        log.info('%s %s build started', build[0], build[1])
+    for build in builds_to_build:
+        with cf.PrivDropper():
+            already_installed = False
+            check = cf.get_installed_version(build[0])
+            if check != [None] and build[1] == check[1]:
+                already_installed = True
+                cf.yellow(f"{build[0]} version {build[1]} already installed!")
+                print("Install again? ")
+                if input(">>> ") in ['n', 'N']:
+                    cf.red("aborting")
+                    sys.exit(1)
 
-        cf.print_bold("starting build ")
-        cf.print_green(str(this_build))
-        cf.print_bold(" of ")
-        cf.print_green(str(n_builds))
-        cf.print_bold(f" {build[0]}\n")
-        print()
+            print()
+            start_time = datetime.datetime.now()
+            log.info('%s %s build started', build[0], build[1])
 
-        # xterm titlebar
-        if config['xterm']:
-            os.system(f'echo -e "\033]0; build {this_build} of {n_builds}: {build[0]}\a"')
+            cf.print_bold("starting build ")
+            cf.print_green(str(this_build))
+            cf.print_bold(" of ")
+            cf.print_green(str(n_builds))
+            cf.print_bold(f" {build[0]}\n")
+            print()
 
-        this_build += 1
+            # xterm titlebar
+            if config['xterm']:
+                os.system(f'echo -e "\033]0; build {this_build} of {n_builds}: {build[0]}\a"')
 
-        bld = build_package.BuildPackage(build[0], args)
-        bld.fetch()
+            this_build += 1
 
-        if args.fetch:
-            continue
+            bld = build_package.BuildPackage(build[0], args)
+            bld.fetch()
 
-        bld.install_source()
-        bld.configure_src()
-        bld.make_src()
-        bld.make_inst()
+            if args.fetch:
+                continue
+
+            bld.install_source()
+            bld.configure_src()
+            bld.make_src()
+            bld.make_inst()
+
+        # These two need priv
         bld.inst()
         bld.cleanup()
 
-        print()
-        if not args.test:
-            cf.green(f"Recording {build[0]} {build[1]} in 'sets/installed'...")
-            if not already_installed:
-                cf.add_to_installed(build[0], build[1])
-        print(">>> ...done!")
+        with cf.PrivDropper():
+            print()
+            if not args.test:
+                cf.green(f"Recording {build[0]} {build[1]} in 'sets/installed'...")
+                if not already_installed:
+                    cf.add_to_installed(build[0], build[1])
+            print(">>> ...done!")
 
-        finish_time = datetime.datetime.now()
-        elapsed = finish_time - start_time
-        print()
-        cf.bold(f"build of {build[0]} version {build[1]} complete in {elapsed}.")
-        log.info('%s %s build complete in %s', build[0], build[1], elapsed)
+            finish_time = datetime.datetime.now()
+            elapsed = finish_time - start_time
+            print()
+            cf.bold(f"build of {build[0]} version {build[1]} complete in {elapsed}.")
+            log.info('%s %s build complete in %s', build[0], build[1], elapsed)
 
     print()
     cf.green("Finished all builds. Exiting...")
     sys.exit(0)
-
-
 
 
 def show_usage() -> None:
