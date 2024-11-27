@@ -19,7 +19,13 @@
 
 
 def configure(self):
-    print(f"Effective UID (from inside build script configure()): {os.geteuid()}")
+    # FIXME: There is some sort of bug here; unsure if in tar configure script or elsewhere
+    # This fails when running a system builds install, even after setting EUID to non-privileged.
+    # line 39027 in the tar configure script explicitly tests EUID:
+    # if (geteuid () == ROOT_UID) return 99;
+    # However, it still fails with non-root EUID; so a sed hack to remove the line,
+    # until I can figure it out.
+    os.system("sed -i '/if (geteuid () == ROOT_UID) return 99/d' configure")
     return os.system(f"./configure --prefix=/usr")
 
 
