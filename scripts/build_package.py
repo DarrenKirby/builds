@@ -403,6 +403,7 @@ class BuildPackage(FileInstaller):
         """
         Configure the source code and build environment
         """
+        print(f"Effective UID (from inside configure_src()): {os.geteuid()}")
         os.chdir(self.package_dir)
         cf.bold("Configuring package...")
         print()

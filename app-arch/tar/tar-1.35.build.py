@@ -19,6 +19,7 @@
 
 
 def configure(self):
+    print(f"Effective UID (from inside build script configure()): {os.geteuid()}")
     return os.system(f"./configure --prefix=/usr")
 
 
