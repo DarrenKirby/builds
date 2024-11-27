@@ -31,17 +31,21 @@ def make_install(self):
 
 
 def install(self):
-    pass
-    #self.inst_binary(f"{self.p['_ub']}/psl", self.p['ub'])
-    #self.inst_script(f"{self.p['_ub']}/psl-make-dafsa", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/asn1Coding", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/asn1Decoding", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/asn1Parser", self.p['ub'])
 
-    #self.inst_header(f"{self.p['_ui']}/libpsl.h", self.p['ui'])
+    self.inst_header(f"{self.p['_ui']}/libtasn1.h", self.p['ui'])
 
-    #self.inst_library(f"{self.p['_ul']}/libpsl.so.5.3.5", self.p['ul'])
-    #self.inst_symlink(f"{self.p['ul']}/libpsl.so.5.3.5", f"{self.p['ul']}/libpsl.so.5")
-    #self.inst_symlink(f"{self.p['ul']}/libpsl.so.5", f"{self.p['ul']}/libpsl.so")
+    self.inst_library(f"{self.p['_ul']}/libtasn1.so.6.6.3", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libtasn1.so.6.6.3", f"{self.p['ul']}/libtasn1.so.6")
+    self.inst_symlink(f"{self.p['ul']}/libtasn1.so.6.6.3", f"{self.p['ul']}/libtasn1.so")
 
-    #self.inst_file(f"{self.p['_ul']}/pkgconfig/libpsl.pc", f"{self.p['ul']}/pkgconfig/")
+    self.inst_file(f"{self.p['_ul']}/pkgconfig/libtasn1.pc", f"{self.p['ul']}/pkgconfig/")
 
-    #self.inst_manpage(f"{self.p['_man1']}/psl.1", self.p['man1'])
-    #self.inst_manpage(f"{self.p['_man1']}/psl-make-dafsa.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/asn1Coding.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/asn1Decoding.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/asn1Parser.1", self.p['man1'])
+
+    for manpage in os.listdir(self.p['_man3']):
+        self.inst_manpage(f"{self.p['_man3']}/{manpage}", self.p['man3'])

@@ -1,5 +1,5 @@
 #    dev-tool/flex/flex-2.6.4.build.py
-#    Sun Nov 24 03:03:45 UTC 2024
+#    Tue Nov 26 23:16:03 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -31,4 +31,13 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_binary(self.p['_ub'] + "/flex", self.p['ub'])
+    self.inst_symlink(self.p['ub'] + "/flex", self.p['ub'] + "/flex++")
+
+    self.inst_header(self.p['_ui'] + "/FlexLexer.h", self.p['ui'])
+
+    self.inst_library(f"{self.p['_ul']}/libfl.so.2.0.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libfl.so.2.0.0", f"{self.p['ul']}/libfl.so.2")
+    self.inst_symlink(f"{self.p['ul']}/libfl.so.2.0.0", f"{self.p['ul']}/libfl.so")
+
+    self.inst_manpage(self.p['_man1'] + "/flex.1", self.p['man1'])

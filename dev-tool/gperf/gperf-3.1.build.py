@@ -1,5 +1,5 @@
 #    dev-tool/gperf/gperf-3.1.build.py
-#    Sun Nov 24 03:10:24 UTC 2024
+#    Wed Nov 27 00:12:52 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -31,4 +31,5 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_binary(self.p['_ub'] + "/gperf", self.p['ub'])
+    self.inst_manpage(self.p['_man1'] + "/gperf.1", self.p['man1'])
