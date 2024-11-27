@@ -173,10 +173,16 @@ else:
     INSTALL_ROOT = ""
 
     print("OK. We need to create an unpriviledged user and group for builds:")
-    create_system_user("builds", BUILDS_ROOT)
+    # Check if user already exists
+    try:
+        pwd.getpwnam('builds')
+        print("User 'builds' already exists. Skipping...")
+    except KeyError:
+        create_system_user("builds", BUILDS_ROOT)
+
     ug = pwd.getpwnam("builds")
-    print(f"UID: {ug.pw_uid}")
-    print(f"GID: {ug.pw_gid}")
+    print(f"builds UID: {ug.pw_uid}")
+    print(f"builds GID: {ug.pw_gid}")
 
     print(f"Creating log file at {LOG_PATH}")
     with open(LOG_PATH, 'a'):
@@ -252,6 +258,8 @@ if not os.path.exists(f"{BUILDS_ROOT}/distfiles"):
 
 
 print(f"Initializing database at {BUILDS_ROOT}/scripts/builds-stable")
+if os.path.isfile(f"{BUILDS_ROOT}/scripts/builds-stable"):
+    os.remove(f"{BUILDS_ROOT}/scripts/builds-stable")
 
 with dbm.open(f'{BUILDS_ROOT}/scripts/builds-stable', 'c') as db:
     with open(f'{BUILDS_ROOT}/scripts/builds-stable.csv', newline='', encoding='utf-8') as f:
