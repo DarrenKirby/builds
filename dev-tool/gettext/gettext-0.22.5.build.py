@@ -70,7 +70,7 @@ def install(self):
     self.inst_directory(self.p['_ush'] + "/gettext-0.22.5/", self.p['ush'] + "/gettext-0.22.5/")
 
     for file in os.listdir(self.p['_ush'] + "/aclocal"):
-        self.inst_file(f"{self.p['_ush']}/aclocal/{file}", self.p['_ush'] + "/aclocal/")
+        self.inst_file(f"{self.p['_ush']}/aclocal/{file}", self.p['ush'] + "/aclocal/")
 
     for manpage in os.listdir(self.p['_man1']):
         self.inst_manpage(f"{self.p['_man1']}/{manpage}", self.p['man1'])
