@@ -30,7 +30,6 @@ import argparse
 import os
 import glob
 import subprocess
-from os.path import exists
 from shutil import unpack_archive, rmtree
 import subprocess as sp
 import shlex
@@ -295,6 +294,20 @@ class FileInstaller:
                 sys.exit(-1)
 
         self.manifest.append(absfile)
+
+    @staticmethod
+    def do(cmd: str) -> int:
+        """
+        Helper function for running shell commands in a build script.
+        """
+        try:
+            sp.run(shlex.split(cmd), check=True)
+            return 0
+        except sp.CalledProcessError as e:
+            cf.red(f"command: {cmd} failed: ")
+            print(e)
+            log.error("build failure: command '%s' failed: %s", cmd, e)
+            sys.exit(-1)
 
     @staticmethod
     def _list_all_paths(directory_path):
