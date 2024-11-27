@@ -1,5 +1,5 @@
 #    dev-lang/expect/expect-5.45.4.build.py
-#    Sat Nov 23 03:17:49 UTC 2024
+#    Wed Nov 27 02:33:45 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -66,7 +66,7 @@ def install(self):
     for header in os.listdir(self.p['_ui']):
         self.inst_header(f"{self.p['_ui']}/{header}", self.p['ui'])
 
-    self.inst_directory(self.p['_ul'] + f"/expect{self.version}/", self.p['_ul'] + f"/expect{self.version}/")
+    self.inst_directory(self.p['_ul'] + f"/expect{self.version}/", self.p['ul'] + f"/expect{self.version}/")
 
     for manpage in os.listdir(self.p['_man1']):
         self.inst_manpage(f"{self.p['_man1']}/{manpage}", self.p['man1'])
