@@ -27,12 +27,14 @@ def configure(self):
                      "--with-superuser-path=/usr/sbin:/usr/bin "
                      "--with-pid-dir=/run")
 
+
 def make(self):
     return os.system(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
     return os.system(f"make DESTDIR={self.seg_dir} install")
+
 
 def install(self):
     # Get all files in work/seg/usr/bin/, and install to /usr/bin/
