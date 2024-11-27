@@ -28,6 +28,7 @@ import os
 import csv
 import dbm
 import shutil
+import pwd
 import logging as log
 import urllib.request as request
 from urllib.error import URLError
@@ -106,6 +107,30 @@ def print_red(msg: str) -> None:
     """Print red text with no newline """
     msg = colorize("red", msg)
     print(msg, end='')
+
+
+class PrivDropper:
+    """
+    A class which implements a simple context
+    manager to run unprivileged commands
+    """
+
+    def __init__(self):
+        self.orig_uid = os.geteuid()
+        self.orig_gid = os.getegid()
+
+    def __enter__(self):
+        if self.orig_uid == 0:
+            self.unpriv_uid = pwd.getpwnam("builds").pw_uid
+            self.unpriv_gid = pwd.getpwnam("builds").pw_gid
+            os.seteuid(self.unpriv_uid)
+            os.setegid(self.unpriv_gid)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.orig_uid == 0:
+            os.seteuid(self.orig_uid)
+            os.setegid(self.orig_gid)
+        return False
 
 
 def uniq_list(input_list: list) -> list:
