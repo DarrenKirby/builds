@@ -1,5 +1,5 @@
-#    dev-util/git/git-2.47.0.build.py
-#    Fri Nov 15 03:04:20 UTC 2024
+#    dev-util/git/git-2.47.1.build.py
+#    Wed Nov 27 05:49:06 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
