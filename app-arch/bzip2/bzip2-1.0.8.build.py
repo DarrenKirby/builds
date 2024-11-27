@@ -40,7 +40,7 @@ def install(self):
 
     os.rename("bzip2-shared", f"{self.p['_ub']}/bzip2")
     self.inst_binary(f"{self.p['_ub']}/bzip2", f"{self.p['ub']}")
-    self.inst_symlink(f"{self.p['ub']}/bzip2", f"{self.p['ub']}/bzat")
+    self.inst_symlink(f"{self.p['ub']}/bzip2", f"{self.p['ub']}/bzcat")
     self.inst_symlink(f"{self.p['ub']}/bzip2", f"{self.p['ub']}/bunzip2")
 
     self.inst_script(f"{self.p['_ub']}/bzdiff", f"{self.p['ub']}")
