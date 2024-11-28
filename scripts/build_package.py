@@ -497,7 +497,7 @@ class BuildPackage(FileInstaller):
             self.cleanup_prehook()
 
         print()
-        with cf.PrivDropper:
+        with cf.PrivDropper():
             cf.green("Writing manifest file...")
             if self._write_manifest_file():
                 print(">>> ...done.")
