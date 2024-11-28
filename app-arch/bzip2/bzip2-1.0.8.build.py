@@ -1,5 +1,5 @@
 #    app-arch/bzip2/bzip2-1.0.8.build.py
-#    Tue Nov  5 23:04:26 UTC 2024
+#    Thu Nov 28 00:03:00 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -20,15 +20,15 @@
 
 def make(self):
     # Build shared lib, and use Makefile which links binaries against it
-    exit1 = os.system("make -f Makefile-libbz2_so")
-    exit2 = os.system("make clean")
+    exit1 = self.do("make -f Makefile-libbz2_so")
+    exit2 = self.do("make clean")
     if (exit1 != 0) and (exit2 != 0):
         return 1
-    return os.system("make")
+    return self.do("make")
 
 
 def make_install(self):
-    return os.system(f"make PREFIX={self.seg_dir}/usr install")
+    return self.do(f"make PREFIX={self.seg_dir}/usr install")
 
 
 def install(self):

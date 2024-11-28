@@ -1,5 +1,5 @@
 #    app-arch/xz/xz-5.6.2.build
-#    Thu Nov  7 01:21:57 UTC 2024
+#    Thu Nov 28 00:06:27 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,15 +19,15 @@
 
 
 def configure(self):
-    return os.system("./configure --prefix=/usr --disable-static --disable-doc")
+    return self.do("./configure --prefix=/usr --disable-static --disable-doc")
 
 
 def make(self):
-    return os.system("make")
+    return self.do("make")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

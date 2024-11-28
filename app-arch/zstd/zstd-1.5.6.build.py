@@ -1,5 +1,5 @@
 #    app-arch/zstd/zstd-1.5.6-.build.py
-#    Thu Nov  7 02:10:02 UTC 2024
+#    Thu Nov 28 00:07:55 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,11 +19,11 @@
 
 
 def make(self):
-    return os.system(f"make prefix={self.seg_dir}")
+    return self.do(f"make prefix={self.seg_dir}")
 
 
 def make_install(self):
-    return os.system(f"make prefix={self.seg_dir} install")
+    return self.do(f"make prefix={self.seg_dir} install")
 
 
 def install(self):

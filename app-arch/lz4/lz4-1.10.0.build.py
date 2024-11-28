@@ -1,5 +1,5 @@
 #    app-arch/lz4/lz4-1.10.0.build.py
-#    Thu Nov  7 01:08:57 UTC 2024
+#    Thu Nov 28 00:05:28 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,11 +19,11 @@
 
 
 def make(self):
-    return os.system(f"make BUILD_STATIC=no PREFIX={self.seg_dir}/usr")
+    return self.do(f"make BUILD_STATIC=no PREFIX={self.seg_dir}/usr")
 
 
 def make_install(self):
-    return os.system(f"make BUILD_STATIC=no PREFIX={self.seg_dir}/usr install")
+    return self.do(f"make BUILD_STATIC=no PREFIX={self.seg_dir}/usr install")
 
 
 def install(self):

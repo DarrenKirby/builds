@@ -1,5 +1,5 @@
 #    app-arch/gzip/gzip-1.13.build.py
-#    Thu Nov  7 00:27:56 UTC 2024
+#    Thu Nov 28 00:04:29 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,15 +19,15 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix=/usr")
+    return self.do(f"./configure --prefix=/usr")
 
 
 def make(self):
-    return os.system("make")
+    return self.do("make")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
