@@ -157,68 +157,68 @@ def do_main() -> None:
         uninstall.do_uninstall(args)
         sys.exit(0)
 
-    with cf.PrivDropper():
+        #with cf.PrivDropper():
 
-        builds_to_build = dep_resolve.resolve_dependencies(args)
+    builds_to_build = dep_resolve.resolve_dependencies(args)
 
-        n_builds = len(builds_to_build)
-        this_build = 1
+    n_builds = len(builds_to_build)
+    this_build = 1
 
-        cf.green("builds to build:")
-        for name, version in builds_to_build:
-            cf.print_bold(f">>> {name} ")
-            cf.print_green(f"{version}\n")
-        print()
+    cf.green("builds to build:")
+    for name, version in builds_to_build:
+        cf.print_bold(f">>> {name} ")
+        cf.print_green(f"{version}\n")
+    print()
 
-        if args.pretend:
-            sys.exit(0)
+    if args.pretend:
+        sys.exit(0)
 
-        if args.ask:
-            cont = input("...continue with these builds? [y/n] ")
-            if cont in ['n', 'N']:
+    if args.ask:
+        cont = input("...continue with these builds? [y/n] ")
+        if cont in ['n', 'N']:
+            cf.red("aborting")
+            sys.exit(1)
+
+    for build in builds_to_build:
+        #with cf.PrivDropper():
+        already_installed = False
+        check = cf.get_installed_version(build[0])
+        if check != [None] and build[1] == check[1]:
+            already_installed = True
+            cf.yellow(f"{build[0]} version {build[1]} already installed!")
+            print("Install again? ")
+            if input(">>> ") in ['n', 'N']:
                 cf.red("aborting")
                 sys.exit(1)
 
-    for build in builds_to_build:
-        with cf.PrivDropper():
-            already_installed = False
-            check = cf.get_installed_version(build[0])
-            if check != [None] and build[1] == check[1]:
-                already_installed = True
-                cf.yellow(f"{build[0]} version {build[1]} already installed!")
-                print("Install again? ")
-                if input(">>> ") in ['n', 'N']:
-                    cf.red("aborting")
-                    sys.exit(1)
+        print()
+        start_time = datetime.datetime.now()
+        log.info('%s %s build started', build[0], build[1])
 
-            print()
-            start_time = datetime.datetime.now()
-            log.info('%s %s build started', build[0], build[1])
+        cf.print_bold("starting build ")
+        cf.print_green(str(this_build))
+        cf.print_bold(" of ")
+        cf.print_green(str(n_builds))
+        cf.print_bold(f" {build[0]}\n")
+        print()
 
-            cf.print_bold("starting build ")
-            cf.print_green(str(this_build))
-            cf.print_bold(" of ")
-            cf.print_green(str(n_builds))
-            cf.print_bold(f" {build[0]}\n")
-            print()
+        # xterm titlebar
+        if config['xterm']:
+            os.system(f'echo -e "\033]0; build {this_build} of {n_builds}: {build[0]}\a"')
 
-            # xterm titlebar
-            if config['xterm']:
-                os.system(f'echo -e "\033]0; build {this_build} of {n_builds}: {build[0]}\a"')
+        this_build += 1
 
-            this_build += 1
+        bld = build_package.BuildPackage(build[0], args)
+        bld.fetch()
 
-            bld = build_package.BuildPackage(build[0], args)
-            bld.fetch()
+        if args.fetch:
+            continue
 
-            if args.fetch:
-                continue
-
-            bld.install_source()
-            print(f"Effective UID (just before call to configure_src()): {os.geteuid()}")
-            bld.configure_src()
-            bld.make_src()
-            bld.make_inst()
+        bld.install_source()
+        print(f"Effective UID (just before call to configure_src()): {os.geteuid()}")
+        bld.configure_src()
+        bld.make_src()
+        bld.make_inst()
 
         # These two need priv
         bld.inst()

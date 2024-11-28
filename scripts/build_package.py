@@ -301,7 +301,7 @@ class FileInstaller:
         Helper function for running shell commands in a build script.
         """
         try:
-            sp.run(shlex.split(cmd), check=True)
+            sp.run(shlex.split(cmd), check=True, user="builds", group="builds")
             return 0
         except sp.CalledProcessError as e:
             cf.red(f"command: {cmd} failed: ")
