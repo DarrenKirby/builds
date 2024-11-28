@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return self.do("./configure --prefix=/usr")
+    return self.do("PAGE=letter ./configure --prefix=/usr")
 
 
 def make(self):

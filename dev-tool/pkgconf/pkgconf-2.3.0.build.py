@@ -19,11 +19,11 @@
 
 
 def configure(self):
-    return self.do("./configure --prefix=/usr")
+    return self.do("./configure --prefix=/usr --disable-static")
 
 
 def make(self):
-    return self.do("make")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):

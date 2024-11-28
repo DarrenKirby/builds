@@ -20,15 +20,15 @@
 
 def configure(self):
     # Prevent static libs
-    return self.do("sed -i '/install -m.*STA/d' libcap/Makefile")
+    return self.do("./configure --prefix=/usr --disable-static --with-gcc-arch=native")
 
 
 def make(self):
-    return self.do(f"make {cf.config['makeopts']} prefix={self.seg_dir}/usr lib=lib")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return self.do(f"make prefix={self.seg_dir}/usr lib=lib install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

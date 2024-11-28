@@ -19,7 +19,13 @@
 
 
 def configure(self):
-    return self.do("./configure --prefix=/usr")
+    return self.do("./configure --prefix=/usr "
+                   "--sysconfdir=/etc "
+                   "--with-openssl "
+                   "--with-xz "
+                   "--with-zstd "
+                   "--with-zlib "
+                   "--disable-manpages")
 
 
 def make(self):

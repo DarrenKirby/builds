@@ -22,7 +22,7 @@
 #      How to resolve with temp install directory? As-is, the
 #      make_install step will fail on permissions for non-system install
 def configure(self):
-    return self.do("./configure --prefix=/usr")
+    return self.do("./configure --prefix=/usr --localstatedir=/var/lib/locate")
 
 
 def make(self):

@@ -31,18 +31,4 @@ def make_install(self):
 
 
 def install(self):
-    self.inst_binary(f"{self.p['_ub']}/fuser", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/killall", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/peekfd", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/prtstat", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/pslog", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/pstree", self.p['ub'])
-
-    self.inst_symlink(f"{self.p['ub']}/pstree", f"{self.p['ub']}/pstree.x11")
-
-    self.inst_manpage(f"{self.p['_man1']}/fuser.1", self.p['man1'])
-    self.inst_manpage(f"{self.p['_man1']}/killall.1", self.p['man1'])
-    self.inst_manpage(f"{self.p['_man1']}/peekfd.1", self.p['man1'])
-    self.inst_manpage(f"{self.p['_man1']}/prtstat.1", self.p['man1'])
-    self.inst_manpage(f"{self.p['_man1']}/pslog.1", self.p['man1'])
-    self.inst_manpage(f"{self.p['_man1']}/pstree.1", self.p['man1'])
+    pass

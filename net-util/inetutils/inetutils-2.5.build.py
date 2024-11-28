@@ -19,7 +19,17 @@
 
 
 def configure(self):
-    return self.do(f"./configure --prefix=/usr --with-ssl=openssl")
+    self.do("sed -i 's/def HAVE_TERMCAP_TGETENT/ 1/' telnet/telnet.c")
+    return self.do(f"./configure --prefix=/usr "
+                   "--bindir=/usr/bin "
+                   "--localstatedir=/var "
+                   "--disable-logger "
+                   "--disable-whois "
+                   "--disable-rcp "
+                   "--disable-rexec "
+                   "--disable-rlogin "
+                   "--disable-rsh "
+                   "--disable-servers")
 
 
 def make(self):
