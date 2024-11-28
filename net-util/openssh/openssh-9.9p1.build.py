@@ -20,20 +20,20 @@
 
 def configure(self):
     conf_d = '/etc/ssh' if cf.config['user'] == 'root' else '/usr/etc/ssh'
-    return os.system("./configure --prefix=/usr "
-                     f"--sysconfdir={conf_d} "
-                     "--with-privsep-path=/var/lib/sshd "
-                     "--with-default-path=/usr/bin "
-                     "--with-superuser-path=/usr/sbin:/usr/bin "
-                     "--with-pid-dir=/run")
+    return self.do("./configure --prefix=/usr "
+                   f"--sysconfdir={conf_d} "
+                   "--with-privsep-path=/var/lib/sshd "
+                   "--with-default-path=/usr/bin "
+                   "--with-superuser-path=/usr/sbin:/usr/bin "
+                   "--with-pid-dir=/run")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
@@ -74,14 +74,14 @@ def cleanup_posthook(self):
     # Check if sshd user already exists...
     import pwd
     try:
-        pwd.getpwuid(50)
+        pwd.getpwnam("sshd")
         return
     except KeyError:
         pass
     try:
         cf.bold("Creating user/group 'sshd'")
-        os.system("install -v -g sys -m700 -d /var/lib/sshd")
-        os.system("groupadd -g 50 sshd")
-        os.system("useradd -c 'sshd PrivSep' -d /var/lib/sshd -g sshd -s /bin/false -u 50 sshd")
+        self.do("install -v -g sys -m700 -d /var/lib/sshd")
+        self.do("groupadd -g 50 sshd")
+        self.do("useradd -c 'sshd PrivSep' -d /var/lib/sshd -g sshd -s /bin/false -u 50 sshd")
     except OSError as e:
         cf.yellow(f"Adding user/group 'sshd' failed: {e}")

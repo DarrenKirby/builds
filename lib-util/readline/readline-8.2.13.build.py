@@ -19,19 +19,19 @@
 
 
 def configure(self):
-    os.system("sed -i '/MV.*old/d' Makefile.in")
-    os.system("sed -i '/{OLDSUFF}/c:' support/shlib-install")
-    os.system("sed -i 's/-Wl,-rpath,[^ ]*//' support/shobj-conf")
+    self.do("sed -i '/MV.*old/d' Makefile.in")
+    self.do("sed -i '/{OLDSUFF}/c:' support/shlib-install")
+    self.do("sed -i 's/-Wl,-rpath,[^ ]*//' support/shobj-conf")
 
-    return os.system("./configure --prefix=/usr --disable-static --with-curses")
+    return self.do("./configure --prefix=/usr --disable-static --with-curses")
 
 
 def make(self):
-    return os.system(f'make SHLIB_LIBS="-lncursesw" {cf.config["makeopts"]}')
+    return self.do(f'make SHLIB_LIBS="-lncursesw" {cf.config["makeopts"]}')
 
 
 def make_install(self):
-    return os.system(f'make DESTDIR={self.seg_dir} SHLIB_LIBS="-lncursesw" install')
+    return self.do(f'make DESTDIR={self.seg_dir} SHLIB_LIBS="-lncursesw" install')
 
 
 def install(self):

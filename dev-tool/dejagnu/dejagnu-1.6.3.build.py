@@ -23,16 +23,16 @@ depend = "dev-lang/expect"
 def configure(self):
     os.mkdir("build")
     os.chdir("build/")
-    return os.system("../configure --prefix=/usr")
+    return self.do("../configure --prefix=/usr")
 
 
 def make(self):
-    os.system("makeinfo --html --no-split -o doc/dejagnu.html ../doc/dejagnu.texi")
-    return os.system("makeinfo --plaintext -o doc/dejagnu.txt  ../doc/dejagnu.texi")
+    self.do("makeinfo --html --no-split -o doc/dejagnu.html ../doc/dejagnu.texi")
+    return self.do("makeinfo --plaintext -o doc/dejagnu.txt  ../doc/dejagnu.texi")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

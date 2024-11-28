@@ -19,15 +19,15 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix=/usr --with-ssl=openssl")
+    return self.do(f"./configure --prefix=/usr --with-ssl=openssl")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

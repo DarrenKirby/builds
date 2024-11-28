@@ -20,15 +20,15 @@
 
 def configure(self):
     # -N: --disable-nls, as --prefix is not honoured for locale installation
-    return os.system("CC=gcc ./configure --prefix=/usr -G -N -O3 -r")
+    return self.do("CC=gcc ./configure --prefix=/usr -G -N -O3 -r")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

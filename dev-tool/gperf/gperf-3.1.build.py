@@ -19,15 +19,15 @@
 
 
 def configure(self):
-    return os.system("./configure --prefix=/usr")
+    return self.do("./configure --prefix=/usr")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

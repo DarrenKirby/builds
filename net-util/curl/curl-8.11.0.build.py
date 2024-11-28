@@ -21,20 +21,20 @@
 depend = "dev-lib/libpsl"
 
 def configure(self):
-    return os.system("./configure --prefix=/usr "
-                     "--disable-static "
-                     "--with-openssl "
-                     "--enable-threaded-resolver "
-                     # "--with-libssh2 "
-                     "--with-ca-path=/etc/ssl/certs")
+    return self.do("./configure --prefix=/usr "
+                   "--disable-static "
+                   "--with-openssl "
+                   "--enable-threaded-resolver "
+                   # "--with-libssh2 "
+                   "--with-ca-path=/etc/ssl/certs")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
