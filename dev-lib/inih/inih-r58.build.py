@@ -21,16 +21,16 @@
 def configure(self):
     os.mkdir("build")
     os.chdir("build")
-    return os.system("meson setup --prefix=/usr "
-                     "--libdir=lib --buildtype=release ..")
+    return self.do("meson setup --prefix=/usr "
+                   "--libdir=lib --buildtype=release ..")
 
 
 def make(self):
-    return os.system("ninja")
+    return self.do("ninja")
 
 
 def make_install(self):
-    return os.system(f"DESTDIR={self.seg_dir} ninja install")
+    return self.do(f"DESTDIR={self.seg_dir} ninja install")
 
 
 def install(self):

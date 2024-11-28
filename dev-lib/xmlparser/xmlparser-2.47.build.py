@@ -24,15 +24,15 @@ def install_source_posthook(self):
     os.rename(f"XML-Parser-{self.version}", self.package_dir)
 
 def configure(self):
-    return os.system(f"perl Makefile.PL EXPATLIBPATH={self.p['ui']} EXPATINCPATH={self.p['ui']}")
+    return self.do(f"perl Makefile.PL EXPATLIBPATH={self.p['ui']} EXPATINCPATH={self.p['ui']}")
 
 
 def make(self):
-    return os.system("make")
+    return self.do("make")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

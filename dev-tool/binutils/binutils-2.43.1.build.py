@@ -21,25 +21,25 @@
 def configure(self):
     os.mkdir("build")
     os.chdir("build/")
-    return os.system("../configure --prefix=/usr "
-                     f"--sysconfdir={'/etc' if cf.config['user'] == 'root' else '/usr/etc'} "
-                     "--enable-gold "
-                     "--enable-ld=default "
-                     "--enable-plugins "
-                     "--enable-shared "
-                     "--disable-werror "
-                     "--enable-64-bit-bfd "
-                     "--enable-new-dtags "
-                     "--with-system-zlib "
-                     "--enable-default-hash-style=gnu")
+    return self.do("../configure --prefix=/usr "
+                   f"--sysconfdir={'/etc' if cf.config['user'] == 'root' else '/usr/etc'} "
+                   "--enable-gold "
+                   "--enable-ld=default "
+                   "--enable-plugins "
+                   "--enable-shared "
+                   "--disable-werror "
+                   "--enable-64-bit-bfd "
+                   "--enable-new-dtags "
+                   "--with-system-zlib "
+                   "--enable-default-hash-style=gnu")
 
 
 def make(self):
-    return os.system("make tooldir=/usr")
+    return self.do("make tooldir=/usr")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} tooldir=/usr install")
+    return self.do(f"make DESTDIR={self.seg_dir} tooldir=/usr install")
 
 
 def install(self):

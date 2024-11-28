@@ -19,28 +19,28 @@
 
 
 def configure(self):
-    return os.system("./configure --prefix=/usr "
-                     "--mandir=/usr/share/man "
-                     "--with-shared "
-                     "--without-debug "
-                     "--without-normal "
-                     "--with-cxx-shared "
-                     "--enable-pc-files "
-                     "--with-pkg-config-libdir=/usr/lib/pkgconfig")
+    return self.do("./configure --prefix=/usr "
+                   "--mandir=/usr/share/man "
+                   "--with-shared "
+                   "--without-debug "
+                   "--without-normal "
+                   "--with-cxx-shared "
+                   "--enable-pc-files "
+                   "--with-pkg-config-libdir=/usr/lib/pkgconfig")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
     try:
-        os.system(f"make DESTDIR={self.seg_dir} install")
+        self.do(f"make DESTDIR={self.seg_dir} install")
     except OSError as e:
         cf.yellow(f"make_install failed: {e}")
         return 1
     # Edit header file
-    return os.system(f"sed -e 's/^#if.*XOPEN.*$/#if 1/' -i {self.p['_ui']}/curses.h")
+    return self.do(f"sed -e 's/^#if.*XOPEN.*$/#if 1/' -i {self.p['_ui']}/curses.h")
 
 def install(self):
     for file in os.listdir(self.p['_ub']):

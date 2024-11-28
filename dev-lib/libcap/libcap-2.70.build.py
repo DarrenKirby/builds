@@ -20,15 +20,15 @@
 
 def configure(self):
     # Prevent static libs
-    return os.system("sed -i '/install -m.*STA/d' libcap/Makefile")
+    return self.do("sed -i '/install -m.*STA/d' libcap/Makefile")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']} prefix={self.seg_dir}/usr lib=lib")
+    return self.do(f"make {cf.config['makeopts']} prefix={self.seg_dir}/usr lib=lib")
 
 
 def make_install(self):
-    return os.system(f"make prefix={self.seg_dir}/usr lib=lib install")
+    return self.do(f"make prefix={self.seg_dir}/usr lib=lib install")
 
 
 def install(self):
