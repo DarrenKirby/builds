@@ -1,5 +1,5 @@
 #    app-shell/dash/dash-0.5.12.build.py
-#    Thu Nov  7 04:26:15 UTC 2024
+#    Thu Nov 28 00:32:18 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,15 +19,15 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix=/usr")
+    return self.do(f"./configure --prefix=/usr")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

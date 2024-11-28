@@ -34,7 +34,7 @@ def install_source_posthook(self):
 /usr/sbin/make-ca -r    
 """
     os.chdir(self.package_dir)
-    os.system("sed '20,$ d' -i trust/trust-extract-compat")
+    self.do("sed '20,$ d' -i trust/trust-extract-compat")
     with open("trust/trust-extract-compat", "a", encoding='utf-8') as f:
         f.write(text)
     os.chdir(self.work_dir)
@@ -42,15 +42,15 @@ def install_source_posthook(self):
 def configure(self):
     os.mkdir("build")
     os.chdir("build")
-    return os.system("meson setup --prefix=/usr --buildtype=release -D trust_paths=/etc/pki/anchors")
+    return self.do("meson setup --prefix=/usr --buildtype=release -D trust_paths=/etc/pki/anchors")
 
 
 def make(self):
-    return os.system("ninja")
+    return self.do("ninja")
 
 
 def make_install(self):
-    return os.system(f"DESTDIR={self.seg_dir} ninja install")
+    return self.do(f"DESTDIR={self.seg_dir} ninja install")
 
 
 def install(self):

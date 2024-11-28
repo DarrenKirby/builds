@@ -1,5 +1,5 @@
 #    app-shell/bash/bash-5.2.37.build.py
-#    Thu Nov  7 04:18:15 UTC 2024
+#    Thu Nov 28 00:31:33 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,18 +19,18 @@
 
 
 def configure(self):
-    return os.system("./configure --prefix=/usr "
-                     f"--without-bash-malloc "
-                     f"--with-installed-readline "
-                     f"bash_cv_strtold_broken=no")
+    return self.do("./configure --prefix=/usr "
+                   f"--without-bash-malloc "
+                   f"--with-installed-readline "
+                   f"bash_cv_strtold_broken=no")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

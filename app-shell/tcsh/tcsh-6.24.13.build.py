@@ -1,5 +1,5 @@
 #    app-shell/tcsh/tcsh-6.24.13.build.py
-#    Thu Nov  7 04:29:59 UTC 2024
+#    Thu Nov 28 00:32:49 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:Darren Kirby)
@@ -19,15 +19,15 @@
 
 
 def configure(self):
-    return os.system("./configure --prefix=/usr")
+    return self.do("./configure --prefix=/usr")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install install.man")
+    return self.do(f"make DESTDIR={self.seg_dir} install install.man")
 
 
 def install(self):

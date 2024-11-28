@@ -1,5 +1,5 @@
 #    app-editor/nano/nano-8.2.build.py
-#    Thu Nov  7 03:41:03 UTC 2024
+#    Thu Nov 28 00:13:16 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,15 +19,15 @@
 
 
 def configure(self):
-    return os.system(f"./configure --prefix=/usr --enable-utf8")
+    return self.do(f"./configure --prefix=/usr --enable-utf8")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

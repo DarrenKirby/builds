@@ -1,5 +1,5 @@
 #    app-editor/vim/vim-9.0.build.py
-#    Thu Nov  7 03:47:34 UTC 2024
+#    Thu Nov 28 00:14:14 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -20,7 +20,10 @@
 
 def install_source_posthook(self):
     # extracted directory does not match tarball
-    os.rename(self.package_dir.replace('-', '').replace('.', ''), self.package_dir)
+    try:
+        os.rename(self.package_dir.replace('-', '').replace('.', ''), self.package_dir)
+    except OSError as e:
+        cf.red(f"rename failed: {e}")
 
 def configure(self):
 
@@ -28,15 +31,15 @@ def configure(self):
     with open("src/feature.h", 'a', encoding='utf-8') as f:
         f.write('#define SYS_VIMRC_FILE "/etc/vimrc"')
 
-    return os.system(f"./configure --prefix=/usr --with-x=no --disable-gui")
+    return self.do(f"./configure --prefix=/usr --with-x=no --disable-gui")
 
 
 def make(self):
-    return os.system("make")
+    return self.do("make")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

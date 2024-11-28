@@ -1,5 +1,5 @@
 #    app-shell/zsh/zsh-5.9.build.py
-#    Thu Nov  7 04:40:49 UTC 2024
+#    Thu Nov 28 00:34:01 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -21,20 +21,20 @@
 def configure(self):
     # Fix configure files as per:
     # https://www.linuxfromscratch.org/blfs/view/stable/postlfs/zsh.html
-    os.system("sed -e 's/set_from_init_file/texinfo_&/' -i Doc/Makefile.in")
-    os.system("sed -e 's/^main/int &/' -e 's/exit(/return(/' -i aczsh.m4 configure.ac")
-    os.system("sed -e 's/test = /&(char**)/' -i configure.ac")
-    os.system("autoconf")
+    self.do("sed -e 's/set_from_init_file/texinfo_&/' -i Doc/Makefile.in")
+    self.do("sed -e 's/^main/int &/' -e 's/exit(/return(/' -i aczsh.m4 configure.ac")
+    self.do("sed -e 's/test = /&(char**)/' -i configure.ac")
+    self.do("autoconf")
 
-    return os.system("./configure --prefix=/usr --enable-cap --enable-gdbm ")
+    return self.do("./configure --prefix=/usr --enable-cap --enable-gdbm ")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

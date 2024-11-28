@@ -21,7 +21,7 @@ depend = "app-crypt/p11-kit"
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir}")
+    return self.do(f"make DESTDIR={self.seg_dir}")
 
 def install(self):
     pass
