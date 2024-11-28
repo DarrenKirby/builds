@@ -1,5 +1,5 @@
 #    app-arch/tar/tar-1.35.build.py
-#    Thu Nov  7 01:08:57 UTC 2024
+#    Wed Nov 27 23:57:45 UTC 2024
 
 #    Copyright:: (c) 2024 Darren Kirby
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,22 +19,15 @@
 
 
 def configure(self):
-    # FIXME: There is some sort of bug here; unsure if in tar configure script or elsewhere
-    # This fails when running a system builds install, even after setting EUID to non-privileged.
-    # line 39027 in the tar configure script explicitly tests EUID:
-    # if (geteuid () == ROOT_UID) return 99;
-    # However, it still fails with non-root EUID; so a sed hack to remove the line,
-    # until I can figure it out.
-    os.system("sed -i '/if (geteuid () == ROOT_UID) return 99/d' configure")
-    return os.system(f"./configure --prefix=/usr")
+    return self.do("./configure --prefix=/usr")
 
 
 def make(self):
-    return os.system("make")
+    return self.do("make")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
