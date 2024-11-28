@@ -35,25 +35,25 @@ def install_source_posthook(self):
 
     os.chdir(self.package_dir)
     patchname = "expect-5.45.4-gcc14-1.patch"
-    os.system(f"patch -Np1 -i {cf.config['builds_root']}/distfiles/{patchname}")
+    self.do(f"patch -Np1 -i {cf.config['builds_root']}/distfiles/{patchname}")
     os.chdir(self.work_dir)
 
 
 def configure(self):
-    return os.system("./configure --prefix=/usr "
-                     "--with-tcl=/usr/lib64 "
-                     "--enable-shared "
-                     "--disable-rpath "
-                     "--mandir=/usr/share/man "
-                     "--with-tclinclude=/usr/include ")
+    return self.do("./configure --prefix=/usr "
+                   "--with-tcl=/usr/lib64 "
+                   "--enable-shared "
+                   "--disable-rpath "
+                   "--mandir=/usr/share/man "
+                   "--with-tclinclude=/usr/include ")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

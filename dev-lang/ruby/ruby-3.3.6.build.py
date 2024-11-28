@@ -21,21 +21,21 @@ depend = "dev-lib/libyaml"
 
 
 def configure(self):
-    return os.system("./configure --prefix=/usr "
-                     "--disable-static "
-                     "--disable-rpath "
-                     "--enable-shared "
-                     "--without-valgrind "
-                     "--without-baseruby "
-                     "ac_cv_func_qsort_r=no")
+    return self.do("./configure --prefix=/usr "
+                   "--disable-static "
+                   "--disable-rpath "
+                   "--enable-shared "
+                   "--without-valgrind "
+                   "--without-baseruby "
+                   "ac_cv_func_qsort_r=no")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

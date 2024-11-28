@@ -22,11 +22,11 @@ depend="dev-lib/inih,lib-util/liburcu"
 
 
 def make(self):
-    return os.system(f"make DEBUG=-DNDEBUG {cf.config['makeopts']}")
+    return self.do(f"make DEBUG=-DNDEBUG {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
@@ -54,4 +54,4 @@ def install(self):
     # Strip the binaries
     for file in ["mkfs.xfs", "xfs_repair", "xfs_copy", "xfs_db", "xfs_estimate", "xfs_fsr", "xfs_growfs", "xfs_io",
                  "xfs_logprint", "xfs_mdrestore", "xfs_quota", "xfs_rtcp", "xfs_scrub", "xfs_spaceman"]:
-        os.system(f"strip -v {self.p['us']}/{file}")
+        self.do(f"strip -v {self.p['us']}/{file}")

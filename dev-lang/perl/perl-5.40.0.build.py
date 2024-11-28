@@ -18,27 +18,28 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 def configure(self):
-    return os.system("sh Configure -des "
-                     "-D prefix=/usr "
-                     "-D vendorprefix=/usr "
-                     "-D privlib=/usr/lib/perl5/5.40/core_perl "
-                     "-D archlib=/usr/lib/perl5/5.40/core_perl "
-                     "-D sitelib=/usr/lib/perl5/5.40/site_perl "
-                     "-D sitearch=/usr/lib/perl5/5.40/site_perl "
-                     "-D vendorlib=/usr/lib/perl5/vendor_perl "
-                     "-D vendorarch=/usr/lib/perl5/vendor_perl "
-                     "-D man1dir=/usr/share/man/man1 "
-                     "-D man3dir=/usr/share/man/man3 "
-                     "-D pager='/usr/bin/less -isR' "
-                     "-D useshrplib "
-                     "-D usethreads")
+    return self.do("sh Configure -des "
+                   "-D prefix=/usr "
+                   "-D vendorprefix=/usr "
+                   "-D privlib=/usr/lib/perl5/5.40/core_perl "
+                   "-D archlib=/usr/lib/perl5/5.40/core_perl "
+                   "-D sitelib=/usr/lib/perl5/5.40/site_perl "
+                   "-D sitearch=/usr/lib/perl5/5.40/site_perl "
+                   "-D vendorlib=/usr/lib/perl5/vendor_perl "
+                   "-D vendorarch=/usr/lib/perl5/vendor_perl "
+                   "-D man1dir=/usr/share/man/man1 "
+                   "-D man3dir=/usr/share/man/man3 "
+                   "-D pager='/usr/bin/less -isR' "
+                   "-D useshrplib "
+                   "-D usethreads")
+
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make install DESTDIR={self.seg_dir}")
+    return self.do(f"make install DESTDIR={self.seg_dir}")
 
 
 def install(self):
