@@ -38,7 +38,7 @@ def make_install(self):
 def install(self):
     self.inst_header(self.p['_ui'] + "/yaml.h", self.p['ui'])
 
-    self.inst_library(self.p['_ul'] + "/libyaml-0.so.2.0.9")
+    self.inst_library(self.p['_ul'] + "/libyaml-0.so.2.0.9", self.p['ul'])
     self.inst_symlink(self.p['ul'] + "/libyaml-0.so.2.0.9", self.p['ul'] + "/libyaml-0.so.2")
     self.inst_symlink(self.p['ul'] + "/libyaml-0.so.2.0.9", self.p['ul'] + "/libyaml-0.so")
 
