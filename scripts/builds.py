@@ -208,17 +208,18 @@ def do_main() -> None:
 
         this_build += 1
 
-        bld = build_package.BuildPackage(build[0], args)
-        bld.fetch()
+        with cf.PrivDropper():
+            bld = build_package.BuildPackage(build[0], args)
+            bld.fetch()
 
-        if args.fetch:
-            continue
+            if args.fetch:
+                continue
 
-        bld.install_source()
-        print(f"Effective UID (just before call to configure_src()): {os.geteuid()}")
-        bld.configure_src()
-        bld.make_src()
-        bld.make_inst()
+            bld.install_source()
+            print(f"Effective UID (just before call to configure_src()): {os.geteuid()}")
+            bld.configure_src()
+            bld.make_src()
+            bld.make_inst()
 
         # These two need priv
         bld.inst()
