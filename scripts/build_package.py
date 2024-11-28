@@ -453,6 +453,9 @@ class BuildPackage(FileInstaller):
         """
         Install the compiled program into a segregated directory.
         """
+        # Make directory as 'builds'
+        os.mkdir(self.seg_dir)
+
         if hasattr(self, 'make_install'):
             cf.green("Installing components into segregated directory...")
             print()
@@ -494,9 +497,10 @@ class BuildPackage(FileInstaller):
             self.cleanup_prehook()
 
         print()
-        cf.green("Writing manifest file...")
-        if self._write_manifest_file():
-            print(">>> ...done.")
+        with cf.PrivDropper:
+            cf.green("Writing manifest file...")
+            if self._write_manifest_file():
+                print(">>> ...done.")
 
         if not self.args.dontclean:
             cf.bold("Cleaning up work directory...")
