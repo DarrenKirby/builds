@@ -39,4 +39,25 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    for file in os.listdir(self.p['_ub']):
+        if file in ["ruby"]:
+            self.inst_binary(f"{self.p['_ub']}/{file}", self.p['ub'])
+        else:
+            self.inst_script(f"{self.p['_ub']}/{file}", self.p['ub'])
+
+    self.inst_directory(f"{self.p['_ui']}/ruby-3.3.0", f"{self.p['ui']}/ruby-3.3.0")
+
+    self.inst_library(self.p['_ul'] + "/libruby.so.3.3.6", self.p['ul'])
+    self.inst_symlink(self.p['ul'] + "/libruby.so.3.3.6", self.p['ul'] + "/libruby.so.3.3")
+    self.inst_symlink(self.p['ul'] + "/libruby.so.3.3.6", self.p['ul'] + "/libruby.so")
+
+    self.inst_file(self.p['_ul'] + "/pkgconfig/ruby-3.3.pc", self.p['ul'] + "/pkgconfig/")
+
+    self.inst_directory(f"{self.p['_ul']}/ruby", f"{self.p['ul']}/ruby")
+
+    self.inst_directory(f"{self.p['_ush']}/ri", f"{self.p['ush']}/ri")
+
+    self.inst_manpage(f"{self.p['_man1']}/erb.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/irb.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/ri.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/ruby.1", self.p['man1'])
