@@ -31,16 +31,16 @@ def fetch_prehook(self):
 def install_source_posthook(self):
     os.chdir(self.package_dir)
     patchname = "coreutils-9.5-i18n-2.patch"
-    os.system(f"patch -Np1 -i {cf.config['builds_root']}/distfiles/{patchname}")
+    self.do(f"patch -Np1 -i {cf.config['builds_root']}/distfiles/{patchname}")
     os.chdir(self.work_dir)
 
 
 
 def configure(self):
-    es1 = os.system("autoreconf -fiv")
-    es2 = os.system("FORCE_UNSAFE_CONFIGURE=1 "
-                    "./configure --prefix=/usr "
-                    "--enable-no-install-program=kill,uptime")
+    es1 = self.do("autoreconf -fiv")
+    es2 = self.do("FORCE_UNSAFE_CONFIGURE=1 "
+                  "./configure --prefix=/usr "
+                  "--enable-no-install-program=kill,uptime")
 
     if es1 == 0 and es2 == 0:
         return 0
@@ -48,11 +48,11 @@ def configure(self):
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):

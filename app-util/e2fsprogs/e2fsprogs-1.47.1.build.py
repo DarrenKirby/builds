@@ -24,20 +24,20 @@ def configure(self):
     os.mkdir("build")
     os.chdir("build")
 
-    return os.system("../configure --prefix=/usr "
-                     "--enable-elf-shlibs "
-                     "--disable-libblkid "
-                     "--disable-libuuid "
-                     "--disable-uuidd "
-                     "--disable-fsck")
+    return self.do("../configure --prefix=/usr "
+                   "--enable-elf-shlibs "
+                   "--disable-libblkid "
+                   "--disable-libuuid "
+                   "--disable-uuidd "
+                   "--disable-fsck")
 
 
 def make(self):
-    return os.system(f"make {cf.config['makeopts']}")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return os.system(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
@@ -103,5 +103,5 @@ def install(self):
                  "mklost+found",
                  "resize2fs",
                  "tune2fs"]:
-        os.system(f"strip {self.p['us']}/{file}")
+        self.do(f"strip {self.p['us']}/{file}")
         print(f"stripping {self.p['us']}/{file}")
