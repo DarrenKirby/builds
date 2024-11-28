@@ -18,6 +18,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+# tarball name does not match package name
+def install_source_posthook(self):
+    os.rename(f"yaml-{self.version}", f"libyaml-{self.version}")
+
+
 def configure(self):
     return self.do("./configure --prefix=/usr --disable-static")
 
