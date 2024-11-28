@@ -126,7 +126,6 @@ class PrivDropper:
             os.setegid(self.unpriv_gid)
             os.seteuid(self.unpriv_uid)
 
-
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.orig_uid == 0:
             os.seteuid(self.orig_uid)
