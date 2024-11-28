@@ -1,5 +1,7 @@
 #    app-shell/tcsh/tcsh-6.24.13.build.py
 #    Thu Nov 28 00:32:49 UTC 2024
+import os
+
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:Darren Kirby)
@@ -27,6 +29,7 @@ def make(self):
 
 
 def make_install(self):
+    print(f"EUID: {os.geteuid()} EGID: {os.getegid()}")
     return self.do(f"make DESTDIR={self.seg_dir} install install.man")
 
 
