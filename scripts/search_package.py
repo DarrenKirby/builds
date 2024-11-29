@@ -194,7 +194,18 @@ def do_info(args):
             manifest_file += f"{pkg_info[0]}-{pkg_info[2]}.manifest"
 
             manifest = cf.get_manifest(manifest_file)
-            cf.print_bold(f"{len(manifest)} files installed by {pkg}: \n")
-            for line in manifest:
-                print(f">>> {line}")
+            manifest_length = len(manifest)
+            cf.print_bold(f"{manifest_length} files installed by {pkg}: \n")
+
+            if manifest_length > 30:
+                for line in manifest[0:15]:
+                    print(f">>> {line}")
+                print()
+                print("     ...")
+                print()
+                for line in manifest[-16:-1]:
+                    print(f">>> {line}")
+            else:
+                for line in manifest:
+                    print(f">>> {line}")
             print()
