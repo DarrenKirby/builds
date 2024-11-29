@@ -300,8 +300,11 @@ class FileInstaller:
         """
         Helper function for running shell commands in a build script.
         """
+        usr = "builds" if cf.config['user'] == 'root' else usr = None
+        grp = "builds" if cf.config['user'] == 'root' else grp = None
+
         try:
-            sp.run(shlex.split(cmd), check=True, user="builds", group="builds")
+            sp.run(shlex.split(cmd), check=True, user=usr, group=grp)
             return 0
         except sp.CalledProcessError as e:
             cf.red(f"command: {cmd} failed: ")
