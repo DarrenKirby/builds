@@ -198,14 +198,13 @@ def download(url: str, filename: str) -> None:
             yellow("Download timed out")
             print("Perhaps try a mirror?")
             log.error("Download of %s timed out", filename)
+            # remove the zero-length file written by requests
+            os.remove(filename)
             sys.exit(12)
         except requests.exceptions.ConnectionError:
             red("Name resolution error!")
             print("Are you sure you're connected to the Internet?")
             log.error("Download of %s failed", filename)
-            # requests leaves a zero-length stub file
-            # which we need to clean up if the download fails
-            os.remove(filename)
             sys.exit(12)
         # Some servers cannot/will not return a content-length header
         # resulting in a 406 error
