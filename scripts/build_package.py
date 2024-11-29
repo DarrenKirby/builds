@@ -300,8 +300,8 @@ class FileInstaller:
         """
         Helper function for running shell commands in a build script.
         """
-        usr = "builds" if cf.config['user'] == 'root' else usr = None
-        grp = "builds" if cf.config['user'] == 'root' else grp = None
+        usr = "builds" if cf.config['user'] == 'root' else None
+        grp = "builds" if cf.config['user'] == 'root' else None
 
         try:
             sp.run(shlex.split(cmd), check=True, user=usr, group=grp)

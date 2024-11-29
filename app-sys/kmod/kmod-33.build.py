@@ -37,4 +37,33 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_binary(self.p['_ub'] + "/kmod", self.p['ub'])
+
+    self.inst_symlink(f"{self.p['ub']}/kmod", f"{self.p['ub']}/depmod")
+    self.inst_symlink(f"{self.p['ub']}/kmod", f"{self.p['ub']}/insmod")
+    self.inst_symlink(f"{self.p['ub']}/kmod", f"{self.p['ub']}/lsmod")
+    self.inst_symlink(f"{self.p['ub']}/kmod", f"{self.p['ub']}/modinfo")
+    self.inst_symlink(f"{self.p['ub']}/kmod", f"{self.p['ub']}/modprobe")
+    self.inst_symlink(f"{self.p['ub']}/kmod", f"{self.p['ub']}/rmmod")
+
+    self.inst_header(f"{self.p['_ui']}/libkmod.h", self.p['ui'])
+
+    self.inst_library(f"{self.p['_ul']}/libkmod.so.2.5.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libkmod.so.2.5.0", f"{self.p['ul']}/libkmod.so")
+    self.inst_symlink(f"{self.p['ul']}/libkmod.so.2.5.0", f"{self.p['ul']}/libkmod.so.2")
+
+    self.inst_file(self.p['ul'] + "/pkgconfig/libkmod.pc", self.p['ul'] + "/pkgconfig/")
+
+    os.makedirs(self.p['ush'] + "/bash-completion/completions/", exist_ok=True)
+    os.makedirs(self.p['ush'] + "/pkgconfig/", exist_ok=True)
+
+    self.inst_file(self.p['_ush'] + "/bash-completion/completions/kmod",
+                   self.p['ush'] + "/bash-completion/completions/")
+    self.inst_file(self.p['_ush'] + "/pkgconfig/kmod.pc", self.p['ush'] + "/pkgconfig/")
+
+
+
+
+
+
+

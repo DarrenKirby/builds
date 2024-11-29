@@ -1,5 +1,7 @@
 #    net-util/inetutils/inetutils-2.5.build.py
 #    Sat Nov 16 21:11:57 UTC 2024
+import os
+
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -41,6 +43,28 @@ def make_install(self):
 
 
 def install(self):
-    self.inst_binary(f"{self.p['_ub']}/wget", self.p['ub'])
-    self.inst_manpage(f"{self.p['_man1']}/wget.1", self.p['man1'])
-    self.inst_config(f"{self.p['_ue']}/wgetrc", self.p['e'] if cf.config['user'] == 'root' else self.p['ue'])
+    # ping, ping6, and traceroute will fail to install as root user
+    self.do(f"chmod 755 {self.p['_ub']}/ping")
+    self.do(f"chmod 755 {self.p['_ub']}/ping6")
+    self.do(f"chmod 755 {self.p['_ub']}/traceroute")
+
+    self.inst_binary(f"{self.p['_ub']}/dnsdomainname", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/ftp", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/hostname", self.p['ub'])
+    # ifconfig to /usr/sbin
+    self.inst_binary(f"{self.p['_ub']}/ifconfig", self.p['us'])
+    self.inst_binary(f"{self.p['_ub']}/ping", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/ping6", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/telnet", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/tftp", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/traceroute", self.p['ub'])
+
+    for man in os.listdir(self.p['_man1']):
+        if man in ['ifconfig.1']:
+            os.rename(f"{self.p['_man1']}/{man}", self.p['_man1'] + "/ifconfig.8")
+            self.inst_manpage(f"{self.p['_man1']}/ifconfig.", self.p['man8'])
+        else:
+            self.inst_manpage(f"{self.p['_man1']}/{man}", self.p['man1'])
+
+
+

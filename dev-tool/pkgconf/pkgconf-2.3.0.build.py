@@ -31,4 +31,19 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_binary(f"{self.p['_ub']}/bomtool", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/pkgconf", self.p['ub'])
+
+    self.inst_directory(self.p['_ui'] + '/pkgconf/', self.p['ui'] + '/pkgconf/')
+
+    self.inst_library(f"{self.p['_ul']}/libpkgconf.so.5.0.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libpkgconf.so.5.0.0", f"{self.p['ul']}/libpkgconf.so")
+    self.inst_symlink(f"{self.p['ul']}/libpkgconf.so.5.0.0", f"{self.p['ul']}/libpkgconf.so.5")
+
+    self.inst_file(self.p['ul'] + "/pkgconfig/libpkgconf.pc", self.p['ul'] + "/pkgconfig/")
+    self.inst_file(self.p['ul'] + "/aclocal/pkg.m4", self.p['ul'] + "/aclocal/")
+
+    self.inst_manpage(f"{self.p['_man1']}/pkgconf.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man5']}/pc.5", self.p['man5'])
+    self.inst_manpage(f"{self.p['_man5']}/pkgconf-personality.5", self.p['man5'])
+    self.inst_manpage(f"{self.p['_man7']}/pkg.m4.7", self.p['man7'])
