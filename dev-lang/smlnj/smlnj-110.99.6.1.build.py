@@ -18,10 +18,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 def configure(self):
-    return self.do("CXX='/usr/bin/g++' ./configure --prefix=/usr "
-                   "--enable-optimizations "
-                   "--with-system-expat "
-                   "--enable-shared ")
+    return self.do("")
 
 
 def make(self):
