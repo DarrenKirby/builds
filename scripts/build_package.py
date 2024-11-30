@@ -147,7 +147,7 @@ class FileInstaller:
         """
         if not self.args.test:
             try:
-                sp.run(shlex.split(f"install -v -o {cf.config['user']} -g {cf.config['group']} -m 755 {frm} {to}"),
+                sp.run(shlex.split(f"install -v -o {cf.config['user']} -g {cf.config['group']} -m 755 -s {frm} {to}"),
                        check=True)
             except sp.CalledProcessError as e:
                 cf.red(f"Install of {frm} failed: ")
