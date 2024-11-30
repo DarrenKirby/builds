@@ -19,11 +19,13 @@
 
 
 def configure(self):
+    user_disable = ""
     if cf.config['user'] != 'root':
         cf.yellow("Many of the binaries installed by util-linux require superuser")
-        cf.yellow("privileges to install and use  correctly. At some  point these")
-        cf.yellow("binaries will be filtered from being built, but for now, this ")
-        cf.yellow("package will almost certainly fail for user installs of builds")
+        cf.yellow("privileges to install and use correctly. This will cause failures")
+        cf.yellow("during the 'make install' step, so this build file disables chown,")
+        cf.yellow("chmod, and setuid commands for all user installs of builds.")
+        user_disable += "--disable-use-tty-group --disable-makeinstall-chown --disable-makeinstall-setuid"
     if not os.path.exists("./configure"):
         self.do("./autogen.sh")
     return self.do("./configure --bindir=/usr/bin "
@@ -42,7 +44,7 @@ def configure(self):
                    "--without-python "
                    "--without-systemd "
                    "--without-systemdsystemunitdir "
-                   "ADJTIME_PATH=/var/lib/hwclock/adjtime")
+                   f"ADJTIME_PATH=/var/lib/hwclock/adjtime {user_disable}")
 
 
 def make(self):
