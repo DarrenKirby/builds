@@ -119,7 +119,8 @@ def do_uninstall(args: argparse.Namespace) -> None:
         uninstaller = Unistaller(manifest_file, args)
         uninstaller.delete()
         uninstaller.delete_manifest_file()
-        uninstaller.delete_from_installed_file()
+        with cf.PrivDropper():
+            uninstaller.delete_from_installed_file()
 
         cf.print_bold(f"Package deleted: ")
         cf.green(f" {pkg_info[0]} - {pkg_info[1]}")
