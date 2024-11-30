@@ -505,14 +505,14 @@ class BuildPackage(FileInstaller):
                 print(">>> ...done.")
 
         if not self.args.dontclean:
-            cf.bold("Cleaning up work directory...")
+            cf.green("Cleaning up work directory...")
             os.chdir(self.build_dir)
             rmtree(self.work_dir)
 
         if hasattr(self, 'cleanup_posthook'):
             self.cleanup_posthook()
 
-        cf.green("Clean up successful")
+        print("...clean up successful")
 
     # The following methods are 'private', that is, they are
     # not intended for use outside this class.
