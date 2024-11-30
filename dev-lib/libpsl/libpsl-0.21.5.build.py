@@ -31,7 +31,7 @@ def make(self):
 
 
 def make_install(self):
-    return self.do(f"DESTDIR={self.seg_dir} ninja install")
+    return self.do(f"DESTDIR={self.seg_dir} ninja install", shell=True)
 
 
 def install(self):
