@@ -49,4 +49,27 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_script(self.p['_ub'] + "/unicode_start", self.p['ub'])
+    self.inst_script(self.p['_ub'] + "/unicode_stop", self.p['ub'])
+
+    for binary in os.listdir(self.p['_ub']):
+        if binary not in ["unicode_start", "unicode_stop", "psfaddtable", "psfgettable", "psfstriptable"]:
+            self.inst_binary(f"{self.p['_ub']}/{binary}", self.p['ub'])
+
+    self.inst_symlink(self.p['ub'] + "/psfxtable", self.p['ub'] + "/psfaddtable")
+    self.inst_symlink(self.p['ub'] + "/psfxtable", self.p['ub'] + "/psfgettable")
+    self.inst_symlink(self.p['ub'] + "/psfxtable", self.p['ub'] + "/psfstriptable")
+
+    self.inst_directory(f"{self.p['_ush']}/consolefonts/", f"{self.p['ush']}/consolefonts/")
+    self.inst_directory(f"{self.p['_ush']}/consoletrans/", f"{self.p['ush']}/consoletrans/")
+    self.inst_directory(f"{self.p['_ush']}/keymaps/", f"{self.p['ush']}/keymaps/")
+    self.inst_directory(f"{self.p['_ush']}/unimaps/", f"{self.p['ush']}/unimaps/")
+
+    for file in os.listdir(self.p['_man1']):
+        self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
+
+    for file in os.listdir(self.p['_man5']):
+        self.inst_manpage(f"{self.p['_man5']}/{file}", self.p['man5'])
+
+    for file in os.listdir(self.p['_man8']):
+        self.inst_manpage(f"{self.p['_man8']}/{file}", self.p['man8'])
