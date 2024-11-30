@@ -296,7 +296,7 @@ class FileInstaller:
         self.manifest.append(absfile)
 
     @staticmethod
-    def do(cmd: str) -> int:
+    def do(cmd: str, shell: bool = False) -> int:
         """
         Helper function for running shell commands in a build script.
         """
@@ -304,7 +304,7 @@ class FileInstaller:
         grp = "builds" if cf.config['user'] == 'root' else None
 
         try:
-            sp.run(shlex.split(cmd), check=True, user=usr, group=grp)
+            sp.run(shlex.split(cmd), check=True, user=usr, group=grp, shell=shell)
             return 0
         except sp.CalledProcessError as e:
             cf.red(f"command: {cmd} failed: ")
@@ -419,7 +419,6 @@ class BuildPackage(FileInstaller):
         """
         Configure the source code and build environment
         """
-        print(f"Effective UID (from inside configure_src()): {os.geteuid()}")
         os.chdir(self.package_dir)
         cf.bold("Configuring package...")
         print()
