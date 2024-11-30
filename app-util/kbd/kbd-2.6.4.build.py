@@ -17,18 +17,35 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+def fetch_prehook(self):
+    patchname = "kbd-2.6.4-backspace-1.patch"
+    cf.bold(f"Downloading {patchname}...")
+    cf.download(f"https://www.linuxfromscratch.org/patches/lfs/12.2/{patchname}",
+                f"{cf.config['builds_root']}/distfiles/{patchname}")
+    cf.bold("...done.")
+
+
+def install_source_posthook(self):
+    os.chdir(self.package_dir)
+    patchname = "kbd-2.6.4-backspace-1.patch"
+    cf.bold(f"Applying {patchname}")
+    self.do(f"patch -Np1 -i {cf.config['builds_root']}/distfiles/{patchname}")
+    os.chdir(self.work_dir)
+
 
 def configure(self):
     # Prevent static libs
-    return self.do("sed -i '/install -m.*STA/d' libcap/Makefile")
+    self.do("sed -i '/RESIZECONS_PROGS=/s/yes/no/' configure")
+    self.do("sed -i 's/resizecons.8 //' docs/man/man8/Makefile.in")
+    return self.do("./configure --prefix=/usr --disable-vlock")
 
 
 def make(self):
-    return self.do(f"make {cf.config['makeopts']} prefix={self.seg_dir}/usr lib=lib")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
-    return self.do(f"make prefix={self.seg_dir}/usr lib=lib install")
+    return self.do(f"make DESTDIR={self.seg_dir} install")
 
 
 def install(self):
