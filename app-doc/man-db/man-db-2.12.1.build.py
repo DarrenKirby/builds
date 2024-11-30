@@ -52,10 +52,10 @@ def install(self):
     self.inst_symlink(self.p['ub'] + "/whatis", self.p['ub'] + "/apropos")
 
     os.makedirs(self.p['ul'] + "/man-db/", exist_ok=True)
-    self.inst_library(f"{self.p['_ul']}/man-db/libman-2.12.1.so", self.p['ul'] + "/man-db/")
+    self.inst_library(f"{self.p['_ul']}/man-db/libman-2.12.1.so", self.p['ul'] + "/man-db")
     self.inst_symlink(f"{self.p['ul']}/man-db/libman-2.12.1.so", f"{self.p['ul']}/man-db/libman.so")
 
-    self.inst_library(f"{self.p['_ul']}/man-db/libmandb-2.12.1.so", self.p['ul'] + "/man-db/")
+    self.inst_library(f"{self.p['_ul']}/man-db/libmandb-2.12.1.so", self.p['ul'] + "/man-db")
     self.inst_symlink(f"{self.p['ul']}/man-db/libmandb-2.12.1.so", f"{self.p['ul']}/man-db/libmandb.so")
 
     self.inst_directory(f"{self.p['_ule']}/man-db/", f"{self.p['ule']}/man-db/")
