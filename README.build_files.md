@@ -56,8 +56,8 @@ of this document to explain, but there
 are [good references](https://www.tecmint.com/verify-pgp-signature-downloaded-software/)
 online with instructions.
 
-Regardless of how you verify the download, *builds* uses a sha256sum. If the distributor does not ptovide this you can
-generate it your self using the previously verified download:
+Regardless of how you verify the download, *builds* uses a sha256sum. If the distributor does not provide this you can
+generate it yourself using the previously verified download:
 
     # sha256sum openssh-9.9p1.tar.gz
     b343fbcdbff87f15b1986e6e15d6d4fc9a7d36066be6b7fb507087ba8f966c02  openssh-9.9p1.tar.gz
@@ -86,31 +86,33 @@ The build script contains all the package-specific instructions on how to config
 *builds* models this process in seven discrete steps, of which 3 are automatic, and 4 must be manually specified in the
 build file. These steps are:
 
-1. *Fetching the package*. This step is automated. As long as the download URL in the db is correct, `bld` will download
+1. **Fetching the package** This step is automated. As long as the download URL in the db is correct, `bld` will
+   download
    the package into the `./builds/distfiles/` directory automatically. `bld` will also verify the sha256 hash of the
    downloaded file. There are two scriptable hooks into this process, if needed, but more on that later.
-2. *Extracting the package into a working directory*. This step is automated. `bld` will extract package tarballs into
+2. **Extracting the package into a working directory** This step is automated. `bld` will extract package tarballs into
    a directory called 'work' under the package directory. In our example, this would result in the OpenSSH source tree
    in `./builds/net-util/openssh/work/openssh-9.9p1`. Again, there are hooks into this step if needed. For example, you
    may want to apply patches to the source.
-3. *configuring the package*. This is an optional step that can be specified manually if necessary. This is where you
+3. `configure`**ing the package** This is an optional step that can be specified manually if necessary. This is where
+   you
    would perform the `./configure` step in the typical configure/make/make install process.
-4. *'make'ing the package*. Optional. This is where you would run `make` if necessary.
-5. *'make install'ing the package*. Optional. This is where you would run `make install`. Note that this step should
+4. `make`**ing the package** Optional. This is where you would run `make` if necessary.
+5. `make install`**ing the package**. Optional. This is where you would run `make install`. Note that this step should
    not be used to install files to the live filesystem, but rather, into a segregated staging directory. More on this
    later.
-6. *Installing the package*. This step is required to be defined in the build file. This is where the package files
+6. **Installing the package**. This step is required to be defined in the build file. This is where the package files
    get installed into the live filesystem. A set of helper functions and path variables are provided to make this easy.
-7. *Clean up* This step is automated. If all previous steps ran successfully, this step will remove the temporary
+7. **Clean up** This step is automated. If all previous steps ran successfully, this step will remove the temporary
    'work' directory, write a manifest of installed files, and record the package and version into a special 'installed'
    set file. This step also has two hooks into the process, if necessary.
 
 While knowledge of the internal workings of *builds* is not necessary to write build scripts, it is very important to
-understand that build files are not typical Python scripts. They do not get run or exec'ed from start to end. The build
-files only accept a small number of pre-defined functions which provide a way to script the above seven steps.
-Internally, the functions defined in a build file are 'injected' into, and called from within the main BuildPackage
-class defined in `build_package.py`. The upshot of this is that any code written outside of these predefined functions
-(including module import statements) will be silently ignored.
+understand that build files are not typical Python scripts. They do not get run or executed from start to end. The build
+files will run any valid Python code but only within the bounds of a small number of pre-defined functions which provide
+a way to script the above seven steps. Internally, the functions defined in a build file are 'injected' into, and called
+from within the main BuildPackage class defined in `build_package.py`. This means that any code written outside of these
+predefined functions (including module import statements) is undefined and may cause bad things to happen.
 
 The namespace into which these functions are injected contains a few useful Python standard library modules, as well
 as a suite of helpful functions provided by *builds*. They are:
@@ -128,7 +130,7 @@ The first thing to define in a build file is any dependencies. There is not yet 
 run-time dependencies. There is not yet support for optional dependencies. So you will have to consider which
 dependencies to list here in accordance with your own needs. It stands to reason, if there is not yet a build file
 for a package listed as a dependency, you will have to write that too. Dependencies are specified using category/package
-pairs seperated by commas like so:
+pairs separated by commas like so:
 
       depend = "net-util/curl,app-editor/vim"
 
@@ -137,8 +139,8 @@ Since our example package OpenSSH does not have any explicit dependencies, we wi
 ## Predefined variables and functions
 
 As the predefined variables and functions are defined within, and called from an enclosing class, variables must be
-prefaced by `self`, and functions (more correctly: methods) must have `self` as the sole srgument. The `BuildPackage` 
-class defines several instance variables available to the build scripts which may be useful. Here we are assuming 
+prefaced by `self`, and functions (more correctly: methods) must have `self` as the sole argument. The `BuildPackage`
+class defines several instance variables available to the build scripts which may be useful. Here we are assuming
 that the builds_root specified in the configuration file is `/var/builds`:
 
          self.build       = 'app-arch/tar'
@@ -158,7 +160,7 @@ that the builds_root specified in the configuration file is `/var/builds`:
 
 These two functions are hooks into the package download step. As is implied, prehook runs before the package is fetched,
 and posthook is run after the package is fetched. These functions can be used to download other packages or patches if
-required. For example, `git` distributes its manpages in a seperate tarball, so `git`'s build file contains:
+required. For example, `git` distributes its manpages in a separate tarball, so `git`'s build file contains:
 
       def fetch_posthook(self):
          url = f"https://www.kernel.org/pub/software/scm/git/git-manpages-{self.version}.tar.xz"
@@ -170,13 +172,13 @@ print any string argument to the console in bold text. `cf` also defines similar
 `cf.green()`, `cf.yellow()`, and `cf.red()`. All four of these functions have analogs that DO NOT include a newline
 character. These functions have the same name but prefaced by `print_`, so, `cf.print_green()`, for example.
 
-The second is `cf.download()`. This function takes two string arguments. The first is a web URL, and the second is 
-a local filename. Apropos, when it comes to file paths, it is important to understand the directory from which the 
+The second is `cf.download()`. This function takes two string arguments. The first is a web URL, and the second is
+a local filename. Apropos, when it comes to file paths, it is important to understand the directory from which the
 predefined functions are called, and thus, the PWD in relation to the function call. `fetch_prehook()` and
-`fetch_posthook()` are both run from within the `./builds/distfiles/` directory, which is where all packages 
+`fetch_posthook()` are both run from within the `./builds/distfiles/` directory, which is where all packages
 should be downloaded to.
 
-Back to our example, OpenSSH does not require any special handline or downloads at this step, so we leave these
+Back to our example, OpenSSH does not require any special handling or downloads at this step, so we leave these
 functions undefined.
 
 ## install_source_prehook() and install_source_posthook()
@@ -200,8 +202,8 @@ Again, OpenSSH requires no special patching or otherwise, so we will leave this 
 ## configure()
 
 For all packages that require configuration, this is the place to do it. Generally, the easiest way to do this is to
-place the relevant command withing an `os.system()` call. It is considered better practice to use the newer 
-`subprocess.run()` interface, and you are welcome to do so, but it is a bit more complicated, so I will use 
+place the relevant command withing an `os.system()` call. It is considered better practice to use the newer
+`subprocess.run()` interface, and you are welcome to do so, but it is a bit more complicated, so I will use
 `os.system()` for our OpenSSH example:
 
       def configure(self:)
@@ -213,15 +215,15 @@ place the relevant command withing an `os.system()` call. It is considered bette
                            "--with-pid-dir=/run")
 
 Note that I have directly returned the exit status of the `os.system` call here. The callers of `configure()`, `make()`
-and `make_install()` all expect a return value of 0, so they know the commands ran successfully, and that they are 
-free to continue. It doesn't matter how you do it, but if the code and commands you script in these functions run 
+and `make_install()` all expect a return value of 0, so they know the commands ran successfully, and that they are
+free to continue. It doesn't matter how you do it, but if the code and commands you script in these functions run
 normally, you must return 0, and if they do not, you must return a non-zero exit.
 
 Another thing to note is the `--prefix=/usr`. The [Linux from scratch](https://www.linuxfromscratch.org/) system that
 I originally designed *builds* for, and the Gentoo system from which I have done most of *builds*'s development
 and testing on, both make all of `/bin`, `/sbin`, and `/lib` as symlinks to their counterparts in `/usr`, so I have
 gotten in the habit of installing to user. You can of course use a prefix of `/` or `/usr/local` if it better suits
-your purposes. 
+your purposes.
 
 It should go without saying that `configure()` is run from within `self.package_dir`. It also bears repeating that
 defining this function is optional. If you don't need to run configure, leave it undefined.
@@ -235,22 +237,22 @@ As the name would imply, this is where you would run `make` if necessary. It is 
 
 Again we directly return the exit status of `os.system()` to the caller. `cf.config` is a dictionary
 of key -> value pairs loaded from the configuration file when you run `bld`. In this case, we are using 'makeopts' to
-pass `-j4` to the make command, to speed up compilation. You can define this in your configuration file. If it is not 
+pass `-j4` to the make command, to speed up compilation. You can define this in your configuration file. If it is not
 defined it will default to `-j1`.
 
 `make()` is called from `self.package_dir`, and is an optional function.
 
 ## make_install()
 
-This is the function from which to run your `make install` command. Again, I will re-itterate that this is NOT from
-where files are installed to the live filesystem. This function should command `make` to install the files into 
+This is the function from which to run your `make install` command. Again, I will re-iterate that this is NOT from
+where files are installed to the live filesystem. This function should command `make` to install the files into
 a segregated directory, which is the predefined instance variable `self.seg_dir`, and will appear in the filesystem as
-`./builds/net-util/openssh/work/seg`. It is not manditory to do this, but it is certainly a best practice. If your 
+`./builds/net-util/openssh/work/seg`. It is not mandatory to do this, but it is certainly a best practice. If your
 package is simple enough (or a binary package), it may be easier to just pluck the files you want to install from
 within the package source tree (in the next step), and leave this function undefined.
 
-For any non-trivial package, however, it is far preferable to install to the staging directory, as all the files you 
-need to install will be nicely seperated into their appropriate directories under `seg/`.
+For any non-trivial package, however, it is far preferable to install to the staging directory, as all the files you
+need to install will be nicely separated into their appropriate directories under `seg/`.
 
       def make_install(self):
          return os.system(f"make DESTDIR={self.seg_dir} install")
@@ -265,7 +267,7 @@ similar way to install the files to a segregated directory. Read the docs, and a
 
 Now: This is generally a good place to stop and test your script, and make sure the package is building as expected.
 `bld install` has a few options that make testing easier for us. The `-d` or `--dontclean` option will skip the cleaning
-step, which preserves the work directory for inspection. The `-t` or `--test` option will make `bld` run right up until 
+step, which preserves the work directory for inspection. The `-t` or `--test` option will make `bld` run right up until
 this step, then it will exit. This allows you to test a build without affecting the greater system. Try it now by
 running:
 
@@ -279,9 +281,9 @@ you need to install, and where they should be installed for the next step.
 This is the penultimate step which installs the build files into your live filesystem. This is the only function that
 is required to be defined in a build file. The class `FileInstaller`, defined in `build_package.py` creates a dictionary
 of useful file paths, and defines nine functions which install files and directories. It is very import to use these
-functions, as they keep track of which files they have installed, and where they have put them. These paths are 
+functions, as they keep track of which files they have installed, and where they have put them. These paths are
 then written to a manifest file which will be located at `builds/net-util/openssh/openssh-9.9p1.manifest` for our
-example. While it is certainly possible to define any valid Python code to put any file wherever you want, within 
+example. While it is certainly possible to define any valid Python code to put any file wherever you want, within
 this function, if the files are not wrangled through these functions they will not be placed in the manifest, and `bld`
 will not know they are installed if you later decide to uninstall or update the package. This may result in orphaned
 files, or other hard to track down breakages. If you decide to do this, you are on your own. Fair warning...
@@ -348,25 +350,25 @@ The first group are paths in the live filesystem, in which to install files. `{i
 read from the configuration file, which is set up during the installation of builds. For a system-wide install it is
 simply an empty string, which means the paths resolve from the `/` (root) directory. For a default user install, this
 will be the user's home directory, thus, assuming a --prefix of /usr in the configure step, files will be installed
-under `/home/<user>/usr/`. 
+under `/home/<user>/usr/`.
 
 The second group of paths, which are identical but for the underscore, are paths which lead to files installed under
-the segregated directory. These paths may, but don't have to be, used as path arguments to the nine installation 
+the segregated directory. These paths may, but don't have to be, used as path arguments to the nine installation
 functions, which are enumerated now:
 
-`self.inst_binary(frm: str, to: str)` - for installing binaries
-`self.inst_script(frm: str, to: str)` - for installing scripts and other executable text files
-`self.inst_library(frm: str, to: str)` - for installing library files
-`self.inst_header(frm: str, to: str)` - for installing header files
-`self.inst_manpage(frm: str, to: str, compress: bool = True)`- for installing manpages
-`self.inst_symlink(target: str, name: str)` - for creating symlinks
-`self.inst_config(frm: str, to: str` - for installing configuration files
-`self.inst_directory(frm: str, to: str)` - for recursively installing entire directories
-`self.inst_file(frm: str, to: str, mode: int = 644)` - for installing any file, with optional mode argument
+- `self.inst_binary(frm: str, to: str)` - for installing binaries
+- `self.inst_script(frm: str, to: str)` - for installing scripts and other executable text files
+- `self.inst_library(frm: str, to: str)` - for installing library files
+- `self.inst_header(frm: str, to: str)` - for installing header files
+- `self.inst_manpage(frm: str, to: str, compress: bool = True)`- for installing manpages
+- `self.inst_symlink(target: str, name: str)` - for creating symlinks
+- `self.inst_config(frm: str, to: str` - for installing configuration files
+- `self.inst_directory(frm: str, to: str)` - for recursively installing entire directories
+- `self.inst_file(frm: str, to: str, mode: int = 644)` - for installing any file, with optional mode argument
 
-All of these functions, except for `inst_directory()`, use the `install` shell command under the hood. This ensures all 
+All of these functions, except for `inst_directory()`, use the `install` shell command under the hood. This ensures all
 files are placed in the filesystem with proper ownership and permissions, and allows us to overwrite existing files
-for an upgrade. The general signiture is to call them with the 'from' location as the first arg, and the 'to' location
+for an upgrade. The general signature is to call them with the 'from' location as the first arg, and the 'to' location
 as the second arg. *builds* compresses manpages using `bzip2` by default, but this can be disabled by passing an
 optional `compress=False` third arg to `inst_manpage()`
 
@@ -374,8 +376,8 @@ So with that explanation, let's get back to our example and start by installing 
 
 Taking a peak in `./seg/usr/bin` we can see that there are several binaries here. It is important to ascertain that
 the binaries you install are actually binaries. `inst_binary()` strips them, and will raise an error if you try to
-strip a script. `inst_script()` is functionally equivelant, but for the stripping, so use that for scripts, or if you
-don't want your binaries stripped. It is a good idea to run `file` on 
+strip a script. `inst_script()` is functionally equivalent, but for the stripping, so use that for scripts, or if you
+don't want your binaries stripped. It is a good idea to run `file` on
 these directories, as regular `ls -l` output will not distinguish between binaries and scripts:
 
       # for f in `ls`; do file ${f}; done
@@ -387,7 +389,7 @@ these directories, as regular `ls -l` output will not distinguish between binari
       ssh-keygen: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, stripped
       ssh-keyscan: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, stripped
 
-So we can see they are all in fact binaries, but they are already stripped. Not all packages do this, so it is good to 
+So we can see they are all in fact binaries, but they are already stripped. Not all packages do this, so it is good to
 check. Since they are stripped, we will use `inst_script`:
 
       def install(self):
@@ -395,7 +397,7 @@ check. Since they are stripped, we will use `inst_script`:
          for file in os.listdir(self.p['_ub']):
             self.inst_script(f"{self.p['_ub']}/{file}", self.p['ub'])
 
-Note that we only have to specify the destination directory for the second argument. 
+Note that we only have to specify the destination directory for the second argument.
 
 OpenSSH has placed the stripped `sshd` binary in sbin/:
 
@@ -408,7 +410,7 @@ There are several helper binaries in `usr/libexec/`. They are all stripped:
       for file in os.listdir(self.p['_ule']):
          self_inst_script(f"{self.p['_ule']}/{file}", self.p['ule'])
 
-There are only manpages left. They are seperated into man1, man5, and man8 directories:
+There are only manpages left. They are separated into man1, man5, and man8 directories:
 
       # install manpages
       for file in os.listdir(self.p['_man1']):
