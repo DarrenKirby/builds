@@ -512,7 +512,7 @@ class BuildPackage(FileInstaller):
         if hasattr(self, 'cleanup_posthook'):
             self.cleanup_posthook()
 
-        print("...clean up successful")
+        print(">>> ...clean up successful.")
 
     # The following methods are 'private', that is, they are
     # not intended for use outside this class.
