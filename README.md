@@ -1,8 +1,8 @@
 ## *builds*
 
-*builds* is a lightweight and simple package management tool for installing, managing, and updating software, typically,
+*builds* is a lightweight and simple package management tool for installing, managing, and updating software, typically
 from source code. It is superficially similar to *ports* from FreeBSD, and *portage* from Gentoo.
-Similarily to both, *builds* uses backend scripts which specify how to build and install packages. Unlike both,
+Similarly to both, *builds* uses backend scripts which specify how to build and install packages. Unlike both,
 there is no central 'official' repository of
 scripts or packages. While I have created a modest library of scripts which are distributed with the platform, *builds*
 should be thought of as a kitchen, in which you create and test your own recipes. If a particular
@@ -17,21 +17,21 @@ preferences. *builds* is pure-Python, and uses only two non-standard library
 modules: [requests](https://pypi.org/project/requests/)
 to download packages, and [tqdm](https://pypi.org/project/tqdm/) for a nice download progress bar.
 
-Although it is theroretically possible, I have not designed *builds* to take the place of a proper, operating
-system-wide package management system. Rather than managing all software for a particular system, *builds* is best
-suited to managing a specific subset of
+Although it is theoretically possible, I have not designed *builds* to take the place of a proper, operating
+system-wide package management system, outside an LFS/BLFS system. Rather than managing all software for a
+particular system, *builds* is best suited to managing a specific subset of
 packages, collected for a specific purpose. For example, collectively managing all the packages required for a Python
 data-science ecosystem. Or perhaps for managing a development/testing environment for some custom software and its
-dependancies. Maybe you like having the bleeding-edge versions of a few packages and your OS delivers stable packages
-from a few versions back.
+dependencies. Or for keeping a collection of bleeding-edge versions of some favourite packages separate from the stable
+base packages offered by your operating system.
 
 There are two different methods for installing *builds*:
 
-The first is a system-wide install, which will install all software to the usual locations in the live filesystem. This
-type of install will therefore require root, or otherwise priveliged access to the system.
+The first is a system-wide install, which will install all software to the usual locations in the live file system. This
+type of install will therefore require root, or otherwise privileged access to the system.
 
 The second method is a segregated user install. This method will install the software and associated files to a
-directory of the user's choosing, presumably, somewhere within their home directory. This does not require priveliged
+directory of the user's choosing, presumably, somewhere within their home directory. This does not require privileged
 access.
 
 While it should be possible to have a single system-wide and multiple user installations of *builds* on the same
@@ -129,22 +129,29 @@ You can use `info` to get information about installed packages:
 The simplest method to install *builds* is to just `git clone` the builds tree into the location you want it to live in.
 For a system-wide install it is recommended (but not necessary) to use `/var/builds/`. For a user
 install, `/home/<user>/builds/` is appropriate. If `git` is not available on the target system, then you extract a
-tarball of the builds tree into the appropriate location, then  use builds to install `git` to keep updated.
+tarball of the builds tree into the appropriate location, then use builds to install `git` to keep updated.
 
-    # To install...
+To install...
+
     # git clone https://github.com/DarrenKirby/builds.git
 
-    # To update (run from the top-level "builds" directory:
+To update (run from the top-level "builds" directory:
+
     # git pull
 
 Once the tree is installed, you can `cd` into the `scripts` directory and run `initialize_builds_tree.py` like so:
 
 	# python initialize_builds_tree.py
 
-If you run this script as root, it will assume a system-wide installation. If you run it as a non-priveliged user, it
+If you run this script as root, it will assume a system-wide installation. If you run it as a non-privileged user, it
 will assume a user install. The script will write a configuration file (`/etc/builds.conf` for system-wide,
 `~/.config/builds/builds.conf` for user) and initialize the database. It is important to run this script from inside
 `builds/scripts/`, as the script uses the $PWD to determine paths to write to the config file.
+
+For system-wide installations the initialization script will create a non-privileged system user and group named
+"builds", and `chown` the entire builds tree to this user. While `bld` will still have to be run as root, the program
+will drop privileges and execute as the 'builds' user except for the step where it installs the files to the live
+filesystem.
 
 ## Note on stability
 

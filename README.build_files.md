@@ -5,18 +5,19 @@
 *builds* keeps track of which packages are available to install using a [gdmb](https://www.gnu.org.ua/software/gdbm/)
 database. Upon installation, *builds* will initialize a database which includes the package build scripts distributed
 with the platform. This db is named 'builds-stable', and will be created in the script folder upon running the
-`initialize_builds.py` script. Ths CSV file used to generate the db is also included in the scripts directory.
+`initialize_builds.py` script. The (semicolon-delimited) CSV file used to generate the db is also included in the
+scripts directory.
 
 To add your own packages, you can either edit the existing CSV file, or create your own from scratch. The format of this
 file is:
 
-    <pkg name>,<pkg category/name>,<pkg version>,<sha256 hash of pkg>,<download url>,<pkg homepage>,<pkg desription>
+    <pkg name>;<pkg category/name>;<pkg version>;<sha256 hash of pkg>;<download url>;<pkg homepage>;<pkg desription>
 
 For example:
 
-    gzip,app-arch/gzip,1.13,7454eb6935db17c6655576c2e1b0fabefd38b4d0936e0f87f48cd062ce91a057,https://ftpmirror.gnu.org/gzip/gzip-VVV.tar.xz,https://www.gnu.org/software/gzip/,Standard GNU compression utility
+    gzip;app-arch/gzip;1.13;7454eb6935db17c6655576c2e1b0fabefd38b4d0936e0f87f48cd062ce91a057;https://ftpmirror.gnu.org/gzip/gzip-VVV.tar.xz;https://www.gnu.org/software/gzip/;Standard GNU compression utility
 
-Note the 'VVV' slug in the download URL. This slug will be replaced 1:1 with the version string by bld. To regenerate
+Note the 'VVV' slug in the download URL. This slug will be replaced 1:1 with the version string by `bld`. To regenerate
 the db after editing a CSV file use the `initdb` command:
 
     # bld initdb ./scripts/builds-stable.csv
@@ -69,11 +70,12 @@ of the software to be printed when running `bld search` or `bld info`.
 
 So the complete line in the CSV file should look like this:
 
-    # openssh,net-util/openssh,9.9p1,b343fbcdbff87f15b1986e6e15d6d4fc9a7d36066be6b7fb507087ba8f966c02,https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-VVV.tar.gz,https://www.openssh.com/,OpenSSH is the premier connectivity tool for remote login with the SSH protocol
+    # openssh;net-util/openssh;9.9p1;b343fbcdbff87f15b1986e6e15d6d4fc9a7d36066be6b7fb507087ba8f966c02;https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-VVV.tar.gz;https://www.openssh.com/;OpenSSH is the premier connectivity tool for remote login with the SSH protocol
 
 Now, re-initialize the database, and prepare to write the build script:
 
-    (from './builds/':)
+From './builds/':
+
     # bld initdb ./scripts/builds-stable.csv
     # mkdir -p net-util/openssh
     # cp ./scripts/template.build.py net-util/openssh/openssh-9.9p1.build.py
@@ -129,8 +131,8 @@ for a package listed as a dependency, you will have to write that too. Dependenc
 pairs seperated by commas like so:
 
       depend = "net-util/curl,app-editor/vim"
-   
-Since our example package OpenSSH does not have any explicit dependencies,we willomit his line.
+
+Since our example package OpenSSH does not have any explicit dependencies, we will omit his line.
 
 ## Predefined variables and functions
 
@@ -162,7 +164,7 @@ required. For example, `git` distributes its manpages in a seperate tarball, so 
          url = f"https://www.kernel.org/pub/software/scm/git/git-manpages-{self.version}.tar.xz"
          cf.bold(f"Fetching {url.split('/')[-1]}")
          cf.download(url, url.split('/')[-1])
-   
+
 Here we can see two of the functions defined in `common_functions.py` being used. The first is `cf.bold()` which will
 print any string argument to the console in bold text. `cf` also defines similar formatted output functions:
 `cf.green()`, `cf.yellow()`, and `cf.red()`. All four of these functions have analogs that DO NOT include a newline
