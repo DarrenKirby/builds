@@ -24,7 +24,7 @@ def configure(self):
         cf.yellow("Many of the binaries installed by util-linux require superuser")
         cf.yellow("privileges to install and use correctly. This will cause failures")
         cf.yellow("during the 'make install' step, so this build file disables chown,")
-        cf.yellow("chmod, and setuid commands for all user installs of builds.")
+        cf.yellow("chmod, and setuid commands for all user installs of util-linux.")
         user_disable += "--disable-use-tty-group --disable-makeinstall-chown --disable-makeinstall-setuid"
     if not os.path.exists("./configure"):
         self.do("./autogen.sh")
