@@ -52,7 +52,7 @@ def install(self):
     self.inst_symlink(f"{self.p['ul']}/libkmod.so.2.5.0", f"{self.p['ul']}/libkmod.so")
     self.inst_symlink(f"{self.p['ul']}/libkmod.so.2.5.0", f"{self.p['ul']}/libkmod.so.2")
 
-    self.inst_file(self.p['ul'] + "/pkgconfig/libkmod.pc", self.p['ul'] + "/pkgconfig/")
+    self.inst_file(self.p['_ul'] + "/pkgconfig/libkmod.pc", self.p['ul'] + "/pkgconfig/")
 
     os.makedirs(self.p['ush'] + "/bash-completion/completions/", exist_ok=True)
     os.makedirs(self.p['ush'] + "/pkgconfig/", exist_ok=True)

@@ -19,7 +19,7 @@
 
 
 def configure(self):
-    return self.do("./configure --prefix=/usr")
+    return self.do("./configure --prefix=/usr --sysconfdir=/etc --runstatedir=/run --without-logger")
 
 
 def make(self):
@@ -31,4 +31,16 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_directory(f"{self.p['_ui']}/syslog/", f"{self.p['ui']}/syslog/")
+
+    self.inst_library(f"{self.p['_ul']}/libsyslog.so.0.1.0", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libsyslog.so.0.1.0", f"{self.p['ul']}/libsyslog.so")
+    self.inst_symlink(f"{self.p['ul']}/libsyslog.so.0.1.0", f"{self.p['ul']}/libsyslog.so.0")
+
+    self.inst_file(self.p['_ul'] + "/pkgconfig/libsyslog.pc", self.p['ul'] + "/pkgconfig/")
+
+    self.inst_binary(f"{self.p['_us']}/syslogd", self.p['us'])
+
+    self.inst_manpage(f"{self.p['_man3']}/syslogp.3", self.p['man3'])
+    self.inst_manpage(f"{self.p['_man5']}/syslog.conf.5", self.p['man5'])
+    self.inst_manpage(f"{self.p['_man8']}/syslogd.8", self.p['man8'])
