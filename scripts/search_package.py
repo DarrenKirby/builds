@@ -198,6 +198,7 @@ def do_info(args):
             cf.print_bold(f"{manifest_length} files installed by {pkg}: \n")
 
             if manifest_length > 30:
+                # Only show head and tail of large manifests
                 for line in manifest[0:15]:
                     print(f">>> {line}")
                 print()
