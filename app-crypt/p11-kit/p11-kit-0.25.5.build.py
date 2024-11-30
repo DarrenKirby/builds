@@ -55,16 +55,4 @@ def make_install(self):
 
 def install(self):
     pass
-    #self.inst_binary(f"{self.p['_ub']}/psl", self.p['ub'])
-    #self.inst_script(f"{self.p['_ub']}/psl-make-dafsa", self.p['ub'])
 
-    #self.inst_header(f"{self.p['_ui']}/libpsl.h", self.p['ui'])
-
-    #self.inst_library(f"{self.p['_ul']}/libpsl.so.5.3.5", self.p['ul'])
-    #self.inst_symlink(f"{self.p['ul']}/libpsl.so.5.3.5", f"{self.p['ul']}/libpsl.so.5")
-    #self.inst_symlink(f"{self.p['ul']}/libpsl.so.5", f"{self.p['ul']}/libpsl.so")
-
-    #self.inst_file(f"{self.p['_ul']}/pkgconfig/libpsl.pc", f"{self.p['ul']}/pkgconfig/")
-
-    #self.inst_manpage(f"{self.p['_man1']}/psl.1", self.p['man1'])
-    #self.inst_manpage(f"{self.p['_man1']}/psl-make-dafsa.1", self.p['man1'])
