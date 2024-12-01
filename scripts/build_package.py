@@ -313,6 +313,23 @@ class FileInstaller:
             sys.exit(-1)
 
     @staticmethod
+    def sudo(cmd: str, shell: bool = False) -> int:
+        """
+        Helper function for running shell commands in a build script.
+        """
+        usr = "root" if cf.config['user'] == 'root' else None
+        grp = "root" if cf.config['user'] == 'root' else None
+
+        try:
+            sp.run(shlex.split(cmd), check=True, user=usr, group=grp, shell=shell)
+            return 0
+        except sp.CalledProcessError as e:
+            cf.red(f"command: {cmd} failed: ")
+            print(e)
+            log.error("build failure: command '%s' failed: %s", cmd, e)
+            sys.exit(-1)
+
+    @staticmethod
     def _list_all_paths(directory_path):
         all_paths = []
         for root, dirs, files in os.walk(directory_path):
