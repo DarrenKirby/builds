@@ -79,9 +79,10 @@ def cleanup_posthook(self):
     except KeyError:
         pass
     try:
+        # UID/GID 50 to match LFS/BLFS
         cf.bold("Creating user/group 'sshd'")
-        self.do("install -v -g sys -m700 -d /var/lib/sshd")
-        self.do("groupadd -g 50 sshd")
-        self.do("useradd -c 'sshd PrivSep' -d /var/lib/sshd -g sshd -s /bin/false -u 50 sshd")
+        self.sudo("install -v -g sys -m700 -d /var/lib/sshd")
+        self.sudo("groupadd -g 50 sshd")
+        self.sudo("useradd -c 'sshd PrivSep' -d /var/lib/sshd -g sshd -s /bin/false -u 50 sshd")
     except OSError as e:
         cf.yellow(f"Adding user/group 'sshd' failed: {e}")
