@@ -228,7 +228,7 @@ def do_main() -> None:
                 cf.green(f"Recording {build[0]} {build[1]} in 'sets/installed'...")
                 if not already_installed:
                     cf.add_to_installed(build[0], build[1])
-            print(">>> ...done!")
+                print(">>> ...done!")
 
             finish_time = datetime.datetime.now()
             elapsed = finish_time - start_time
