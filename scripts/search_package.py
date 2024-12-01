@@ -204,7 +204,7 @@ def do_info(args):
                 print()
                 print("     ...")
                 print()
-                for line in manifest[-16:-1]:
+                for line in manifest[-16:]:
                     print(f">>> {line}")
             else:
                 for line in manifest:
