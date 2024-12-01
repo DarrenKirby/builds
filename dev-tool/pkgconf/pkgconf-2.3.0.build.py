@@ -40,8 +40,8 @@ def install(self):
     self.inst_symlink(f"{self.p['ul']}/libpkgconf.so.5.0.0", f"{self.p['ul']}/libpkgconf.so")
     self.inst_symlink(f"{self.p['ul']}/libpkgconf.so.5.0.0", f"{self.p['ul']}/libpkgconf.so.5")
 
-    self.inst_file(self.p['ul'] + "/pkgconfig/libpkgconf.pc", self.p['ul'] + "/pkgconfig/")
-    self.inst_file(self.p['ul'] + "/aclocal/pkg.m4", self.p['ul'] + "/aclocal/")
+    self.inst_file(self.p['_ul'] + "/pkgconfig/libpkgconf.pc", self.p['ul'] + "/pkgconfig/")
+    self.inst_file(self.p['_ush'] + "/aclocal/pkg.m4", self.p['ush'] + "/aclocal/")
 
     self.inst_manpage(f"{self.p['_man1']}/pkgconf.1", self.p['man1'])
     self.inst_manpage(f"{self.p['_man5']}/pc.5", self.p['man5'])

@@ -54,6 +54,6 @@ def install(self):
     self.inst_symlink(f"{self.p['ul']}/libsqlite3.so.0.8.6", f"{self.p['ul']}/libsqlite3.so.0")
     self.inst_symlink(f"{self.p['ul']}/libsqlite3.so.0.8.6", f"{self.p['ul']}/libsqlite3.so")
 
-    self.inst_file(self.p['ul'] + "/pkgconfig/sqlite3.pc", self.p['ul'] + "/pkgconfig/")
+    self.inst_file(self.p['_ul'] + "/pkgconfig/sqlite3.pc", self.p['ul'] + "/pkgconfig/")
 
     self.inst_manpage(f"{self.p['_man1']}/sqlite.1", self.p['man1'])

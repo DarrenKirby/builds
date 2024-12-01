@@ -31,8 +31,8 @@ def make_install(self):
 
 
 def install(self):
-    self.inst_binary(f"{self.p['_ub']}/libtool", self.p['ub'])
-    self.inst_binary(f"{self.p['_ub']}/libtoolize", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/libtool", self.p['ub'])
+    self.inst_script(f"{self.p['_ub']}/libtoolize", self.p['ub'])
 
     self.inst_header(f"{self.p['_ui']}/ltdl.h", self.p['ui'])
     self.inst_directory(f"{self.p['_ui']}/libltdl/", f"{self.p['ui']}/libltdl/")

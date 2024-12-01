@@ -23,7 +23,7 @@ import os
 def configure(self):
     # arpd is not getting installed
     os.unlink("man/man8/arpd.8")
-    return self.do("./configure --prefix=/usr")
+    return self.do("./configure --prefix=/usr --color=auto")
 
 
 def make(self):
