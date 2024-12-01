@@ -208,7 +208,8 @@ def do_main() -> None:
             this_build += 1
 
             bld = build_package.BuildPackage(build[0], args)
-            bld.fetch()
+            if bld.fetch():
+                continue
 
             if args.fetch:
                 continue

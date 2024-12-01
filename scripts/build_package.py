@@ -383,7 +383,7 @@ class BuildPackage(FileInstaller):
         # Load build_file methods as a module
         self._load_buildfile_methods()
 
-    def fetch(self) -> None:
+    def fetch(self) -> [None | bool]:
         """
         Fetch the package source and check sha256sum
         """
@@ -404,7 +404,8 @@ class BuildPackage(FileInstaller):
             sys.exit(-1)
 
         if hasattr(self, 'fetch_posthook'):
-            self.fetch_posthook()
+            if self.fetch_posthook():
+                return True
 
     def install_source(self) -> None:
         """
