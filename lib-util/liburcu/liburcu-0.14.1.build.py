@@ -28,7 +28,7 @@ def configure(self):
 
 
 def make(self):
-    return self.do("make")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
