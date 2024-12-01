@@ -1,5 +1,7 @@
 #    net-util/iproute2/iproute2-6.11.0.build.py
-#    Sat Nov 16 21:11:57 UTC 2024
+#    Sun Dec  1 00:37:10 UTC 2024
+import os
+
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -19,18 +21,41 @@
 
 
 def configure(self):
-    return self.do(f"./configure --prefix=/usr --with-ssl=openssl")
+    # arpd is not getting installed
+    os.unlink("man/man8/arpd.8")
+    return self.do("./configure --prefix=/usr")
 
 
 def make(self):
-    return self.do(f"make {cf.config['makeopts']}")
+    return self.do("make NETNS_RUN_DIR=/run/netns")
 
 
 def make_install(self):
-    return self.do(f"make DESTDIR={self.seg_dir} install")
+    return self.do(f"make SBINDIR=/usr/sbin DESTDIR={self.seg_dir} install")
 
 
 def install(self):
-    self.inst_binary(f"{self.p['_ub']}/wget", self.p['ub'])
-    self.inst_manpage(f"{self.p['_man1']}/wget.1", self.p['man1'])
-    self.inst_config(f"{self.p['_ue']}/wgetrc", self.p['e'] if cf.config['user'] == 'root' else self.p['ue'])
+    for file in os.listdir(self.p['_us']):
+        if file not in ["ctstat", "routel", "rtstat"]:
+            self.inst_binary(f"{self.p['_us']}/{file}", self.p['us'])
+
+    self.inst_script(self.p['_us'] + "/routel", self.p['us'])
+    self.inst_symlink(self.p['us'] + "/lnstat", self.p['us'] + "/ctstat")
+    self.inst_symlink(self.p['us'] + "/lnstat", self.p['us'] + "/rtstat")
+
+    self.inst_directory(f"{self.p['_ul']}/tc/", f"{self.p['ul']}/tc/")
+    self.inst_directory(f"{self.p['_ui']}/iproute2/", f"{self.p['ui']}/iproute2/")
+
+    self.inst_directory(f"{self.p['_ush']}/iproute2/", f"{self.p['ush']}/iproute2/")
+
+    #
+    self.inst_file(self.p['_ush'] + "/bash-completion/completions/devlink",
+                   self.p['ush'] + "/bash-completion/completions/")
+    self.inst_file(self.p['_ush'] + "/bash-completion/completions/tc",
+                   self.p['ush'] + "/bash-completion/completions/")
+
+    self.inst_manpage(f"{self.p['_man3']}/libnetlink.3", self.p['man3'])
+    self.inst_manpage(f"{self.p['_man7']}/tc-hfsc.7", self.p['man7'])
+
+    for file in os.listdir(self.p['_man8']):
+        self.inst_manpage(f"{self.p['_man8']}/{file}", self.p['man8'])

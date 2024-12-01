@@ -31,4 +31,5 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_binary(self.p['_ub'] + "/patch", self.p['ub'])
+    self.inst_manpage(f"{self.p['_man1']}/patch.1", self.p['man1'])

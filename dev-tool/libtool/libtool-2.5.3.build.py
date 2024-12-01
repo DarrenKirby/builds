@@ -23,7 +23,7 @@ def configure(self):
 
 
 def make(self):
-    return self.do("make")
+    return self.do(f"make {cf.config['makeopts']}")
 
 
 def make_install(self):
@@ -31,4 +31,20 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_binary(f"{self.p['_ub']}/libtool", self.p['ub'])
+    self.inst_binary(f"{self.p['_ub']}/libtoolize", self.p['ub'])
+
+    self.inst_header(f"{self.p['_ui']}/ltdl.h", self.p['ui'])
+    self.inst_directory(f"{self.p['_ui']}/libltdl/", f"{self.p['ui']}/libltdl/")
+
+    self.inst_library(f"{self.p['_ul']}/libltdl.so.7.3.2", self.p['ul'])
+    self.inst_symlink(f"{self.p['ul']}/libltdl.so.7.3.2", f"{self.p['ul']}/libltdl.so.7")
+    self.inst_symlink(f"{self.p['ul']}/libltdl.so.7.3.2", f"{self.p['ul']}/libltdl.so")
+
+    self.inst_directory(f"{self.p['_ush']}/libtool/", f"{self.p['ush']}/libtool/")
+
+    for file in os.listdir(self.p['_ush'] + "/aclocal"):
+        self.inst_file(f"{self.p['_ush']}/aclocal/{file}", f"{self.p['_ush']}/aclocal/")
+
+    self.inst_manpage(f"{self.p['_man1']}/libtool.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/libtoolize.1", self.p['man1'])
