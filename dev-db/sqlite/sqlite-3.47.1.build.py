@@ -56,4 +56,4 @@ def install(self):
 
     self.inst_file(self.p['_ul'] + "/pkgconfig/sqlite3.pc", self.p['ul'] + "/pkgconfig/")
 
-    self.inst_manpage(f"{self.p['_man1']}/sqlite.1", self.p['man1'])
+    self.inst_manpage(f"{self.p['_man1']}/sqlite3.1", self.p['man1'])

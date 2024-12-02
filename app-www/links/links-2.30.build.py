@@ -17,7 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-depend = "lib-util/libevent/"
+depend = "lib-util/libevent"
 
 def configure(self):
     return self.do("./configure --prefix=/usr --mandir=/usr/share/man")
