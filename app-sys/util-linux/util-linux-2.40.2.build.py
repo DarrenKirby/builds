@@ -25,7 +25,7 @@ def configure(self):
         cf.yellow("privileges to install and use correctly. This will cause failures")
         cf.yellow("during the 'make install' step, so this build file disables chown,")
         cf.yellow("chmod, and setuid commands for all user installs of util-linux.")
-        user_disable += "--disable-use-tty-group --disable-makeinstall-chown --disable-makeinstall-setuid"
+
     if not os.path.exists("./configure"):
         self.do("./autogen.sh")
     return self.do("./configure --bindir=/usr/bin "
@@ -44,7 +44,10 @@ def configure(self):
                    "--without-python "
                    "--without-systemd "
                    "--without-systemdsystemunitdir "
-                   f"ADJTIME_PATH=/var/lib/hwclock/adjtime {user_disable}")
+                   "ADJTIME_PATH=/var/lib/hwclock/adjtime "
+                   "--disable-use-tty-group "
+                   "--disable-makeinstall-chown "
+                   "--disable-makeinstall-setuid")
 
 
 def make(self):
