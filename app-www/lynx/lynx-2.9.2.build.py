@@ -46,4 +46,4 @@ def install(self):
     self.inst_manpage(self.p['_man1'] + "/lynx.1", self.p['man1'])
 
     conf_d = 'e' if cf.config['user'] == 'root' else 'ue'
-    self.inst_directory(f"{self.p['_' + conf_d]}/lynx/", f"{self.p['_' + conf_d]}/lynx/")
+    self.inst_directory(f"{self.p['_' + conf_d]}/lynx/", f"{self.p[conf_d]}/lynx/")
