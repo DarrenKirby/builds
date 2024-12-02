@@ -60,9 +60,9 @@ def install(self):
     self.inst_directory(f"{self.p['_ush']}/gitweb/", f"{self.p['ush']}/gitweb/")
     # self.inst_directory(f"{self.p['_ush']}/locale/", f"{self.p['ush']}/locale/")
     # Perl modules
-    self.inst_directory(f"{self.p['_ush']}/perl5/Git/", f"{self.p['ul']}/perl5/vendor_perl/Git/")
-    self.inst_directory(f"{self.p['_ush']}/perl5/FromCPAN/", f"{self.p['ul']}/perl5/vendor_perl/FromCPAN/")
-    self.inst_file(f"{self.p['_ush']}/perl5/Git.pm", f"{self.p['ul']}/perl5/vendor_perl/")
+    self.inst_directory(f"{self.p['_ush']}/perl5/Git/", f"{self.p['ul']}/perl5/5.40/site_perl/Git/")
+    self.inst_directory(f"{self.p['_ush']}/perl5/FromCPAN/", f"{self.p['ul']}/perl5/5.40/site_perl/FromCPAN/")
+    self.inst_file(f"{self.p['_ush']}/perl5/Git.pm", f"{self.p['ul']}/perl5/5.40/site_perl/")
 
     for file in os.listdir(f"{self.work_dir}/man1/"):
         self.inst_manpage(f"{self.work_dir}/man1/{file}", self.p['man1'])
