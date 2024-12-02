@@ -217,9 +217,9 @@ def do_main() -> None:
             bld.install_source()
             bld.configure_src()
             bld.make_src()
-            bld.make_inst()
 
-        # These two need priv
+        # These three need priv
+        bld.make_inst()
         bld.inst()
         bld.cleanup()
 
