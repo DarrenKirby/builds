@@ -17,10 +17,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-depend = "lib-util/libnl"
 
-#def configure(self):
-#    return self.do("./configure --prefix=/usr --disable-static")
+depend = "lib-util/libnl"
 
 
 def make(self):
@@ -32,4 +30,7 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_binary(self.p['_us'] + "/iw", self.p['us'])
+
+    # Manpage is already compressed
+    self.inst_manpage(self.p['_man8'] + "/iw.1.gz", self.p['man8'], compress=False)
