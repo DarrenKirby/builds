@@ -33,4 +33,4 @@ def install(self):
     self.inst_binary(self.p['_us'] + "/iw", self.p['us'])
 
     # Manpage is already compressed
-    self.inst_manpage(self.p['_man8'] + "/iw.1.gz", self.p['man8'], compress=False)
+    self.inst_manpage(self.p['_man8'] + "/iw.8.gz", self.p['man8'], compress=False)
