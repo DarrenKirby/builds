@@ -29,14 +29,78 @@ import csv
 import dbm
 import shutil
 import pwd
+import re
 import logging as log
 import urllib.request as request
+from os import error
 from urllib.error import URLError
 
 import requests
 import tqdm
 
 from config import config
+
+
+class VersionComparator:
+    @staticmethod
+    def _parse_version(version: str):
+        """
+        Parses a version string into a tuple of comparable elements.
+        Numeric segments are converted to integers, and alphabetic
+        segments remain strings.
+        """
+        # Split by dots, then split alphanumeric parts
+        segments = re.split(r'\.', version)
+        parsed = []
+        for segment in segments:
+            parts = re.findall(r'\d+|[a-zA-Z]+', segment)
+            parsed.extend(int(part) if part.isdigit() else part for part in parts)
+        return tuple(parsed)
+
+    @staticmethod
+    def is_higher(version1: str, version2: str) -> bool:
+        """Returns True if version1 is higher than version2."""
+        return VersionComparator._parse_version(version1) > VersionComparator._parse_version(version2)
+
+    @staticmethod
+    def is_lower(version1: str, version2: str) -> bool:
+        """Returns True if version1 is lower than version2."""
+        return VersionComparator._parse_version(version1) < VersionComparator._parse_version(version2)
+
+    @staticmethod
+    def higher(version1: str, version2: str) -> str:
+        """Returns the higher of the two version strings."""
+        return version1 if VersionComparator.is_higher(version1, version2) else version2
+
+    @staticmethod
+    def lower(version1: str, version2: str) -> str:
+        """Returns the lower of the two version strings."""
+        return version1 if VersionComparator.is_lower(version1, version2) else version2
+
+
+class PrivDropper:
+    """
+    A class which implements a simple context
+    manager to run unprivileged commands
+    """
+
+    def __init__(self):
+        self.orig_uid = os.geteuid()
+        self.orig_gid = os.getegid()
+
+    def __enter__(self):
+        if self.orig_uid == 0:
+            self.unpriv_uid = pwd.getpwnam("builds").pw_uid
+            self.unpriv_gid = pwd.getpwnam("builds").pw_gid
+            os.setegid(self.unpriv_gid)
+            os.seteuid(self.unpriv_uid)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.orig_uid == 0:
+            os.seteuid(self.orig_uid)
+            os.setegid(self.orig_gid)
+        return False
+
 
 clr = {
     'green': '\033[1;32m',
@@ -109,30 +173,6 @@ def print_red(msg: str) -> None:
     print(msg, end='')
 
 
-class PrivDropper:
-    """
-    A class which implements a simple context
-    manager to run unprivileged commands
-    """
-
-    def __init__(self):
-        self.orig_uid = os.geteuid()
-        self.orig_gid = os.getegid()
-
-    def __enter__(self):
-        if self.orig_uid == 0:
-            self.unpriv_uid = pwd.getpwnam("builds").pw_uid
-            self.unpriv_gid = pwd.getpwnam("builds").pw_gid
-            os.setegid(self.unpriv_gid)
-            os.seteuid(self.unpriv_uid)
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.orig_uid == 0:
-            os.seteuid(self.orig_uid)
-            os.setegid(self.orig_gid)
-        return False
-
-
 def uniq_list(input_list: list) -> list:
     """
     `uniq`, but for Python lists
@@ -177,7 +217,10 @@ def download(url: str, filename: str) -> None:
 
     with open(filename, 'wb') as f:
         try:
-            with requests.get(url, stream=True, timeout=10) as r:
+            headers = {
+                'User-Agent': 'Builds/1.0',
+            }
+            with requests.get(url, headers=headers, stream=True, timeout=10) as r:
                 r.raise_for_status()
                 total = int(r.headers.get('content-length', 0))
 
@@ -196,7 +239,6 @@ def download(url: str, filename: str) -> None:
 
         except requests.exceptions.Timeout:
             yellow("Download timed out")
-            print("Perhaps try a mirror?")
             log.error("Download of %s timed out", filename)
             # remove the zero-length file written by requests
             os.remove(filename)
@@ -206,10 +248,14 @@ def download(url: str, filename: str) -> None:
             print("Are you sure you're connected to the Internet?")
             log.error("Download of %s failed", filename)
             sys.exit(12)
-        # Some servers cannot/will not return a content-length header
-        # resulting in a 406 error
         except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 404:
+                yellow(f"404: File not found. Please check the URL you are attempting to access")
+                yellow(f"{url} does not exist")
+                log.error(f"build failure: %s", e)
+                log.error(f"{url} does not exist")
             yellow(str(e))
+            # Sometimes this is recoverable using a basic downloader
             print("Attempting basic download")
             # remove the zero-length file written by requests
             os.remove(filename)
@@ -228,6 +274,10 @@ class DownloadProgressBar(tqdm.tqdm):
     tqdm wrapper for ftp download
     """
 
+    #def __init__(self, *args, **kwargs):
+    #    super.__init__(*args, **kwargs)
+    #    self.total = None
+
     def update_to(self, b=1, bsize=1, tsize=None):
         """
         Set total size of download or None
@@ -242,6 +292,9 @@ def download_ftp(url: str, filename: str) -> None:
     Download using ftp protocol
     """
     try:
+        opener = request.build_opener()
+        opener.addheaders = [('User-Agent', 'Builds/1.0')]
+        request.install_opener(opener)
         with DownloadProgressBar(unit='B',
                                  unit_scale=True,
                                  miniters=1,
