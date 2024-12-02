@@ -37,4 +37,14 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    conf_d = 'e' if cf.config['user'] == 'root' else 'ue'
+    self.inst_config(f"{self.p['_' + conf_d]}/dhcpcd.conf", f"{self.p[conf_d]}/dhcpcd.conf")
+
+    self.inst_directory(f"{self.p['_ul']}/dhcpcd/", f"{self.p['ul']}/dhcpcd/")
+
+    self.inst_binary(f"{self.p['_us']}/dhcpcd", self.p['us'])
+    self.inst_directory(f"{self.p['_ush']}/dhcpcd/", f"{self.p['ush']}/dhcpcd/")
+
+    self.inst_manpage(self.p['_man5'] + "/dhcpcd.conf.5", self.p['man5'])
+    self.inst_manpage(self.p['_man8'] + "/dhcpcd-run-hooks.8", self.p['man8'])
+    self.inst_manpage(self.p['_man8'] + "/dhcpcd.8", self.p['man8'])
