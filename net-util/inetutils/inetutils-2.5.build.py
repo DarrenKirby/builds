@@ -1,7 +1,5 @@
 #    net-util/inetutils/inetutils-2.5.build.py
 #    Sat Nov 16 21:11:57 UTC 2024
-import os
-
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -62,7 +60,7 @@ def install(self):
     for man in os.listdir(self.p['_man1']):
         if man in ['ifconfig.1']:
             os.rename(f"{self.p['_man1']}/{man}", self.p['_man1'] + "/ifconfig.8")
-            self.inst_manpage(f"{self.p['_man1']}/ifconfig.", self.p['man8'])
+            self.inst_manpage(f"{self.p['_man1']}/ifconfig.8", self.p['man8'])
         else:
             self.inst_manpage(f"{self.p['_man1']}/{man}", self.p['man1'])
 
