@@ -296,7 +296,7 @@ class FileInstaller:
         self.manifest.append(absfile)
 
     @staticmethod
-    def do(cmd: str, shell: bool = False) -> int:
+    def do(cmd: str, shell: bool = False, env: [None | dict] = None) -> int:
         """
         Helper function for running shell commands in a build script.
         """
@@ -304,7 +304,7 @@ class FileInstaller:
         grp = "builds" if cf.config['user'] == 'root' else None
 
         try:
-            sp.run(shlex.split(cmd), check=True, user=usr, group=grp, shell=shell)
+            sp.run(shlex.split(cmd), check=True, user=usr, group=grp, shell=shell, env=env)
             return 0
         except sp.CalledProcessError as e:
             cf.red(f"command: {cmd} failed: ")

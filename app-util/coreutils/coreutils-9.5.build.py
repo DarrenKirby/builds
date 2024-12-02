@@ -18,14 +18,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
 def fetch_prehook(self):
     patchname = "coreutils-9.5-i18n-2.patch"
     cf.bold(f"Downloading {patchname}...")
     cf.download(f"https://www.linuxfromscratch.org/patches/lfs/12.2/{patchname}",
                 f"{cf.config['builds_root']}/distfiles/{patchname}")
     cf.bold("...done.")
-
 
 
 def install_source_posthook(self):
@@ -35,11 +33,10 @@ def install_source_posthook(self):
     os.chdir(self.work_dir)
 
 
-
 def configure(self):
     es1 = self.do("autoreconf -fiv")
-    es2 = self.do("FORCE_UNSAFE_CONFIGURE=1 "
-                  "./configure --prefix=/usr "
+    env = {'FORCE_UNSAFE_CONFIGURE': 1}
+    es2 = self.do("./configure --prefix=/usr "
                   "--enable-no-install-program=kill,uptime")
 
     if es1 == 0 and es2 == 0:

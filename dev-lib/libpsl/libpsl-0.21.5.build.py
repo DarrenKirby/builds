@@ -23,7 +23,7 @@ depend = "dev-lib/libunistring,dev-lib/libidn2"
 def configure(self):
     os.mkdir("build")
     os.chdir("build")
-    return self.do(f"meson setup -Dprefix={self.seg_dir}/usr --libdir=/usr/lib --buildtype=release")
+    return self.do(f"meson setup --prefix=/usr --libdir=/usr/lib --buildtype=release")
 
 
 def make(self):
@@ -31,7 +31,8 @@ def make(self):
 
 
 def make_install(self):
-    return self.do(f"ninja install")
+    env = {'DESTDIR': self.seg_dir}
+    return self.do(f"ninja install", env=env)
 
 
 def install(self):
