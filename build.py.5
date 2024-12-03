@@ -204,7 +204,7 @@ There is also a dictionary defined which contains abbreviated keys for brevity, 
 directory is simply defined as 'p', and again, must be prefaced with self. The keys that are prefaced with an underscore
 expand to locations within the predefined 'seg_dir' segregated directory into which the 'make install' step should
 install the built files. The non-underscore versions expand to paths in the live filesystem where the built files will
-ultimately be installed. This dictionary is defined thusly:
+ultimately be installed. This dictionary is defined as so:
 .PP
 .in +4n
 .nf
@@ -263,7 +263,7 @@ self.p = {
 .fi
 .PP
 Before we have a look at the functions where the seven steps of the build process must be defined, we should talk a bit
-abour users and privileges. If you have installed builds in the user configuration, most of this discussion will not
+about users and privileges. If you have installed builds in the user configuration, most of this discussion will not
 concern you. Your build_root and install_root will be in a  user-owned (or at least user-writable) location, and all
 commands will be run as the user you use to run builds. For system-wide installs, however, there is more nuance.
 .PP
@@ -277,9 +277,9 @@ be run during the install or cleanup steps. All steps prior to this will be run 
 only have privilege enough to write/edit/delete to files and directories in the build_root and below, which includes
 the working directory where the package source is actually build and installed into the segregated directory.
 .PP
-It is best practive to perform as  much work as  is possible in pure Python, hoowever, in the course of building and
+It is best practice to perform as  much work as  is possible in pure Python, however, in the course of building and
 installing software, there are many times you will need to run shell commands. Builds provides two wrapper functions for
-this purpose, and thir call signatures are identical:
+this purpose, and their call signatures are identical:
 .PP
 .in +4n
 .nf
@@ -288,7 +288,7 @@ self.sudo(cmd: str, shell: bool = False, env: [None | dict] = None) -> int
 .fi
 .PP
 As the names may imply, 'do' is for non-privileged commands, and 'sudo' is for commands that must be run as root. As per
-the privilege dropping described in the previous section, this means that 'sudo' may only becalled during the install
+the privilege dropping described in the previous section, this means that 'sudo' may only be called during the install
 and cleanup steps. All other steps should use 'do', or it will cause an error.
 
 .SH Step 1: Fetching
@@ -488,7 +488,7 @@ all files and directories are tracked and written to the manifest file. If you m
 functions builds will not know about them, and you may have orphaned files on your system if you try to uninstall or
 upgrade the package later!
 .PP
-Here is the install() function for the OpenSSSh package, which demontrates the use of most of them:
+Here is the install() function for the OpenSSSh package, which demonstrates the use of most of them:
 .PP
 .in +4n
 .nf
@@ -593,7 +593,7 @@ The author strongly prefers you report bugs by opening an issue at the
 .B builds
 github page:
 .B https://github.com/DarrenKirby/builds/issues.
-If you do not have a githu account, please send an email to <bulliver@gmail.com>
+If you do not have a github account, please send an email to <bulliver@gmail.com>
 
 .SH AUTHOR
 Darren Kirby <bulliver@gmail.com>
