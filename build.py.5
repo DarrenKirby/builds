@@ -1,0 +1,278 @@
+.\" Copyright (C) 2024 Darren Kirby (bulliver@gmail.com)
+.\"
+.\" %%%LICENSE_START(VERBATIM)
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one.
+.\"
+
+.TH BUILD.PY 5 "02 December 24"
+.SH NAME
+.B build.py
+\- A specification of, and terse instruction on tools available for writing build files.
+
+.SH DESCRIPTION
+.PP
+.B build.py
+files are the platform and user-preference dependent backend scripts that specify how to build the software,
+and where to install the software once it is built. These scripts are kept in per-package directories underneath
+an appropriate category in the main builds file tree. The name of these files must be:
+
+.in +4n
+.nf
+<pkg name>-<pkg version>.build.py
+.fi
+
+.PP
+where <pkg name> and <pkg version> are the name and version strings exactly as specified in the builds database.
+
+.SH Build Script Overview
+.PP
+The build script contains all the package-specific instructions on how to configure, build, and install the package.
+.I builds
+models this process in seven discrete steps, of which 3 are automatic, and 4 must be manually specified in the
+build file. These steps are:
+
+.PP
+
+.TP
+\fBFetching the package\fP
+.PP
+This step is automated. As long as the download URL in the db is correct, bld will download the package into
+the ./builds/distfiles/ directory automatically. bld will also verify the sha256 hash of the downloaded file.
+There are two scriptable hooks into this process, if needed.
+
+.TP
+\fBExtracting the package into a working directory\fP
+.PP
+This step is automated. bld will extract package tarballs into a directory called 'work' under the package directory.
+Again, there are hooks into this step if needed. For example, you may want to apply patches to the source.
+
+.TP
+\fBConfigure the package\fP
+.PP
+This is an optional step that can be specified manually if necessary. This is where you would perform the ./configure
+step in the typical configure/make/make install process.
+
+.TP
+\fBMake the package\fP
+.PP
+Optional. This is where you would run make if necessary.
+
+.TP
+\fBMake install the package\fP
+.PP
+Optional. This is where you would run make install. Note that this step should not be used to install files to the
+live filesystem, but rather, into a segregated staging directory.
+
+.TP
+\fBInstalling the package\fP
+.PP
+This step is required to be defined in the build file. This is where the package files get installed into the live
+filesystem. A set of helper functions and path variables are provided to make this easy.
+
+.TP
+\fBCleanup\fP
+.PP
+This step is automated. If all previous steps ran successfully, this step will remove the temporary 'work'
+directory, write a manifest of installed files, and record the package and version into a special 'installed' set
+file. This step also has two hooks into the process, if necessary.
+
+.PP
+While knowledge of the internal workings of builds is not necessary to write build scripts, it is very important to
+understand that build files are not typical Python scripts. They do not get run or executed from start to end. The
+build files will run any valid Python code but only within the bounds of a small number of pre-defined functions which
+provide a way to script the above seven steps. Internally, the functions defined in a build file are 'injected' into,
+and called from within the main BuildPackage class defined in build_package.py. This means that any code written
+outside of these predefined functions (including module import statements) is undefined and may cause bad things to
+happen.
+
+.PP
+The namespace that these functions are injected into contains a few Python Standard Library modules that are useful
+for building and installing the packages. These modules are
+.B os
+,
+.B glob
+, and
+.B subprocess.
+Any other modules needed while have to be imported from within the predefined functions. There are also some
+builds-specific functions defined which are available using the
+.B cf
+namespace. These functions are specified in the following section.
+
+.SH Functions available via the cf namespace
+.PP
+
+.TP
+\fIbold() and print_bold()\fI
+.PP
+.in +4n
+.nf
+cf.bold(msg: str) -> None
+cf.print_bold(msg: str) -> None
+.fi
+.PP
+These functions will print bold text to the console. They are intended for informational output to the user. The 'bold'
+variant includes a newline character, while 'print_bold' does not.
+
+.TP
+\fIgreen() and print_green()\fI
+.PP
+.in +4n
+.nf
+cf.green(msg: str) -> None
+cf.print_green(msg: str) -> None
+.fi
+.PP
+These functions will print green text to the console, unless the user has disabled coloured output. They are intended
+for informational output to the user. The 'green' variant includes a newline character, while 'print_green' does not.
+
+.TP
+\fIyellow() and print_yellow()\fI
+.PP
+.in +4n
+.nf
+cf.yellow(msg: str) -> None
+cf.print_yellow(msg: str) -> None
+.fi
+.PP
+These functions will print yellow text to the console, unless the user has disabled coloured output. They are intended
+for cautionary output to the user. The 'yellow' variant includes a newline character, while 'print_yellow' does not.
+
+.TP
+\fIred() and print_red()\fI
+.PP
+.in +4n
+.nf
+cf.red(msg: str) -> None
+cf.print_red(msg: str) -> None
+.fi
+.PP
+These functions will print red text to the console, unless the user has disabled coloured output. They are intended
+to relay errors to the user. The 'red' variant includes a newline character, while 'print_red' does not.
+
+.TP
+\fIdownload()\fI
+.PP
+.in +4n
+.nf
+cf.download(url: str, filename: str) -> None
+.fi
+.PP
+This function will download the file at 'url' as 'filename' in the current working directory. This is useful if
+supplementary packages or patches are necessary to build a package. Note that it is good form to download all files with
+the potential for reuse into  the distfiles directory. This function will check if the requested file already exists
+in distfiles before downloading again.
+
+.PP
+There are several other functions available through the
+.B cf
+namespace which are defined in the file common_functions.py, which you can look up if you like. They will not be listed
+here because of their limited utility in build files. It is also possible to access values from the configuration file
+by referencing cf.config[<key>].
+
+.SH Predefined variables and functions
+.PP
+
+Because the build script functions are injected into and run from the BuildPackage() class, the build scripts have
+access to a number of instance variables that are useful for building packages. These predefined variables (and the
+functions which will be enumerated soon) must be prefaced by the 'self' instance representation. Using the example of
+the package tar version 1.28, and assuming a builds_root of /var/builds, they are:
+
+.in +4n
+.nf
+self.build       = 'app-arch/tar'
+self.name        = 'tar'
+self.version     = '1.28'
+self.sha256sum   = '9599b22ecd1d5787ad7d3b7bf0c59f312b3396d1e281175dd1f8a4014da621ff'
+self.src_url     = 'http://ftp.gnu.org/gnu/tar/tar-1.28.tar.xz'
+self.builds_root = '/var/builds'
+self.build_dir   = '/var/builds/app-arch/tar'
+self.build_file  = '/var/builds/app-arch/tar/tar-1.28.build.py'
+self.work_dir    = '/var/builds/app-arch/tar/work'
+self.seg_dir     - '/var/builds/app-arch/tar/work/seg'
+self.package     = 'tar-1.28.tar.xz'
+self.package_dir = 'tar-1.28'
+.fi
+.PP
+There is also a dictionary defined which contains abbreviated keys for brevity, and useful file paths as values. The
+directory is simply defined as 'p', and again, must be prefaced with self. The keys that are prefaced with an underscore
+expand to locations within the predefined 'seg_dir' segregated directory into which the 'make install' step should
+install the built files. The non-underscore versions expand to paths in the live filesystem where the built files will
+ultimately be installed. This dictionary is defined thusly:
+.PP
+.in +4n
+.nf
+ir = config['install_root']
+self.p = {
+
+    'b': f"{ir}/bin",
+    's': f"{ir}/sbin",
+    'l': f"{ir}/lib",
+    'e': f"{ir}/etc",
+    'i': f"{ir}/include",
+    'ub': f"{ir}/usr/bin",
+    'ue': f"{ir}/usr/etc",
+    'us': f"{ir}/usr/sbin",
+    'ui': f"{ir}/usr/include",
+    'ul': f"{ir}/usr/lib",
+    'ule': f"{ir}/usr/libexec",
+    'ulb': f"{ir}/usr/local/bin",
+    'uls': f"{ir}/usr/local/sbin",
+    'uli': f"{ir}/usr/local/include",
+    'ull': f"{ir}/usr/local/lib",
+    'ush': f"{ir}/usr/share",
+    'man1': f"{ir}/usr/share/man/man1",
+    'man2': f"{ir}/usr/share/man/man2",
+    'man3': f"{ir}/usr/share/man/man3",
+    'man4': f"{ir}/usr/share/man/man4",
+    'man5': f"{ir}/usr/share/man/man5",
+    'man6': f"{ir}/usr/share/man/man6",
+    'man7': f"{ir}/usr/share/man/man7",
+    'man8': f"{ir}/usr/share/man/man8",
+
+    '_b': self.seg_dir + "/bin",
+    '_s': self.seg_dir + "/sbin",
+    '_l': self.seg_dir + "/lib",
+    '_e': self.seg_dir + "/etc",
+    '_i': self.seg_dir + "/include",
+    '_ub': self.seg_dir + "/usr/bin",
+    '_ue': self.seg_dir + "/usr/etc",
+    '_us': self.seg_dir + "/usr/sbin",
+    '_ui': self.seg_dir + "/usr/include",
+    '_ul': self.seg_dir + "/usr/lib",
+    '_ule': self.seg_dir + "/usr/libexec",
+    '_ulb': self.seg_dir + "/usr/local/bin",
+    '_uls': self.seg_dir + "/usr/local/sbin",
+    '_uli': self.seg_dir + "/usr/local/include",
+    '_ull': self.seg_dir + "/usr/local/lib",
+    '_ush': self.seg_dir + "/usr/share",
+    '_man1': self.seg_dir + "/usr/share/man/man1",
+    '_man2': self.seg_dir + "/usr/share/man/man2",
+    '_man3': self.seg_dir + "/usr/share/man/man3",
+    '_man4': self.seg_dir + "/usr/share/man/man4",
+    '_man5': self.seg_dir + "/usr/share/man/man5",
+    '_man6': self.seg_dir + "/usr/share/man/man6",
+    '_man7': self.seg_dir + "/usr/share/man/man7",
+    '_man8': self.seg_dir + "/usr/share/man/man8"
+.fi
+.PP
+Now, let's have a look at the functions where the seven steps of the build process must be defined.
+
+.SH "SEE ALSO"
+.B bld(1)
+
+.SH BUGS
+The author strongly prefers you report bugs by opening an issue at the
+.B builds
+github page:
+.B https://github.com/DarrenKirby/builds/issues.
+If you prefer not, send an email to <bulliver@gmail.com>
+
+.SH AUTHOR
+Darren Kirby <bulliver@gmail.com>

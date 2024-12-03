@@ -1,0 +1,141 @@
+.\" Copyright (C) 2024 Darren Kirby (bulliver@gmail.com)
+.\"
+.\" %%%LICENSE_START(VERBATIM)
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one.
+.\"
+
+.TH BLD 1 "02 December 24"
+.SH NAME
+.B bld
+\- frontend command to the builds source building/package manager system
+.SH SYNOPSIS
+\fBbld\fP [ general options ] \fIcommand\fP [command options] \fIarg1\fP \fI[arg2...]\fP
+
+.SH DESCRIPTION
+\fBbld\fP is frontend command used for installing, uninstalling, upgrading, and querying available and installed
+packages under the builds source building package manager. Available packages are determined by the contents of one or
+more builds databases, the default of which is typically initiated during installation of builds.
+
+.SH OPTIONS
+
+Note that as per the SYNOPSIS, general options must be passed before the command, and command-specific options after
+the command. This is due to the implementation of Python's Argparse, which
+.B bld
+uses to parse command line arguments. It also leads to the interesting (some will no doubt say 'bad') situation where
+we can specify the same flag in different contexts, and each flag will do something different. For example, try:
+
+.in +4n
+.nf
+$ bld -n search -n bash
+.fi
+
+.SS Commands:
+
+.TP
+\fBinstall\fP \fIpkg_atom [pkg_atom...]\fI
+install one or more packages and dependencies. pkg_atom can be both short form eg: 'git', or long-form eg: 'dev-util/git'.
+.TP
+\fBuninstall\fP \fIpkg_atom [pkg_atom...]\fI
+uninstall one or more packages. Dependencies are not uninstalled.
+.TP
+\fBsearch\fP \fIstring\fI
+search the package database names and descriptions and return package information results matching \fIstring\fI.
+.TP
+\fBinfo\fP \fIpkg_atom [pkg_atom...]\fI
+print information on packages. If the package is installed this will report the version installed, and also parse
+.I builds.log
+and report all builds it has found for the package, including build failures.
+.TP
+\fBinitdb\fP \fIcsv_file [csv_file...]\fI
+initialize a builds database with data from csv_file. Note that despite the name, all csv files must be semi-colon
+delimited. This allows for commas (and thus, proper grammar) in the package description field.
+.TP
+\fBcleantree\fP \fI[category...]\fI
+delete all 'work' directories, or just the work directories under [category].
+
+.SS General Options:
+
+.TP
+\fB-h or --help\fP
+print usage details to the screen.
+.TP
+\fB-v or --verbose\fP
+make bld more chatty. The extra information printed depends on context, but use of this flag is generally a good idea
+while testing build scripts.
+.TP
+\fB-n or --nocolor\fP
+disable colour output to the console. This may also be set permenantly by setting color=False in builds.conf.
+.B bld
+also honours the NO_COLOR environmental variable.
+.TP
+\fB-V or --version\fP
+print version information and exit.
+
+.SS install/uninstall Options:
+
+.TP
+\fB-f or --fetch\fP
+download package tarballs but do not install.
+.TP
+\fB-p or --pretend\fP
+show which packages would be built then exit. This output will include any dependencies. Using this flag with
+.B uninstall
+is pointless, as it will just echo back the package names passed to the command.
+.TP
+\fB-a or --ask\fP
+prompt before installing/uninstalling package(s). Note that when used with
+.B install
+this flag will halt the entire run if given a negative response, whereas with
+.B uninstall
+individual packages will be prompted.
+.TP
+\fB-d or --dontclean\fP
+don't delete the package 'work' tree after installation.
+.TP
+\fB-t or --test\fP
+build package source but do not install to live filesystem. This flag, along with --dontclean are useful when writing
+and testing new build files.
+
+.SS Search Options:
+
+.TP
+\fB-n or --nameonly\fP
+only search package names for a match, skip descriptions.
+
+
+.SH FILES
+\fIbuilds.conf\fP
+The
+.B builds
+configuration file. This file will be located at /etc/builds.conf for system-wide installs, and at
+~/.config/builds/builds.conf for user installs.
+
+\fIbuilds.log\fP
+a log of all build installs and install attempts, and other diagnostic output. By default this file will be located at
+/var/log/builds.log for system-wide installs and in the main 'builds' directory for user installs but the location is
+configurable.
+
+\fIsets/installed\fP
+a file containing the name and version of all packages currently installed by
+.B builds.
+
+
+.SH "SEE ALSO"
+.B build.py(5)
+
+.SH BUGS
+The author strongly prefers you report bugs by opening an issue at the
+.B builds
+github page:
+.B https://github.com/DarrenKirby/builds/issues.
+If you prefer not, send an email to <bulliver@gmail.com>
+
+.SH AUTHOR
+Darren Kirby <bulliver@gmail.com>
