@@ -25,56 +25,42 @@ manually specified in the build file. These steps are:
 
 **Fetch the package**
 
-:   
-
 This step is automated. As long as the download URL in the db is
 correct, bld will download the package into the ./builds/distfiles/
 directory automatically. bld will also verify the sha256 hash of the
 downloaded file. There are two scriptable hooks into this process, if
 needed.
 
-**Extract the package into a work directory**
-
-:   
+**Extract the package into a work directory**  
 
 This step is automated. bld will extract package tarballs into a
 directory called \'work\' under the package directory. Again, there are
 hooks into this step if needed. For example, you may want to apply
 patches to the source.
 
-**Configure the package**
-
-:   
+**Configure the package**  
 
 This is an optional step that can be specified manually if necessary.
 This is where you would perform the ./configure step in the typical
 configure/make/make install process.
 
-**Make the package**
-
-:   
+**Make the package**  
 
 Optional. This is where you would run make if necessary.
 
-**Make install the package**
-
-:   
+**Make install the package**  
 
 Optional. This is where you would run make install. Note that this step
 should not be used to install files to the live filesystem, but rather,
 into a segregated staging directory.
 
-**Installing the package**
-
-:   
+**Installing the package**  
 
 This step is required to be defined in the build file. This is where the
 package files get installed into the live filesystem. A set of helper
 functions and path variables are provided to make this easy.
 
-**Cleanup**
-
-:   
+**Cleanup**  
 
 This step is automated. If all previous steps ran successfully, this
 step will remove the temporary \'work\' directory, write a manifest of
@@ -103,11 +89,7 @@ functions are specified in the following section.
 
 # Functions available via the cf namespace
 
-*bold() and print_bold()*
-
-:   
-
-<!-- -->
+*bold() and print_bold()*  
 
     cf.bold(msg: str) -> None
     cf.print_bold(msg: str) -> None
@@ -117,10 +99,6 @@ for informational output to the user. The \'bold\' variant includes a
 newline character, while \'print_bold\' does not.
 
 *green() and print_green()*
-
-:   
-
-<!-- -->
 
     cf.green(msg: str) -> None
     cf.print_green(msg: str) -> None
@@ -132,10 +110,6 @@ to the user. The \'green\' variant includes a newline character, while
 
 *yellow() and print_yellow()*
 
-:   
-
-<!-- -->
-
     cf.yellow(msg: str) -> None
     cf.print_yellow(msg: str) -> None
 
@@ -146,10 +120,6 @@ the user. The \'yellow\' variant includes a newline character, while
 
 *red() and print_red()*
 
-:   
-
-<!-- -->
-
     cf.red(msg: str) -> None
     cf.print_red(msg: str) -> None
 
@@ -159,10 +129,6 @@ The \'red\' variant includes a newline character, while \'print_red\'
 does not.
 
 *download()*
-
-:   
-
-<!-- -->
 
     cf.download(url: str, filename: str) -> None
 
@@ -300,6 +266,13 @@ As the names may imply, \'do\' is for non-privileged commands, and
 dropping described in the previous section, this means that \'sudo\' may
 only be called during the install and cleanup steps. All other steps
 should use \'do\', or it will cause an error.
+
+Additionally, any dependencies must be listed in the build file first.
+This is the only line of code that should exist outside of one of the 
+supplied functions. Dependencies are listed in comma-delimited 
+<category>/<package> strings like so:
+
+    depend = "dev-lib/libunistring,dev-lib/libidn2"
 
 # Step 1: Fetching
 
