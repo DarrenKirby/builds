@@ -41,14 +41,14 @@ build file. These steps are:
 .PP
 
 .TP
-\fBFetching the package\fP
+\fBFetch the package\fP
 .PP
 This step is automated. As long as the download URL in the db is correct, bld will download the package into
 the ./builds/distfiles/ directory automatically. bld will also verify the sha256 hash of the downloaded file.
 There are two scriptable hooks into this process, if needed.
 
 .TP
-\fBExtracting the package into a working directory\fP
+\fBExtract the package into a work directory\fP
 .PP
 This step is automated. bld will extract package tarballs into a directory called 'work' under the package directory.
 Again, there are hooks into this step if needed. For example, you may want to apply patches to the source.
@@ -262,7 +262,328 @@ self.p = {
     '_man8': self.seg_dir + "/usr/share/man/man8"
 .fi
 .PP
-Now, let's have a look at the functions where the seven steps of the build process must be defined.
+Before we have a look at the functions where the seven steps of the build process must be defined, we should talk a bit
+abour users and privileges. If you have installed builds in the user configuration, most of this discussion will not
+concern you. Your build_root and install_root will be in a  user-owned (or at least user-writable) location, and all
+commands will be run as the user you use to run builds. For system-wide installs, however, there is more nuance.
+.PP
+During a system-wide installation the initialization script will have created a non-privileged user and group,  both
+named 'builds'. While
+.B bld
+must be run as root, the program will drop root privileges as much as possible and run the majority of commands and code
+as user 'builds' right up until the penultimate step where the built files are installed into the live filesystem. So if
+you need to do some housekeeping tasks as root in order to build and install your package, these commands will have to
+be run during the install or cleanup steps. All steps prior to this will be run as 'builds', and therefore, you will
+only have privilege enough to write/edit/delete to files and directories in the build_root and below, which includes
+the working directory where the package source is actually build and installed into the segregated directory.
+.PP
+It is best practive to perform as  much work as  is possible in pure Python, hoowever, in the course of building and
+installing software, there are many times you will need to run shell commands. Builds provides two wrapper functions for
+this purpose, and thir call signatures are identical:
+.PP
+.in +4n
+.nf
+self.do(cmd: str, shell: bool = False, env: [None | dict] = None) -> int
+self.sudo(cmd: str, shell: bool = False, env: [None | dict] = None) -> int
+.fi
+.PP
+As the names may imply, 'do' is for non-privileged commands, and 'sudo' is for commands that must be run as root. As per
+the privilege dropping described in the previous section, this means that 'sudo' may only becalled during the install
+and cleanup steps. All other steps should use 'do', or it will cause an error.
+
+.SH Step 1: Fetching
+.PP
+The fetching step is automated, however, there are two hooks you can define if you need to customize this step:
+.PP
+.in +4n
+.nf
+fetch_prehook()
+fetch_posthook()
+.fi
+.PP
+As is implied, prehook runs before the package is fetched, and posthook is run after the package is fetched. These
+functions can be used to download other packages or patches if required. For example, git distributes its manpages in a
+separate tarball, so git's build file contains:
+.PP
+.in +4n
+.nf
+def fetch_posthook(self):
+   url = f"https://www.kernel.org/pub/software/scm/git/git-manpages-{self.version}.tar.xz"
+   cf.bold(f"Fetching {url.split('/')[-1]}")
+   cf.download(url, url.split('/')[-1])
+.fi
+.PP
+When it comes to file paths, it is important to understand the directory from which the predefined functions are called,
+and thus, the PWD in relation to the function call. fetch_prehook() and fetch_posthook() are both run from within
+the ./builds/distfiles/ directory, which is where all packages should be downloaded to.
+
+.SH Step 2: Extract the package into a work directory
+.PP
+.in +4n
+.nf
+install_source_prehook()
+install_source_posthook()
+.fi
+.PP
+These are two more pre/post hooks into the extract package step. This is the appropriate place to script any changes
+that need to be applied to the package source tree, such as edits to Makefiles and configure scripts, or applying
+patches. The following snippet from the coreutils build file illustrates how to apply a patch:
+.PP
+.in +4n
+.nf
+def install_source_posthook(self):
+    os.chdir(self.package_dir)
+    patchname = "coreutils-9.5-i18n-2.patch"
+    self.do(f"patch -Np1 -i {cf.config['builds_root']}/distfiles/{patchname}")
+    os.chdir(self.work_dir)
+.fi
+.PP
+Note that install_source_prehook() is run from inside distfiles/ (as the package has not yet been extracted) and
+install_source_posthook() is run from inside self.work_dir, so we os.chdir() into the source tree to apply the patch.
+.PP
+Another use for these hooks is to correct a non-standard directory name. Builds expects untarred package directory names
+to be in the form <packagename-version>. While most packages follow this convention, you may encounter some that do not,
+and they will have to be renamed manually in order for builds to continue. Here is an example of renameing the package
+directory for liburcu:
+.PP
+.in +4n
+.nf
+def install_source_posthook(self):
+    os.rename(f"userspace-rcu-{self.version}", f"liburcu-{self.version}")
+.fi
+.PP
+
+.SH Step 3: Configure the package
+.PP
+.in +4n
+.nf
+configure()
+.fi
+.PP
+For all packages that require configuration, this is the place to do it. Generally, this step requires only wrapping
+an appropriate configure command into a call to self.do(), as shown in this example from the OpenSSH build file:
+.PP
+.in +4n
+.nf
+def configure(self):
+    conf_d = '/etc/ssh' if cf.config['user'] == 'root' else '/usr/etc/ssh'
+    return self.do("./configure --prefix=/usr "
+                   f"--sysconfdir={conf_d} "
+                   "--with-privsep-path=/var/lib/sshd "
+                   "--with-default-path=/usr/bin "
+                   "--with-superuser-path=/usr/sbin:/usr/bin "
+                   "--with-pid-dir=/run")
+.fi
+.PP
+Note that we have modified the '--sysconfdir' variable depending on which user is specified in the configuration file.
+Also note that I have directly returned the exit status of the self.do() call here. The callers of configure(), make()
+and make_install() all expect a return value of 0, so they know the commands ran successfully, and that they are free
+to continue. It doesn't matter how you do it, but if the code and commands you script in these functions run normally,
+you must return 0, and if they do not, you must return a non-zero exit.
+.PP
+Another thing to note is the --prefix=/usr. The Linux from scratch system that I originally designed builds for, and
+the Gentoo system from which I have done most of builds's development and testing on, both make all of /bin, /sbin, and
+/lib as symlinks to their counterparts in /usr, so I have gotten in the habit of installing to user. You can of course
+use a prefix of / or /usr/local if it better suits your purposes.
+.PP
+It should go without saying that configure() is run from within self.package_dir. It also bears repeating that defining
+this function is optional. If you don't need to run configure, leave it undefined.
+
+.SH Step 4: Make the package
+
+.PP
+.in +4n
+.nf
+make()
+.fi
+.PP
+As the name would imply, this is where you would run make if necessary. It is generally quite simple:
+.PP
+.in +4n
+.nf
+def make(self):
+    return self.do(f"make {cf.config['makeopts']}")
+.fi
+.PP
+Again we directly return the exit status of self.do() to the caller. cf.config is a dictionary of key -> value pairs
+loaded from the configuration file when you run bld. In this case, we are using 'makeopts' to pass -j4 to the make
+command, to speed up compilation. You can define this in your configuration file. If it is not defined it will
+default to -j1. make() is called from self.package_dir, and is an optional function.
+
+.SH Step 5: Make install the package
+.PP
+.in +4n
+.nf
+make_install()
+.fi
+.PP
+This is the function from which to run your make install command. Again, I will re-iterate that this is NOT from where
+files are installed to the live filesystem. This function should command make to install the files into a segregated
+directory, which is the predefined instance variable self.seg_dir, and will appear in the filesystem
+as ./builds/<category>/<pkgname>/work/seg. It is not mandatory to do this, but it is certainly a best practice. If your
+package is simple enough (or a binary package), it may be easier to just pluck the files you want to install from
+within the package source tree (in the next step), and leave this function undefined.
+.PP
+For any non-trivial package, however, it is far preferable to install to the staging directory, as all the files you
+need to install will be nicely separated into their appropriate directories under seg/:
+.PP
+.in +4n
+.nf
+def make_install(self):
+    return self.do(f"make DESTDIR={self.seg_dir} install")
+.fi
+.PP
+Note the inclusion of DESTDIR here. This tells the install script to install files relative to seg/. After this
+command runs, binaries will be installed in work/seg/usr/bin, libraries in work/seg/usr/lib, headers in
+work/seg/usr/include, manpages in work/seg/usr/share/man/man1 and so on.
+.PP
+Most, if not all build systems have some sort of mechanism analogous to DESTDIR. You may have to read some documentation
+to discover it for your package's build system. Some, like ninja, use DESTDIR, but want the environmental variable
+specified first in the command line, rather than in the middle, as in the above example. This causes problems, as
+subprocess.run(), which is the command that self.do() directly calls, expects the first argument to be a command, and it
+will throw an error (FileNotFoundError) when you try to pass an env var first. There is a workaround. libpsl uses ninja,
+and so during make_install we will put the DESTDIR env var in a dictionary, and pass it as an optional arg to self.do():
+.PP
+.in +4n
+.nf
+def make_install(self):
+    env = {'DESTDIR': self.seg_dir}
+    return self.do(f"ninja install", env=env)
+.fi
+.PP
+
+.SH Step 6: Install the package to the live filesystem
+.PP
+.in +4n
+.nf
+install()
+.fi
+.PP
+This is the penultimate step which installs the build files into your live filesystem. This is the only function that
+is required to be defined in a build file. Along with the self.p path dictionary explained above, there are nine
+predefined functions which should be used to install the files. They are:
+.PP
+.in +4n
+.nf
+self.inst_binary(frm: str, to: str) - for installing binaries
+self.inst_script(frm: str, to: str) - for installing scripts and other executable text files
+self.inst_library(frm: str, to: str) - for installing library files
+self.inst_header(frm: str, to: str) - for installing header files
+self.inst_manpage(frm: str, to: str, compress: bool = True)- for installing manpages
+self.inst_symlink(target: str, name: str) - for creating symlinks
+self.inst_config(frm: str, to: str - for installing configuration files
+self.inst_directory(frm: str, to: str) - for recursively installing entire directories
+self.inst_file(frm: str, to: str, mode: int = 644) - for installing any file, with optional mode argument
+.fi
+.PP
+All of these functions, except for inst_directory(), use the install shell command under the hood. This ensures all
+files are placed in the filesystem with proper ownership and permissions, and allows us to overwrite existing files
+for an upgrade. The general signature is to call them with the 'from' location as the first arg, and the 'to' location
+as the second arg. builds compresses manpages using bzip2 by default, but this can be disabled by passing an optional
+compress=False third arg to inst_manpage(). The inst_file() function accepts an optional 'mode' argument if you need
+something other than the default 644 permissions.
+.PP
+It is very important to only use these provided functions to install files, as when wrangled through these functions
+all files and directories are tracked and written to the manifest file. If you manually install files outside of these
+functions builds will not know about them, and you may have orphaned files on your system if you try to uninstall or
+upgrade the package later!
+.PP
+Here is the install() function for the OpenSSSh package, which demontrates the use of most of them:
+.PP
+.in +4n
+.nf
+def install(self):
+    # Get all files in work/seg/usr/bin/, and install to /usr/bin/
+    for file in os.listdir(self.p['_ub']):
+        self.inst_script(f"{self.p['_ub']}/{file}", self.p['ub'])
+
+    # install sshd
+    self.inst_script(f"{self.p['_us']}/sshd", self.p['us'])
+
+    # install helper programs to /usr/libexec
+    for file in os.listdir(self.p['_ule']):
+        self.inst_script(f"{self.p['_ule']}/{file}", self.p['ule'])
+
+    # install manpages
+    for file in os.listdir(self.p['_man1']):
+        self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
+
+    for file in os.listdir(self.p['_man5']):
+        self.inst_manpage(f"{self.p['_man5']}/{file}", self.p['man5'])
+
+    for file in os.listdir(self.p['_man8']):
+        self.inst_manpage(f"{self.p['_man8']}/{file}", self.p['man8'])
+
+    # install configuration files
+    conf_d = 'e' if cf.config['user'] == 'root' else 'ue'
+    self.inst_directory(self.p['_' + conf_d] + '/ssh/', self.p[conf_d] + '/ssh/')
+
+    # Install ssh-copy-id and manpage
+    self.inst_script(f"{self.work_dir}/{self.package_dir}/contrib/ssh-copy-id", self.p['ub'])
+    self.inst_manpage(f"{self.work_dir}/{self.package_dir}/contrib/ssh-copy-id.1", self.p['man1'])
+.fi
+.PP
+This example from libyaml shows how to install header files, and install library files and their symlinks:
+.PP
+.in +4n
+.nf
+def install(self):
+    self.inst_header(self.p['_ui'] + "/yaml.h", self.p['ui'])
+
+    self.inst_library(self.p['_ul'] + "/libyaml-0.so.2.0.9", self.p['ul'])
+    self.inst_symlink(self.p['ul'] + "/libyaml-0.so.2.0.9", self.p['ul'] + "/libyaml-0.so.2")
+    self.inst_symlink(self.p['ul'] + "/libyaml-0.so.2.0.9", self.p['ul'] + "/libyaml-0.so")
+
+    self.inst_file(self.p['_ul'] + "/pkgconfig/yaml-0.1.pc", self.p['ul'] + "/pkgconfig/")
+.fi
+.PP
+.SH Step 7: Cleanup
+.PP
+.in +4n
+.nf
+cleanup_prehook()
+cleanup_posthook()
+.fi
+.PP
+The cleanup step is automated, but we have our two hooks if needed. prehook is run from self.package_dir before the
+work directory and source tree are deleted, and posthook is run from self.build_dir after the work directory is
+deleted. This is a good place to script any needed post-installation tasks. For example, for OpenSSH, we may want to
+create a 'sshd' user and group to run the daemon under. We can do that here:
+.PP
+.in +4n
+.nf
+# This will only work on a system install.
+def cleanup_posthook(self):
+    if cf.config['user'] != 'root':
+        return
+    # Check if sshd user already exists...
+    import pwd
+    try:
+        pwd.getpwnam("sshd")
+        return
+    except KeyError:
+        pass
+    try:
+        # UID/GID 50 to match LFS/BLFS
+        cf.bold("Creating user/group 'sshd'")
+        self.sudo("install -v -g sys -m700 -d /var/lib/sshd")
+        self.sudo("groupadd -g 50 sshd")
+        self.sudo("useradd -c 'sshd PrivSep' -d /var/lib/sshd -g sshd -s /bin/false -u 50 sshd")
+    except OSError as e:
+        cf.yellow(f"Adding user/group 'sshd' failed: {e}")
+.fi
+.PP
+Note the use of self.sudo() rather than self.do() for these commands that must be run as root.
+.SH Conclusion
+.PP
+So that's how to write a build file in a nutshell. Every package can be different, and you will have to go through a
+manual process of determining how they want to be built, and how they can be scripted in a build file. Thankfully, most
+packages do not stray far from the typical 'configure, make, make install' three-step process.
+.PP
+If you've actually read all the way to the end of this document you may be thinking to yourself that writing build files
+is hopelessly complicated. It really is not. Most are quite simple and straightforward. I strongly suggest reading a
+few of them using this documentation for context on what they are doing.
+
 
 .SH "SEE ALSO"
 .B bld(1)
@@ -272,7 +593,7 @@ The author strongly prefers you report bugs by opening an issue at the
 .B builds
 github page:
 .B https://github.com/DarrenKirby/builds/issues.
-If you prefer not, send an email to <bulliver@gmail.com>
+If you do not have a githu account, please send an email to <bulliver@gmail.com>
 
 .SH AUTHOR
 Darren Kirby <bulliver@gmail.com>
