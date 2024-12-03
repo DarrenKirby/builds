@@ -313,7 +313,7 @@ class FileInstaller:
             sys.exit(-1)
 
     @staticmethod
-    def sudo(cmd: str, shell: bool = False) -> int:
+    def sudo(cmd: str, shell: bool = False, env: [None | dict] = None) -> int:
         """
         Helper function for running shell commands in a build script.
         """
@@ -321,7 +321,7 @@ class FileInstaller:
         grp = "root" if cf.config['user'] == 'root' else None
 
         try:
-            sp.run(shlex.split(cmd), check=True, user=usr, group=grp, shell=shell)
+            sp.run(shlex.split(cmd), check=True, user=usr, group=grp, shell=shell, env=env)
             return 0
         except sp.CalledProcessError as e:
             cf.red(f"command: {cmd} failed: ")
