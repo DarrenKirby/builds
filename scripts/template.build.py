@@ -20,8 +20,8 @@
 
 # If there are no dependencies then comment or delete this line
 # out, otherwise, add all dependencies to this variable as strings ie:
-# depend="dev-lang/ruby,app-editor/nano"
-# All 'system' packages are implicit dependencies, and do not
+# depend = "dev-lang/ruby,app-editor/nano"
+# All 'sets/system' packages are implicit dependencies, and do not
 # need to be listed here as they are (presumably) already installed.
 # depend = ""
 
@@ -44,24 +44,25 @@
 
 # Use configure() to run configure scripts
 # def configure(self):
-#     return os.system("./configure --prefix=/usr")
+#     return self.do("./configure --prefix=/usr")
 
 
 # Use make() to make the package
 # def make(self):
-#     return os.system("make")
+#     return self.do("make")
 
 
 # Use make_install() to install the built files into a segregated directory
 # def make_install(self):
-#     return os.system(f"make DESTDIR={self.seg_dir} install")
+#     return self.do(f"make DESTDIR={self.seg_dir} install")
 
 # The above three functions need to return 0 to the caller
 # so bld knows the commands ran without error, and can continue.
+# self.do() will automatically return zero if the command ran successfully.
 
 
 # install() MUST be defined in the build file.
-# Use the helper functions in build_package.py
+# Use the helper functions defined in build_package.py
 # to install binaries, scripts, libraries, headers,
 # documentation (man pages), and to create symlinks.
 
@@ -69,10 +70,12 @@
 # files that don't fit the above categories.
 # def install(self):
 #     self.inst_binary(f"{self.p['_ub']}/fooapp", self.p['ub'])
-#     self.inst_library(f"{self.p['_ul']}/libfooapp.so", self.p['ul'])
+#     self.inst_library(f"{self.p['_ul']}/libfooapp.so.5.1.2", self.p['ul'])
+#     self.inst_symlink(f"{self.p['ul']}/libfooapp.so.5.1.2", f"{self.p['ul']}/libfooapp.so.5")
 #     self.inst_header(f"{self.p['_ui']}/libfooapp.h", self.p['ui'])
 #     self.inst_manpage(f"{self.p['_man1']}/fooapp.1", self.p['man1'])
 #     self.inst_manpage(f"{self.p['_man3']}/libfooapp.3", self.p['man3'])
+#     self.inst_directory(f"{self.p['_ush']}/fooapp/", f"{self.p['ush']}/fooapp/")
 
 
 # Use these two as pre/post hooks into the cleanup process
