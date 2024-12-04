@@ -10,10 +10,14 @@ build script does not yet exist, it is relatively easy for anyone to create thei
 knowledge.
 
 I originally created *builds* to take care of updating and installing software in a
-new [Linux From Scratch](https://www.linuxfromscratch.org/) system installation of my own. That said, I have designed
+new [Linux From Scratch](https://www.linuxfromscratch.org/) system installation of my own, and the provided build files 
+are tailered specifically for a fresh LFS install. That said, I have designed
 *builds* to be portable, and the front-end should work just fine on any unixish system that supports Python 3.6 or
 better. It is only the per-package build scripts that would need to be customized for each system, and for personal
-preferences. *builds* is pure-Python, and uses only two non-standard library
+preferences. The provided build files _should_ work as-is with most Linux systems, and with minimal changes for 
+macOS and other Unix systems
+
+*builds* is pure-Python, and uses only two non-standard library
 modules: [requests](https://pypi.org/project/requests/)
 to download packages, and [tqdm](https://pypi.org/project/tqdm/) for a nice download progress bar.
 
