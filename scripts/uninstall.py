@@ -30,9 +30,9 @@ import logging as log
 
 from config import config
 import common_functions as cf
+from build_package import BuildPackage
 
-
-class Unistaller:
+class Uninstaller:
     """
     Core logic for uninstalling files and packages.
     """
@@ -47,6 +47,10 @@ class Unistaller:
         manifest = cf.get_manifest(self.manifest_file)
         self.manifest = [Path(file) for file in manifest]
         self.args = args
+
+    def backup(self):
+        pass
+
 
     def delete(self):
         """
@@ -116,7 +120,7 @@ def do_uninstall(args: argparse.Namespace) -> None:
                 sys.exit(1)
 
         # Looks like we really want to delete it...
-        uninstaller = Unistaller(manifest_file, args)
+        uninstaller = Uninstaller(manifest_file, args)
         uninstaller.delete()
         uninstaller.delete_manifest_file()
         with cf.PrivDropper():
@@ -126,3 +130,6 @@ def do_uninstall(args: argparse.Namespace) -> None:
         cf.green(f" {pkg_info[0]} - {pkg_info[1]}")
         log.warning(f"package uninstalled: {pkg_info[0]} - {pkg_info[1]}")
         return
+
+def do_update(args):
+    pass
