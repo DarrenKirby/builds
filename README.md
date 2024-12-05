@@ -11,7 +11,7 @@ knowledge.
 
 I originally created *builds* to take care of updating and installing software in a
 new [Linux From Scratch](https://www.linuxfromscratch.org/) system installation of my own, and the provided build files 
-are tailered specifically for a fresh LFS install. That said, I have designed
+are tailored specifically for a fresh LFS install. That said, I have designed
 *builds* to be portable, and the front-end should work just fine on any unixish system that supports Python 3.6 or
 better. It is only the per-package build scripts that would need to be customized for each system, and for personal
 preferences. The provided build files _should_ work as-is with most Linux systems, and with minimal changes for 
