@@ -35,7 +35,7 @@ import uninstall
 from config import config
 
 APPNAME = "bld"
-APPVERSION = "0.5.1"
+APPVERSION = "0.5.3"
 QUIP = "By far the best software available for turtle stacking"
 
 
@@ -74,9 +74,19 @@ def process_args() -> argparse.Namespace:
     install_parser.add_argument('-t', '--test', action='store_true')
     install_parser.add_argument("pkg_atom", action="extend", nargs="+", type=str)
 
+    # 'update' command options
+    install_parser = subparsers.add_parser("update")
+    install_parser.add_argument('-f', '--fetch', action='store_true')
+    install_parser.add_argument('-p', '--pretend', action='store_true')
+    install_parser.add_argument('-a', '--ask', action='store_true')
+    install_parser.add_argument('-d', '--dontclean', action='store_true')
+    install_parser.add_argument('-t', '--test', action='store_true')
+    install_parser.add_argument('-b', '--backup', action='store_true')
+    install_parser.add_argument("pkg_atom", action="extend", nargs="+", type=str)
+
     # 'uninstall' command options
     uninstall_parser = subparsers.add_parser("uninstall")
-    uninstall_parser.add_argument('-p', '--pretend', action='store_true')
+    uninstall_parser.add_argument('-b', '--backup', action='store_true')
     uninstall_parser.add_argument('-a', '--ask', action='store_true')
     uninstall_parser.add_argument("pkg_atom", action="extend", nargs="+", type=str)
 
@@ -152,10 +162,13 @@ def do_main() -> None:
             cf.print_bold(" directory\n" if num_cleaned == 1 else " directories\n")
             sys.exit(0)
 
-    # Need priv to uninstall
+    # Need priv to uninstall/update
     if args.command == 'uninstall':
         uninstall.do_uninstall(args)
         sys.exit(0)
+
+    if args.command == 'update':
+        uninstall.do_update(args)
 
     with cf.PrivDropper():
         builds_to_build = dep_resolve.resolve_dependencies(args)
@@ -251,6 +264,7 @@ Usage: {APPNAME} [general options] command [command options] arg [arg2...]
 
     Commands:
         'install'   pkg_atom [pkg_atom...]  install one or more packages and dependancies
+        'update'    pkg_atom [pkg_atom...]  update one or more packages
         'uninstall' pkg_atom                uninstall package
         'search'    string                  search the package db for package names matching string
         'info'      pkg_atom [pkg_atom...]  print info on packages if installed
@@ -263,12 +277,16 @@ Usage: {APPNAME} [general options] command [command options] arg [arg2...]
         '-n'   or '--nocolor'               disable color output
         '-V'   or '--version'               print version information and exit
 
-    install/uninstall/update Options:
+    install/update Options:
         '-f'   or '--fetch'                 download packages but do not install
-        '-p'   or '--pretend'               show which packages would be built/deleted then exit
-        '-a'   or '--ask'                   prompt before installing/uninstalling package(s)
+        '-p'   or '--pretend'               show which packages would be built then exit
+        '-a'   or '--ask'                   prompt before installing package(s)
         '-d'   or '--dontclean'             don't delete the package 'work' tree after installation
         '-t'   or '--test'                  build source but do not install to live filesystem
+        '-b'   or '--backup'                backup installed files to '<cat>/<pkg>/backup' before updating
+        
+    uninstall Options:
+        '-a'   or '--ask'                   prompt before uninstalling package(s)
         '-b'   or '--backup'                backup installed files to '<cat>/<pkg>/backup' before uninstalling
         
     search Options:
