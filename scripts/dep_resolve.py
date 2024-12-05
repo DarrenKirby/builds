@@ -87,7 +87,7 @@ def get_deps(build_file: str) -> list:
     return deps
 
 
-def get_version(package: str) -> tuple[str, str]:
+def get_version(package: str, spec_version: [str, None] = None) -> tuple[str, str]:
     """
     Return version number in db given a package.
     """
@@ -111,7 +111,21 @@ def get_version(package: str) -> tuple[str, str]:
                 sys.exit(2)
         # Append tuple of atom and version
         db_list = db_string.split(';')
-        return db_list[0], db_list[1]
+
+        # Check for multiple versions
+        if db_list[1].count(",") > 0:
+            versions = db_list[1].split(",")
+            if spec_version:
+                if spec_version not in versions:
+                    cf.red(f"{spec_version} is not available for {package}")
+                    sys.exit(23)
+                else:
+                    version = spec_version
+            else:
+                version = cf.VersionComparator().higher(versions[0], versions[1])
+        else:
+            version = db_list[1]
+        return db_list[0], version
 
 
 def topological_sort(graph: dict) -> list:
@@ -166,12 +180,22 @@ def resolve_dependencies(args: argparse.Namespace) -> list[tuple]:
 
     # Build the initial version dictionary and dependency graph
     for pkg in pkg_atoms:
-        try:
-            name, version = get_version(pkg)
-        except KeyError:
-            cf.red(f"{pkg} is not a valid package atom.")
-            print(f"Try 'bld search {pkg}'")
-            sys.exit(2)
+        # If version attatched to pkg_atom
+        if pkg.count("-") == 1:
+            n, v = pkg.split("-")
+            try:
+                name, version = get_version(n, v)
+            except KeyError:
+                cf.red(f"{pkg} is not a valid package atom.")
+                print(f"Try 'bld search {pkg}'")
+                sys.exit(2)
+        else:
+            try:
+                name, version = get_version(pkg)
+            except KeyError:
+                cf.red(f"{pkg} is not a valid package atom.")
+                print(f"Try 'bld search {pkg}'")
+                sys.exit(2)
         version_dict[name] = version
         dep_graph[name] = get_deps(f"{config['builds_root']}/{name}/{name.split('/')[-1]}-{version}.build.py")
 
