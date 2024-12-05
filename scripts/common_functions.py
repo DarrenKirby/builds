@@ -46,8 +46,6 @@ class VersionComparator:
     def _parse_version(version: str):
         """
         Parses a version string into a tuple of comparable elements.
-        Numeric segments are converted to integers, and alphabetic
-        segments remain strings.
         """
         # Split by dots, then split alphanumeric parts
         segments = re.split(r'\.', version)
