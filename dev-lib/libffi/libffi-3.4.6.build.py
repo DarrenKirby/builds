@@ -35,7 +35,7 @@ def install(self):
     self.inst_header(f"{self.p['_ui']}/ffi.h", self.p['ui'])
     self.inst_header(f"{self.p['_ui']}/ffitarget.h", self.p['ui'])
 
-    self.inst_file(self.p['ul'] + "/pkgconfig/libffi.pc", self.p['ul'] + "/pkgconfig/")
+    self.inst_file(self.p['_ul'] + "/pkgconfig/libffi.pc", self.p['ul'] + "/pkgconfig/")
 
     self.inst_library(f"{self.p['_ul']}/libffi.so.8.1.4", self.p['ul'])
     self.inst_symlink(f"{self.p['ul']}/libffi.so.8.1.4", f"{self.p['ul']}/libffi.so")
