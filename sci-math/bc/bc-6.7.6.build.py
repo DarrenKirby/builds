@@ -19,8 +19,7 @@
 
 
 def configure(self):
-    # -N: --disable-nls, as --prefix is not honoured for locale installation
-    return self.do("CC=gcc ./configure --prefix=/usr -G -N -O3 -r")
+    return self.do("./configure --prefix=/usr -G -N -O3 -r")
 
 
 def make(self):
