@@ -30,7 +30,8 @@ import logging as log
 
 from config import config
 import common_functions as cf
-from build_package import BuildPackage
+import dep_resolve
+
 
 class Uninstaller:
     """
@@ -44,13 +45,39 @@ class Uninstaller:
         self.package = "/".join(parts[-3:-1])
         self.version = parts[-1].split("-")[1].rsplit(".", 1)[0]
 
-        manifest = cf.get_manifest(self.manifest_file)
-        self.manifest = [Path(file) for file in manifest]
+        self.manifest_list = cf.get_manifest(self.manifest_file)
+        self.manifest = [Path(file) for file in self.manifest_list]
         self.args = args
+        self.backup_root = f"{cf.config['builds_root']}/{self.package}/backup.{self.version}"
+        print(self.backup_root)
 
     def backup(self):
-        pass
+        """
+        Back up files and directories listed in the manifest to self.backup_root.
+        """
+        backup_dir = Path(self.backup_root)
+        # Ensure the backup root directory exists
+        backup_dir.mkdir(parents=True, exist_ok=True)
 
+        for item in self.manifest:
+            # Resolve the relative path within the backup root
+            relative_path = item.relative_to("/")
+            target_path = backup_dir / relative_path
+
+            if item.is_symlink():
+                # Handle symbolic links
+                link_target = item.readlink()
+                target_path.parent.mkdir(parents=True, exist_ok=True)
+                target_path.symlink_to(link_target)
+            elif item.is_file():
+                # Handle files
+                target_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(item, target_path)
+            elif item.is_dir():
+                # Handle directories
+                target_path.mkdir(parents=True, exist_ok=True)
+            else:
+                print(f"Skipping unknown file type: {item}")
 
     def delete(self):
         """
@@ -62,13 +89,13 @@ class Uninstaller:
                 if self.args.verbose:
                     cf.print_green("Deleting link:      ")
                     cf.print_bold(f"{path}\n")
-                path.unlink()  # Remove the symlink itself, not the target
+                path.unlink()
             elif path.is_dir():
                 # Handle directories
                 if self.args.verbose:
                     cf.print_green("Deleting directory: ")
                     cf.print_bold(f"{path}\n")
-                shutil.rmtree(path)  # Recursively delete the directory and its contents
+                shutil.rmtree(path)
             elif path.is_file():
                 # Handle files
                 if self.args.verbose:
@@ -99,12 +126,6 @@ def do_uninstall(args: argparse.Namespace) -> None:
     """
     Uninstall a package
     """
-    if args.pretend:
-        print("Uninstalling:")
-        for arg in args.pkg_atom:
-            cf.yellow(f"\t{arg}")
-        sys.exit(0)
-
     for pkg in args.pkg_atom:
         pkg_info = cf.get_installed_version(pkg)
         c, n = pkg_info[0].split('/')
@@ -121,6 +142,8 @@ def do_uninstall(args: argparse.Namespace) -> None:
 
         # Looks like we really want to delete it...
         uninstaller = Uninstaller(manifest_file, args)
+        if args.backup:
+            uninstaller.backup()
         uninstaller.delete()
         uninstaller.delete_manifest_file()
         with cf.PrivDropper():
@@ -128,8 +151,27 @@ def do_uninstall(args: argparse.Namespace) -> None:
 
         cf.print_bold(f"Package deleted: ")
         cf.green(f" {pkg_info[0]} - {pkg_info[1]}")
-        log.warning(f"package uninstalled: {pkg_info[0]} - {pkg_info[1]}")
+        log.warning(f"package uninstalled: {pkg_info[0]} {pkg_info[1]}")
         return
 
-def do_update(args):
-    pass
+
+def do_update(args) -> list:
+    """
+    Update packages with newer versions available
+    """
+    with cf.PrivDropper():
+        cli_args = args.pkg_atom
+        pkg_atoms = dep_resolve.process_packages(cli_args)
+        pkg_to_update = []
+        for pkg in pkg_atoms:
+            installed_version = cf.get_installed_version(pkg)
+            avail_version = cf.get_latest_avail_version(pkg)
+
+            if installed_version[1] == avail_version:
+                cf.green(f"{pkg}: Version {installed_version[1]} is already up to date.")
+            if cf.VersionComparator().is_lower(installed_version[1], avail_version):
+                cf.green(f"{pkg}: Version {installed_version[1]} will be updated to {avail_version}.")
+                pkg_to_update.append(f"{pkg}-{avail_version}")
+
+        pkgs_to_update = dep_resolve.resolve_dependencies(pkg_to_update)
+        return pkgs_to_update
