@@ -72,17 +72,18 @@ def process_args() -> argparse.Namespace:
     install_parser.add_argument('-a', '--ask', action='store_true')
     install_parser.add_argument('-d', '--dontclean', action='store_true')
     install_parser.add_argument('-t', '--test', action='store_true')
+    install_parser.add_argument('-b', '--backup', action='store_true')
     install_parser.add_argument("pkg_atom", action="extend", nargs="+", type=str)
 
     # 'update' command options
-    install_parser = subparsers.add_parser("update")
-    install_parser.add_argument('-f', '--fetch', action='store_true')
-    install_parser.add_argument('-p', '--pretend', action='store_true')
-    install_parser.add_argument('-a', '--ask', action='store_true')
-    install_parser.add_argument('-d', '--dontclean', action='store_true')
-    install_parser.add_argument('-t', '--test', action='store_true')
-    install_parser.add_argument('-b', '--backup', action='store_true')
-    install_parser.add_argument("pkg_atom", action="extend", nargs="+", type=str)
+    update_parser = subparsers.add_parser("update")
+    update_parser.add_argument('-f', '--fetch', action='store_true')
+    update_parser.add_argument('-p', '--pretend', action='store_true')
+    update_parser.add_argument('-a', '--ask', action='store_true')
+    update_parser.add_argument('-d', '--dontclean', action='store_true')
+    update_parser.add_argument('-t', '--test', action='store_true')
+    update_parser.add_argument('-b', '--backup', action='store_true')
+    update_parser.add_argument("pkg_atom", action="extend", nargs="+", type=str)
 
     # 'uninstall' command options
     uninstall_parser = subparsers.add_parser("uninstall")
@@ -168,10 +169,11 @@ def do_main() -> None:
         sys.exit(0)
 
     if args.command == 'update':
-        uninstall.do_update(args)
+        builds_to_build = uninstall.do_update(args)
 
     with cf.PrivDropper():
-        builds_to_build = dep_resolve.resolve_dependencies(args)
+        if not args.command == 'update':
+            builds_to_build = dep_resolve.resolve_dependencies(args)
 
         n_builds = len(builds_to_build)
         this_build = 1
@@ -220,7 +222,7 @@ def do_main() -> None:
 
             this_build += 1
 
-            bld = build_package.BuildPackage(build[0], args)
+            bld = build_package.BuildPackage(build[0], build[1], args)
             if bld.fetch():
                 continue
 
@@ -231,6 +233,12 @@ def do_main() -> None:
             bld.configure_src()
             bld.make_src()
             bld.make_inst()
+
+            if args.backup or args.command == 'update':
+                pkg_info = cf.get_installed_version(build[0])
+                c, n = pkg_info[0].split('/')
+                manifest_file = f"{config['builds_root']}/{c}/{n}/{n}-{pkg_info[1]}.manifest"
+                uninstall.Uninstaller(manifest_file, args).backup()
 
         # These two need priv
         bld.inst()
@@ -283,7 +291,7 @@ Usage: {APPNAME} [general options] command [command options] arg [arg2...]
         '-a'   or '--ask'                   prompt before installing package(s)
         '-d'   or '--dontclean'             don't delete the package 'work' tree after installation
         '-t'   or '--test'                  build source but do not install to live filesystem
-        '-b'   or '--backup'                backup installed files to '<cat>/<pkg>/backup' before updating
+        '-b'   or '--backup'                backup installed files to '<cat>/<pkg>/backup.version' before updating
         
     uninstall Options:
         '-a'   or '--ask'                   prompt before uninstalling package(s)
