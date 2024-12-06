@@ -272,10 +272,6 @@ class DownloadProgressBar(tqdm.tqdm):
     tqdm wrapper for ftp download
     """
 
-    #def __init__(self, *args, **kwargs):
-    #    super.__init__(*args, **kwargs)
-    #    self.total = None
-
     def update_to(self, b=1, bsize=1, tsize=None):
         """
         Set total size of download or None
@@ -400,6 +396,16 @@ def get_installed_version(package: str) -> list:
 
     # yellow(f"{package} does not appear to be installed")
     return [None]
+
+
+def get_latest_avail_version(pkg: str) -> str:
+    """Checks the db and returns the newest available package"""
+    db_info = get_db_info(pkg)
+    if db_info[2].count(",") == 0:
+        return db_info[2]
+    else:
+        versions = db_info[2].split(",")
+        return VersionComparator().higher(versions[0], versions[1])
 
 
 def add_to_installed(name: str, version: str) -> int:
