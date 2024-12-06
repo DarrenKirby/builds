@@ -24,7 +24,6 @@
 import dbm
 import argparse
 import re
-import sys
 from datetime import datetime
 
 import common_functions as cf
@@ -38,7 +37,12 @@ def print_pkg_info(_a: list) -> None:
     cf.print_bold("Category/Name ")
     cf.green(_a[0])
     cf.print_bold("      Version ")
-    cf.green(_a[1])
+    if _a[1].count(",") > 0:
+        versions = _a[1].split(",")
+        v_string = ", ".join(versions)
+    else:
+        v_string = _a[1]
+    cf.green(v_string)
     cf.print_bold("  Description ")
     cf.green(_a[5])
     cf.print_bold("     Homepage ")
@@ -82,21 +86,19 @@ def parse_log(package_name: str, log_file: str = "builds.log") -> list[dict]:
     Parse builds.log for lines matching package_name.
     """
     results = []
-    with open(log_file, "r") as log_f:
+    with open(log_file, "r", encoding='utf-8') as log_f:
         lines = log_f.readlines()
-
     for i, line in enumerate(lines):
-        if "build started" in line and package_name in line:
+        if "build started" in line and f"/{package_name}" in line:
             # Extract the start time and package version
             start_time_str = re.search(r"\| (.*?) \|", line).group(1)
             start_time = datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
-            # package_version = re.search(rf"{package_name} ([^\s]+)", line).group(1)
-            package_version = re.search(rf"{package_name} (\S+)", line).group(1)
+            package_version = re.search(rf"/{package_name} (\S+)", line).group(1)
 
             # Check the next relevant lines
             for j in range(i + 1, len(lines)):
                 next_line = lines[j]
-                if package_name not in next_line:
+                if "build started" in next_line:
                     break
                 if "build complete" in next_line:
                     # Extract build duration
@@ -120,6 +122,18 @@ def parse_log(package_name: str, log_file: str = "builds.log") -> list[dict]:
                         "failure_reason": failure_reason
                     })
                     break
+        if "package uninstalled" in line and package_name in line:
+            # Extract the start time and package version
+            start_time_str = re.search(r"\| (.*?) \|", line).group(1)
+            start_time = datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
+            package_version = re.search(rf"/{package_name} (\S+)", line).group(1)
+
+            results.append({
+                "status": "uninstalled",
+                "start_time": start_time,
+                "package": package_name,
+                "version": package_version
+            })
 
     # Sort results by start_time in descending order (most recent first)
     sorted_results = sorted(results, key=lambda x: x["start_time"], reverse=True)
@@ -152,6 +166,9 @@ def format_results(results: list[dict]) -> None:
             print(f"Build of {result['package']} {result['version']} started on {start_time_formatted}")
             print(f"Build of {result['package']} {result['version']} failed: {result['failure_reason']}")
             print()
+        elif result["status"] == "uninstalled":
+            print(f"Package {result['package']} {result['version']} uninstalled on {start_time_formatted}")
+            print()
 
 
 def do_info(args):
@@ -161,7 +178,6 @@ def do_info(args):
     to_get_info = args.pkg_atom
 
     for pkg in to_get_info:
-        inst = None
         pkg_info = cf.get_db_info(pkg)
 
         installed_version = cf.get_installed_version(pkg)
