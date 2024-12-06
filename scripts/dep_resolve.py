@@ -184,8 +184,11 @@ def resolve_dependencies(args: [argparse.Namespace, list]) -> list[tuple]:
 
     # Build the initial version dictionary and dependency graph
     for pkg in pkg_atoms:
+        # Normalize to short name
+        if pkg.count("/") == 1:
+            pkg = pkg.split("/")[1]
         # If version attatched to pkg_atom
-        if pkg.split("/")[1].count("-") == 1:
+        if pkg.count("-") == 1:
             n, v = pkg.split("-")
             try:
                 name, version = get_version(n, v)
