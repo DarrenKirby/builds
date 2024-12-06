@@ -348,7 +348,7 @@ class BuildPackage(FileInstaller):
     Implements the main logic for building packages
     """
 
-    def __init__(self, build: str, args: argparse.Namespace) -> None:
+    def __init__(self, build: str, version: str, args: argparse.Namespace) -> None:
         """
          The '__init__' and '_resolve_paths' methods create a bunch of useful
          instance variables which can be used in the build scripts.
@@ -374,8 +374,13 @@ class BuildPackage(FileInstaller):
         with dbm.open(config['db_file']) as db:
             a = db[self.name].decode().split(";")
 
-        self.version = a[1]
-        self.sha256sum = a[2]
+        self.version = version
+        db_version = a[1]
+        if db_version.count(",") > 0:
+            indice = db_version.index(self.version)
+            self.sha256sum = a[2][indice]
+        else:
+            self.sha256sum = a[2]
         self.src_url = a[3]
 
         self._resolve_paths()
