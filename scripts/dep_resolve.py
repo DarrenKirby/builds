@@ -53,12 +53,12 @@ def process_set(set_file: str) -> list:
     return [line[:-1] for line in lines if line[0] != "#" and line != '\n']
 
 
-def process_packages(args: argparse.Namespace) -> list:
+def process_packages(args: list) -> list:
     """
     Converts package args and set args into a single list
     """
     pkgs = []
-    for arg in args.pkg_atom:
+    for arg in args:
         if arg[0] == '@':
             pkgs.extend(process_set(arg[1:]))
         else:
@@ -169,12 +169,16 @@ def topological_sort(graph: dict) -> list:
     return stack
 
 
-def resolve_dependencies(args: argparse.Namespace) -> list[tuple]:
+def resolve_dependencies(args: [argparse.Namespace, list]) -> list[tuple]:
     """
     Resolve package dependencies, perform a topological sort, and
     return a list of (name, version) tuples in correct build order.
     """
-    pkg_atoms = process_packages(args)  # Initial packages from the command line
+    if type(args) == argparse.Namespace:
+        cli_args = args.pkg_atom
+    else:
+        cli_args = args
+    pkg_atoms = process_packages(cli_args)  # Initial packages from the command line
     version_dict = {}
     dep_graph = {}
 
