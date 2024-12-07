@@ -116,8 +116,8 @@ def do_main() -> None:
     """
     The main dispatch loop.
 
-    This function dispatches out all commands that are not `install`,
-    or builds the list of packages to install and feeds them one by one
+    This function dispatches out all commands that are not install/update
+    or builds the list of packages to install/update and feeds them one by one
     to the BuildPackage class.
     """
     # Drop privs
@@ -141,8 +141,7 @@ def do_main() -> None:
 
         if args.version:
             sys.exit(0)
-
-        if args.command == 'search':
+        elif args.command == 'search':
             search_package.do_search(args)
             sys.exit(0)
         elif args.command == 'info':
@@ -163,16 +162,16 @@ def do_main() -> None:
             cf.print_bold(" directory\n" if num_cleaned == 1 else " directories\n")
             sys.exit(0)
 
-    # Need priv to uninstall/update
+    # Need priv to uninstall
     if args.command == 'uninstall':
         uninstall.do_uninstall(args)
         sys.exit(0)
 
-    if args.command == 'update':
-        builds_to_build = uninstall.do_update(args)
-
+    # From here we are either installing or updating
     with cf.PrivDropper():
-        if not args.command == 'update':
+        if args.command == 'update':
+            builds_to_build = uninstall.do_update(args)
+        else:
             builds_to_build = dep_resolve.resolve_dependencies(args)
 
         n_builds = len(builds_to_build)
@@ -188,8 +187,8 @@ def do_main() -> None:
             sys.exit(0)
 
         if args.ask:
-            cont = input("...continue with these builds? [y/n] ")
-            if cont in ['n', 'N']:
+            print("Continue with these builds? [y/n]")
+            if input(">>> ") in ['n', 'N', 'no', 'No']:
                 cf.red("aborting")
                 sys.exit(1)
 
@@ -223,11 +222,13 @@ def do_main() -> None:
             this_build += 1
 
             bld = build_package.BuildPackage(build[0], build[1], args)
-            if bld.fetch():
+            # If True is propagated to here from the fetch_posthook()/fetch()
+            # call stack then we should bail here.
+            if bld.fetch() or args.fetch:
                 continue
 
-            if args.fetch:
-                continue
+            #if args.fetch:
+            #    continue
 
             bld.install_source()
             bld.configure_src()
