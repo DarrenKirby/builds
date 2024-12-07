@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-#    /usr/(s)bin/bld
-#    Sun Oct 19 03:34:12 UTC 2014
+#    /usr/bin/bld
+#    Sat Dec  7 21:18:22 UTC 2024
 
-#    The front end to the builds source building tree
+#    The entry-point to the front end of the builds source building system
 #
-#    Copyright:: (c) 2024 Darren Kirby
+#    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
 
 #    This program is free software: you can redistribute it and/or modify
@@ -26,37 +26,34 @@ import sys
 import os
 
 
-def get_builds_path():
-    # System-wide configuration
-    system_config = "/etc/builds.conf"
-    # User-specific configuration
-    user_config = os.path.expanduser("~/.config/builds/builds.conf")
-    config_file = None
+def get_builds_path() -> [None, str]:
+    """
+    Read the configuration file and return script location
+    so that it can be added to sys.path.
+    """
+    if os.getuid() == 0:
+        # System-wide configuration
+        config_file = "/etc/builds.conf"
+    else:
+        # User-specific configuration
+        config_file = os.path.expanduser("~/.config/builds/builds.conf")
 
     # Check if the configuration file exists
-    if os.path.isfile(system_config):
-        config_file = system_config
-    elif os.path.isfile(user_config):
-        config_file = user_config
+    if not os.path.isfile(config_file):
+        print(f"Cannot find configuration file: {config_file}")
+        sys.exit(2)
 
-    if config_file:
-        with open(config_file, "r") as f:
-            config = {}
-            for line in f:
-                if "=" in line:
-                    key, value = line.strip().split("=", 1)
-                    config[key.strip()] = value.strip()
+    with open(config_file, "r") as f:
+        config = {}
+        for line in f:
+            if "=" in line:
+                key, value = line.strip().split("=", 1)
+                config[key.strip()] = value.strip()
 
-            # Get builds_root and construct scripts path
-            builds_root = config.get("builds_root")
-            if builds_root:
-                return os.path.join(builds_root, "scripts")
-
-    # Fallbacks in case configuration is not found or invalid
-    if os.path.isdir("/var/builds/scripts"):
-        return "/var/builds/scripts"
-    elif os.path.isdir(os.path.expanduser("~/builds/scripts")):
-        return os.path.expanduser("~/builds/scripts")
+        # Get builds_root and construct scripts path
+        builds_root = config.get("builds_root")
+        if builds_root:
+            return os.path.join(builds_root, "scripts")
 
     return None
 
