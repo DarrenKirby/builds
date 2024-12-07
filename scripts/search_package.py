@@ -57,7 +57,7 @@ def do_search(args: argparse.Namespace) -> None:
     to_search = args.pkg_atom
     match = False
 
-    with dbm.open(config['db_file']) as db:
+    with dbm.open(config['db_file'], flag='r') as db:
         for search_string in to_search:
 
             for k in db.keys():
@@ -88,6 +88,7 @@ def parse_log(package_name: str, log_file: str = "builds.log") -> list[dict]:
     results = []
     with open(log_file, "r", encoding='utf-8') as log_f:
         lines = log_f.readlines()
+
     for i, line in enumerate(lines):
         if "build started" in line and f"/{package_name}" in line:
             # Extract the start time and package version
