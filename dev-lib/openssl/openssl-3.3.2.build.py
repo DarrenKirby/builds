@@ -19,8 +19,9 @@
 
 
 def configure(self):
-    return self.do("./configure --prefix=/usr "
-                   "--openssldir=/etc/ssl "
+    confd = "/etc/ssl" if cf.config['user'] == 'root' else "/usr/etc/ssl"
+    return self.do("./config --prefix=/usr "
+                   f"--openssldir={confd} "
                    "--libdir=lib "
                    "shared "
                    "zlib-dynamic")
@@ -36,4 +37,56 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    confd = "e" if cf.config['user'] == 'root' else "ue"
+    self.inst_directory(self.p['_' + confd] + "/ssl", self.p[confd] + "/ssl")
+
+    self.inst_script(self.p['_ub'] + "/c_rehash", self.p['ub'])
+    self.inst_binary(self.p['_ub'] + "/openssl", self.p['ub'])
+
+    self.inst_directory(self.p['_ui'] + "/openssl", self.p['ui'] + "/openssl")
+
+    self.inst_directory(self.p['_ul'] + "/cmake/OpenSSL/", self.p['ul'] + "//cmake/OpenSSL/")
+    self.inst_directory(self.p['_ul'] + "/engines-3/", self.p['ul'] + "/engines-3/")
+    self.inst_directory(self.p['_ul'] + "/ossl-modules/", self.p['ul'] + "/ossl-modules/")
+
+    self.inst_library(self.p['_ul'] + "/libcrypto.so.3", self.p['ul'])
+    self.inst_symlink(self.p['ul'] + "/libcrypto.so.3", self.p['ul'] + "/libcrypto.so")
+
+    self.inst_library(self.p['_ul'] + "/libssl.so.3", self.p['ul'])
+    self.inst_symlink(self.p['ul'] + "/libssl.so.3", self.p['ul'] + "/libssl.so")
+
+    self.inst_file(self.p['_ul'] + "/pkgconfig/libcrypto.pc", self.p['ul'] + "/pkgconfig/")
+    self.inst_file(self.p['_ul'] + "/pkgconfig/libssl.pc", self.p['ul'] + "/pkgconfig/")
+    self.inst_file(self.p['_ul'] + "/pkgconfig/openssl.pc", self.p['ul'] + "/pkgconfig/")
+
+    for file in os.listdir(self.p['_man1']):
+        if os.path.islink(f"{self.p['_man1']}/{file}"):
+            # We need to copy symlinks, and add to manifest manually
+            os.rename(f"{self.p['_man1']}/{file}", f"{self.p['man1']}/{file}")
+            self.manifest.append(f"{self.p['man1']}/{file}")
+        else:
+            self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'], compress=False)
+
+    for file in os.listdir(self.p['_man3']):
+        if os.path.islink(f"{self.p['_man3']}/{file}"):
+            # We need to copy symlinks, and add to manifest manually
+            os.rename(f"{self.p['_man3']}/{file}", f"{self.p['man3']}/{file}")
+            self.manifest.append(f"{self.p['man3']}/{file}")
+        else:
+            self.inst_manpage(f"{self.p['_man3']}/{file}", self.p['man3'], compress=False)
+
+    for file in os.listdir(self.p['_man5']):
+        if os.path.islink(f"{self.p['_man5']}/{file}"):
+            # We need to copy symlinks, and add to manifest manually
+            os.rename(f"{self.p['_man5']}/{file}", f"{self.p['man5']}/{file}")
+            self.manifest.append(f"{self.p['man5']}/{file}")
+        else:
+            self.inst_manpage(f"{self.p['_man5']}/{file}", self.p['man5'], compress=False)
+
+    for file in os.listdir(self.p['_man7']):
+        if os.path.islink(f"{self.p['_man7']}/{file}"):
+            # We need to copy symlinks, and add to manifest manually
+            os.rename(f"{self.p['_man7']}/{file}", f"{self.p['man7']}/{file}")
+            self.manifest.append(f"{self.p['man7']}/{file}")
+        else:
+            self.inst_manpage(f"{self.p['_man7']}/{file}", self.p['man7'], compress=False)
