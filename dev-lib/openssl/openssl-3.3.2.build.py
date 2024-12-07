@@ -1,4 +1,4 @@
-#    dev-lib/openssl/openssl-3.3.1.build.py
+#    dev-lib/openssl/openssl-3.3.2.build.py
 #    Wed Dec  4 18:53:09 UTC 2024
 
 #    Copyright:: (c) 2024
