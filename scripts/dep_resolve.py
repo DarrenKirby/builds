@@ -91,7 +91,7 @@ def get_version(package: str, spec_version: [str, None] = None) -> tuple[str, st
     """
     Return version number in db given a package.
     """
-    with dbm.open(config['db_file']) as db:
+    with dbm.open(config['db_file'], flag='r') as db:
         if package.find('/') != -1:
             db_string = db[package.split('/')[1]].decode()
             pkg_name = db_string.split(';')[0]
@@ -130,7 +130,7 @@ def get_version(package: str, spec_version: [str, None] = None) -> tuple[str, st
 
 def topological_sort(graph: dict) -> list:
     """
-    Perform topological sorting on the dependency graph using DFS.
+    Perform topological sort on the dependency graph using DFS.
     Detect and report circular dependencies.
     """
     visited = set()
@@ -139,7 +139,7 @@ def topological_sort(graph: dict) -> list:
 
     def dfs(node, path):
         """
-        Performs a depth-first search (DFS) to detect cycles and build
+        Perform depth-first search (DFS) to detect cycles and build
         the topological order.
         """
         nonlocal visited, stack, cycle
