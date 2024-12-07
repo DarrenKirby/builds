@@ -1,6 +1,6 @@
 """
     /var/builds/scripts/common_functions.py
-    Wed Oct 30 22:26:43 UTC 2024
+    Sat Dec  7 21:42:17 UTC 2024
 
     Helper module for the builds source building tree
 
@@ -32,7 +32,6 @@ import pwd
 import re
 import logging as log
 import urllib.request as request
-from os import error
 from urllib.error import URLError
 
 import requests
@@ -42,6 +41,10 @@ from config import config
 
 
 class VersionComparator:
+    """
+    A simple class with various static methods for comparing version strings.
+    """
+
     @staticmethod
     def _parse_version(version: str):
         """
@@ -322,7 +325,7 @@ def do_initdb(args: argparse.Namespace) -> None:
     for csv_file in args.db_file:
         try:
             db_file_name = csv_file.split('/')[-1]
-            with dbm.open(f'{config["builds_root"]}/scripts/{db_file_name[:-4]}', 'c') as db:
+            with dbm.open(f'{config["builds_root"]}/scripts/{db_file_name[:-4]}', flag='c') as db:
                 with open(csv_file, newline='', encoding='utf-8') as f:
                     reader = csv.reader(f, delimiter=";")
                     n_packages = 0
@@ -368,7 +371,7 @@ def get_db_info(package: str) -> list:
     if package.find('/') != -1:
         package = package.split('/')[0]
 
-    with dbm.open(config['db_file']) as db:
+    with dbm.open(config['db_file'], flag='r') as db:
         try:
             string = db[package].decode()
         except KeyError:
@@ -394,7 +397,6 @@ def get_installed_version(package: str) -> list:
                 line = line.strip('\n')
                 return line.split(',')
 
-    # yellow(f"{package} does not appear to be installed")
     return [None]
 
 
