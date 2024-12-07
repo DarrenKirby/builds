@@ -547,7 +547,7 @@ class BuildPackage(FileInstaller):
 
         try:
             with open(manifest_file, 'w', encoding='utf-8') as f:
-                for file in sorted(self.manifest):
+                for file in cf.uniq_list(sorted(self.manifest)):
                     f.write(f"{file}\n")
         except IOError as e:
             cf.red(f"Error writing: {manifest_file}")
