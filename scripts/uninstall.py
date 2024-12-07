@@ -159,19 +159,18 @@ def do_update(args) -> list:
     """
     Update packages with newer versions available
     """
-    with cf.PrivDropper():
-        cli_args = args.pkg_atom
-        pkg_atoms = dep_resolve.process_packages(cli_args)
-        pkg_to_update = []
-        for pkg in pkg_atoms:
-            installed_version = cf.get_installed_version(pkg)
-            avail_version = cf.get_latest_avail_version(pkg)
+    cli_args = args.pkg_atom
+    pkg_atoms = dep_resolve.process_packages(cli_args)
+    pkg_to_update = []
+    for pkg in pkg_atoms:
+        installed_version = cf.get_installed_version(pkg)
+        avail_version = cf.get_latest_avail_version(pkg)
 
-            if installed_version[1] == avail_version:
-                cf.green(f"{pkg}: Version {installed_version[1]} is already up to date.")
-            if cf.VersionComparator().is_lower(installed_version[1], avail_version):
-                cf.green(f"{pkg}: Version {installed_version[1]} will be updated to {avail_version}.")
-                pkg_to_update.append(f"{pkg}-{avail_version}")
+        if installed_version[1] == avail_version:
+            cf.green(f"{pkg}: Version {installed_version[1]} is already up to date.")
+        if cf.VersionComparator().is_lower(installed_version[1], avail_version):
+            cf.green(f"{pkg}: Version {installed_version[1]} will be updated to {avail_version}.")
+            pkg_to_update.append(f"{pkg}-{avail_version}")
 
-        pkgs_to_update = dep_resolve.resolve_dependencies(pkg_to_update)
-        return pkgs_to_update
+    pkgs_to_update = dep_resolve.resolve_dependencies(pkg_to_update)
+    return pkgs_to_update
