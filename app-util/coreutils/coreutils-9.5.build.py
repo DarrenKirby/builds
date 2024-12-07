@@ -34,14 +34,14 @@ def install_source_posthook(self):
 
 
 def configure(self):
-    es1 = self.do("autoreconf -fiv")
-    env = {'FORCE_UNSAFE_CONFIGURE': 1}
-    es2 = self.do("./configure --prefix=/usr "
-                  "--enable-no-install-program=kill,uptime")
-
-    if es1 == 0 and es2 == 0:
+    try:
+        self.do("autoreconf -fiv")
+        self.do("./configure --prefix=/usr "
+                "--enable-no-install-program=kill,uptime")
         return 0
-    return 12
+    except OSError as e:
+        cf.red(f"Configure of {self.name} failed: {e}")
+        return 20
 
 
 def make(self):
