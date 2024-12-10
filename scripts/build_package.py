@@ -377,8 +377,10 @@ class BuildPackage(FileInstaller):
         self.version = version
         db_version = a[1]
         if db_version.count(",") > 0:
+            db_version = db_version.split(",")
             indice = db_version.index(self.version)
-            self.sha256sum = a[2][indice]
+            shastr = a[2].split(",")
+            self.sha256sum = shastr[indice]
         else:
             self.sha256sum = a[2]
         self.src_url = a[3]
