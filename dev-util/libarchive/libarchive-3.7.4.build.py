@@ -1,5 +1,5 @@
 #    dev-util/libarchive/libarchive-3.7.4.build.py
-#    Sun Dec  8 03:20:33 UTC 2024
+#    Tue Dec 10 23:45:57 UTC 2024
 
 #    Copyright:: (c) 2024
 #    Author:: Darren Kirby (mailto:bulliver@gmail.com)
@@ -33,4 +33,25 @@ def make_install(self):
 
 
 def install(self):
-    pass
+    self.inst_binary(self.p['_ub'] + "/bsdcat", self.p['ub'])
+    self.inst_binary(self.p['_ub'] + "/bsdcpio", self.p['ub'])
+    self.inst_binary(self.p['_ub'] + "/bsdtar", self.p['ub'])
+    self.inst_binary(self.p['_ub'] + "/bsdunzip", self.p['ub'])
+
+    self.inst_header(self.p['_ui'] + "/archive.h", self.p['ui'])
+    self.inst_header(self.p['_ui'] + "/archive_entry.h", self.p['ui'])
+
+    self.inst_library(self.p['_ul'] + "/libarchive.so.13.7.4", self.p['ul'])
+    self.inst_symlink(self.p['ul'] + "/libarchive.so.13.7.4", self.p['ul'] + "/libarchive.so")
+    self.inst_symlink(self.p['ul'] + "/libarchive.so.13.7.4", self.p['ul'] + "/libarchive.so.13")
+
+    self.inst_file(self.p['_ul'] + "/pkgconfig/libarchive.pc", self.p['ul'] + "/pkgconfig/")
+
+    for file in os.listdir(self.p['_man1']):
+        self.inst_manpage(f"{self.p['_man1']}/{file}", self.p['man1'])
+
+    for file in os.listdir(self.p['_man3']):
+        self.inst_manpage(f"{self.p['_man3']}/{file}", self.p['man3'])
+
+    for file in os.listdir(self.p['_man5']):
+        self.inst_manpage(f"{self.p['_man5']}/{file}", self.p['man5'])
